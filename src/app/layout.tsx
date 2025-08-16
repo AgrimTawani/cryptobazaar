@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
+import { AuthProvider } from "@/components/auth-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   keywords: ["thirdweb", "nextjs", "app router", "blockchain", "web3", "crypto"],
   authors: [{ name: "Agrim Tawani"}],
   description:
-    "Starter template for using thirdweb SDK with Next.js App router",
+    "Modern crypto trading platform with secure authentication",
 };
 
 export default function RootLayout({
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThirdwebProvider>{children}</ThirdwebProvider>
+        <AuthProvider>
+          <ThirdwebProvider>{children}</ThirdwebProvider>
+        </AuthProvider>
       </body>
     </html>
   );

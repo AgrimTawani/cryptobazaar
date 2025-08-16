@@ -1,58 +1,74 @@
-![tw-banner](https://github.com/thirdweb-example/next-starter/assets/57885104/20c8ce3b-4e55-4f10-ae03-2fe4743a5ee8)
+# CryptoBazar 🚀
 
-# thirdweb-next-starter
+A modern, secure cryptocurrency trading platform built with Next.js, NextAuth, Prisma, and Thirdweb.
 
-Starter template to build an onchain react native app with [thirdweb](https://thirdweb.com/) and [next](https://nextjs.org/).
+## ✨ Features
 
-## Installation
+- 🔐 **Secure Authentication**: Google OAuth integration with NextAuth
+- 💾 **Database Integration**: PostgreSQL with Prisma ORM and Neon hosting
+- 💳 **Wallet Management**: Thirdweb integration for Web3 wallet connections
+- 🎨 **Modern UI**: Beautiful, responsive design with Tailwind CSS and Framer Motion
+- 🔒 **Access Control**: Wallet features only available to authenticated users
+- 📱 **Mobile Responsive**: Optimized for all device sizes
+- 🌈 **Color Palette**: Orange, Red, Blue, and White theme
 
-Install the template using [thirdweb create](https://portal.thirdweb.com/cli/create)
+## 🛠️ Tech Stack
 
-```bash
-  npx thirdweb create app --next
-```
+- **Framework**: Next.js 14 with App Router
+- **Authentication**: NextAuth.js with Google Provider  
+- **Database**: PostgreSQL (Neon) with Prisma ORM
+- **Blockchain**: Thirdweb SDK v5 for Web3 integration
+- **Styling**: Tailwind CSS with custom design system
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Language**: TypeScript
 
-## Environment Variables
+## 🚀 Getting Started
 
-To run this project, you will need to add the following environment variables to your .env file:
+### Prerequisites
 
-`CLIENT_ID`
+- Node.js 18+ and npm
+- Google Cloud Console account
+- Neon database account
+- Thirdweb account
 
-To learn how to create a client ID, refer to the [client documentation](https://portal.thirdweb.com/typescript/v5/client).
+### Installation
 
-## Run locally
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Install dependencies
+2. **Set up environment variables**
+   - Fill in all required environment variables in `.env.local`
+   - See [Authentication Setup Guide](./docs/AUTHENTICATION_SETUP.md) for details
 
-```bash
-yarn
-```
+3. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-Start development server
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-```bash
-yarn dev
-```
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-Create a production build
+## 📖 Documentation
 
-```bash
-yarn build
-```
+- [Authentication Setup Guide](./docs/AUTHENTICATION_SETUP.md) - Complete setup instructions
 
-Preview the production build
+## 🔐 Authentication Flow
 
-```bash
-yarn start
-```
+1. **Unauthenticated Access**: Users are redirected to sign-in page
+2. **Google OAuth**: Secure authentication via Google  
+3. **Session Management**: Persistent sessions with NextAuth
+4. **Wallet Access**: Connect wallet only after authentication
+5. **Database Sync**: User data and wallet addresses stored securely
 
-## Resources
+---
 
-- [Documentation](https://portal.thirdweb.com/typescript/v5)
-- [Templates](https://thirdweb.com/templates)
-- [YouTube](https://www.youtube.com/c/thirdweb)
-- [Blog](https://blog.thirdweb.com)
-
-## Need help?
-
-For help or feedback, please [visit our support site](https://thirdweb.com/support)
+Made with ❤️ by [Agrim Tawani](https://github.com/agrimtawani)

@@ -1,0 +1,573 @@
+// CryptoBazar P2P Crypto Exchange Prisma Schema
+// Comprehensive database schema for a peer-to-peer cryptocurrency exchange
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Authentication models (NextAuth.js compatible)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+}
+
+// Core User model with comprehensive profile
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  username      String?   @unique
+  
+  // KYC and verification
+  kycStatus     KYCStatus @default(PENDING)
+  isVerified    Boolean   @default(false)
+  verificationLevel Int   @default(1) // 1-3 levels
+  
+  // Profile information
+  firstName     String?
+  lastName      String?
+  phone         String?
+  phoneVerified Boolean   @default(false)
+  country       String?
+  city          String?
+  timezone      String?
+  language      String    @default("en")
+  
+  // Trading preferences
+  preferredCurrency String @default("USD")
+  bio               String?
+  isTrader          Boolean @default(false)
+  
+  // Reputation system
+  rating        Float?    @default(0)
+  totalTrades   Int       @default(0)
+  successRate   Float?    @default(0)
+  
+  // Security
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+  
+  // Status and timestamps
+  status        UserStatus @default(ACTIVE)
+  lastActive    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  wallets       Wallet[]
+  ads           Ad[]
+  buyOrders     Trade[]   @relation("BuyerTrades")
+  sellOrders    Trade[]   @relation("SellerTrades")
+  reviews       Review[]  @relation("ReviewAuthor")
+  receivedReviews Review[] @relation("ReviewTarget")
+  disputes      Dispute[] @relation("DisputeInitiator")
+  disputesAgainst Dispute[] @relation("DisputeTarget")
+  notifications Notification[]
+  apiKeys       ApiKey[]
+  auditLogs     AuditLog[]
+  supportTickets SupportTicket[]
+  
+  @@index([email])
+  @@index([username])
+  @@index([kycStatus])
+  @@index([rating])
+}
+
+// Cryptocurrency wallets
+model Wallet {
+  id            String   @id @default(cuid())
+  userId        String
+  cryptocurrency String // BTC, ETH, USDT, etc.
+  address       String
+  label         String?
+  balance       Decimal  @default(0) @db.Decimal(18, 8)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, cryptocurrency])
+  @@index([userId])
+  @@index([cryptocurrency])
+}
+
+// Trading advertisements
+model Ad {
+  id               String    @id @default(cuid())
+  userId           String
+  type             AdType    // BUY or SELL
+  cryptocurrency   String    // BTC, ETH, etc.
+  fiatCurrency     String    // USD, EUR, etc.
+  
+  // Pricing
+  priceType        PriceType // FIXED or MARGIN
+  fixedPrice       Decimal?  @db.Decimal(18, 8)
+  marginPercentage Decimal?  @db.Decimal(5, 2)
+  
+  // Limits
+  minAmount        Decimal   @db.Decimal(18, 8)
+  maxAmount        Decimal   @db.Decimal(18, 8)
+  totalAmount      Decimal   @db.Decimal(18, 8)
+  remainingAmount  Decimal   @db.Decimal(18, 8)
+  
+  // Terms and conditions
+  paymentMethods   String[]  // Array of payment method IDs
+  tradingWindow    Int       // Minutes to complete trade
+  terms            String?   @db.Text
+  autoReply        String?   @db.Text
+  
+  // Requirements
+  minTradeVolume   Decimal?  @db.Decimal(18, 8)
+  minSuccessRate   Float?
+  verifiedOnly     Boolean   @default(false)
+  
+  // Status and visibility
+  status           AdStatus  @default(ACTIVE)
+  isPublic         Boolean   @default(true)
+  
+  // Timestamps
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastActivated    DateTime?
+  
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades           Trade[]
+  
+  @@index([userId])
+  @@index([type, cryptocurrency, fiatCurrency])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Individual trades/transactions
+model Trade {
+  id                String      @id @default(cuid())
+  
+  // Parties
+  buyerId           String
+  sellerId          String
+  adId              String
+  
+  // Trade details
+  cryptocurrency    String
+  fiatCurrency      String
+  cryptoAmount      Decimal     @db.Decimal(18, 8)
+  fiatAmount        Decimal     @db.Decimal(18, 2)
+  exchangeRate      Decimal     @db.Decimal(18, 8)
+  
+  // Payment
+  paymentMethod     String
+  paymentDetails    Json?       // Flexible payment information
+  
+  // Status and timeline
+  status            TradeStatus @default(INITIATED)
+  
+  // Important timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  paymentMadeAt     DateTime?
+  paymentConfirmedAt DateTime?
+  cryptoReleasedAt  DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  disputeOpenedAt   DateTime?
+  
+  // Fees
+  buyerFee          Decimal     @default(0) @db.Decimal(18, 8)
+  sellerFee         Decimal     @default(0) @db.Decimal(18, 8)
+  
+  // Escrow
+  escrowAddress     String?
+  escrowTxHash      String?
+  releaseTxHash     String?
+  
+  // Relations
+  buyer             User        @relation("BuyerTrades", fields: [buyerId], references: [id])
+  seller            User        @relation("SellerTrades", fields: [sellerId], references: [id])
+  ad                Ad          @relation(fields: [adId], references: [id])
+  messages          TradeMessage[]
+  dispute           Dispute?
+  review            Review?
+  
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([adId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Trade chat messages
+model TradeMessage {
+  id        String   @id @default(cuid())
+  tradeId   String
+  senderId  String
+  content   String   @db.Text
+  type      MessageType @default(TEXT)
+  attachments String[] // URLs to uploaded files
+  isSystemMessage Boolean @default(false)
+  createdAt DateTime @default(now())
+  
+  trade     Trade    @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  
+  @@index([tradeId])
+  @@index([createdAt])
+}
+
+// Dispute resolution system
+model Dispute {
+  id              String        @id @default(cuid())
+  tradeId         String        @unique
+  initiatorId     String
+  respondentId    String
+  moderatorId     String?
+  
+  reason          DisputeReason
+  description     String        @db.Text
+  evidence        String[]      // URLs to evidence files
+  
+  status          DisputeStatus @default(OPEN)
+  resolution      String?       @db.Text
+  verdict         DisputeVerdict?
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  resolvedAt      DateTime?
+  
+  trade           Trade         @relation(fields: [tradeId], references: [id])
+  initiator       User          @relation("DisputeInitiator", fields: [initiatorId], references: [id])
+  respondent      User          @relation("DisputeTarget", fields: [respondentId], references: [id])
+  messages        DisputeMessage[]
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Dispute messages
+model DisputeMessage {
+  id        String   @id @default(cuid())
+  disputeId String
+  senderId  String
+  content   String   @db.Text
+  attachments String[]
+  isModeratorMessage Boolean @default(false)
+  createdAt DateTime @default(now())
+  
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  
+  @@index([disputeId])
+}
+
+// Review and rating system
+model Review {
+  id         String     @id @default(cuid())
+  tradeId    String     @unique
+  reviewerId String
+  revieweeId String
+  
+  rating     Int        // 1-5 stars
+  comment    String?    @db.Text
+  type       ReviewType // POSITIVE, NEUTRAL, NEGATIVE
+  
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  
+  trade      Trade      @relation(fields: [tradeId], references: [id])
+  reviewer   User       @relation("ReviewAuthor", fields: [reviewerId], references: [id])
+  reviewee   User       @relation("ReviewTarget", fields: [revieweeId], references: [id])
+  
+  @@index([revieweeId])
+  @@index([rating])
+}
+
+// Payment methods
+model PaymentMethod {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  category    String  // bank, digital_wallet, cash, etc.
+  description String?
+  isActive    Boolean @default(true)
+  countries   String[] // Supported countries
+  currencies  String[] // Supported currencies
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([category])
+}
+
+// System notifications
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  data      Json?            // Additional notification data
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+// API keys for developers
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  keyHash     String   @unique
+  permissions String[] // READ, TRADE, etc.
+  isActive    Boolean  @default(true)
+  lastUsed    DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+// Audit logs for security
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+// Support ticket system
+model SupportTicket {
+  id          String        @id @default(cuid())
+  userId      String
+  subject     String
+  description String        @db.Text
+  category    TicketCategory
+  priority    TicketPriority @default(MEDIUM)
+  status      TicketStatus  @default(OPEN)
+  assignedTo  String?
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+  
+  user        User          @relation(fields: [userId], references: [id])
+  messages    SupportMessage[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  senderId  String?       // null if system message
+  content   String        @db.Text
+  isStaff   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+  
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  @@index([ticketId])
+}
+
+// Market data for pricing
+model MarketData {
+  id             String   @id @default(cuid())
+  cryptocurrency String
+  fiatCurrency   String
+  price          Decimal  @db.Decimal(18, 8)
+  change24h      Decimal  @db.Decimal(5, 2)
+  volume24h      Decimal  @db.Decimal(18, 8)
+  source         String   // coinbase, binance, etc.
+  
+  createdAt      DateTime @default(now())
+  
+  @@unique([cryptocurrency, fiatCurrency, source])
+  @@index([cryptocurrency, fiatCurrency])
+  @@index([createdAt])
+}
+
+// System settings and configurations
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+}
+
+// Enums
+enum KYCStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum AdType {
+  BUY
+  SELL
+}
+
+enum AdStatus {
+  ACTIVE
+  INACTIVE
+  PAUSED
+  COMPLETED
+  EXPIRED
+}
+
+enum PriceType {
+  FIXED
+  MARGIN
+}
+
+enum TradeStatus {
+  INITIATED
+  PAYMENT_PENDING
+  PAYMENT_MADE
+  PAYMENT_CONFIRMED
+  CRYPTO_RELEASED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  EXPIRED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+enum DisputeReason {
+  PAYMENT_NOT_RECEIVED
+  PAYMENT_INCOMPLETE
+  WRONG_PAYMENT_METHOD
+  CRYPTOCURRENCY_NOT_RELEASED
+  FRAUDULENT_ACTIVITY
+  TERMS_VIOLATION
+  OTHER
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum DisputeVerdict {
+  BUYER_WINS
+  SELLER_WINS
+  PARTIAL_REFUND
+  NO_FAULT
+}
+
+enum ReviewType {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum NotificationType {
+  TRADE_INITIATED
+  PAYMENT_RECEIVED
+  PAYMENT_CONFIRMED
+  CRYPTO_RELEASED
+  TRADE_COMPLETED
+  TRADE_CANCELLED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  NEW_MESSAGE
+  AD_MATCHED
+  SYSTEM_ALERT
+  SECURITY_ALERT
+}
+
+enum TicketCategory {
+  TECHNICAL
+  TRADING
+  PAYMENT
+  VERIFICATION
+  SECURITY
+  GENERAL
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}

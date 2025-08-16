@@ -10,11 +10,17 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.10.0",
+    "@prisma/client": "^6.14.0",
+    "@types/bcryptjs": "^2.4.6",
     "aceternity-ui": "^0.2.2",
+    "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.539.0",
     "next": "15.4.6",
+    "next-auth": "^4.24.11",
+    "prisma": "^6.14.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "tailwind-merge": "^3.3.1",
