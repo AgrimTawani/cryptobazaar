@@ -1,37 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![tw-banner](https://github.com/thirdweb-example/next-starter/assets/57885104/20c8ce3b-4e55-4f10-ae03-2fe4743a5ee8)
 
-## Getting Started
+# thirdweb-next-starter
 
-First, run the development server:
+Starter template to build an onchain react native app with [thirdweb](https://thirdweb.com/) and [next](https://nextjs.org/).
+
+## Installation
+
+Install the template using [thirdweb create](https://portal.thirdweb.com/cli/create)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  npx thirdweb create app --next
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run this project, you will need to add the following environment variables to your .env file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`CLIENT_ID`
 
-## Learn More
+To learn how to create a client ID, refer to the [client documentation](https://portal.thirdweb.com/typescript/v5/client).
 
-To learn more about Next.js, take a look at the following resources:
+## Run locally
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Install dependencies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+yarn
+```
 
-## Deploy on Vercel
+Start development server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+yarn dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# cryptobazaar
+Create a production build
+
+```bash
+yarn build
+```
+
+Preview the production build
+
+```bash
+yarn start
+```
+
+## Resources
+
+- [Documentation](https://portal.thirdweb.com/typescript/v5)
+- [Templates](https://thirdweb.com/templates)
+- [YouTube](https://www.youtube.com/c/thirdweb)
+- [Blog](https://blog.thirdweb.com)
+
+## Need help?
+
+For help or feedback, please [visit our support site](https://thirdweb.com/support)
