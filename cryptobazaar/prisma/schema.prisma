@@ -1,0 +1,24 @@
+// Prisma schema for Neon PostgreSQL
+// Expects DATABASE_URL in .env pointing to Neon connection string
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  id         String   @id @default(cuid())
+  clerkId    String?  @unique // Explicit Clerk user ID storage (optional to avoid breaking existing rows)
+  email      String?
+  firstName  String?
+  lastName   String?
+  address    String?
+  age        Int?
+  pan        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
