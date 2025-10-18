@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.23",
@@ -35,6 +36,7 @@
     "eslint-config-next": "15.4.6",
     "postcss": "^8",
     "prettier": "^3.6.2",
+    "prisma": "^6.17.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   },
