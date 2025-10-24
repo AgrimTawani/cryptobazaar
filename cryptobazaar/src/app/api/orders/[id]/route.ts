@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 // DELETE - Cancel an order
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -14,7 +14,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const orderId = params.id;
+    const { id: orderId } = await context.params;
 
     // Get user profile
     const userProfile = await prisma.userProfile.findUnique({
