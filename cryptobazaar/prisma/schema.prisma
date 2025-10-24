@@ -21,4 +21,37 @@ model UserProfile {
   pan        String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  
+  // Relations
+  orders     Order[]  @relation("SellerOrders")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  sellerId        String
+  seller          UserProfile @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  amount          Float       // Amount of USDC to sell
+  rate            Float       // Rate in INR per USDC
+  total           Float       // Total INR (amount * rate)
+  walletAddress   String      // Seller's wallet address
+  
+  status          OrderStatus @default(ACTIVE)
+  
+  expiresAt       DateTime?   // When the order expires
+  lockTxHash      String?     // Transaction hash of the lock
+  unlockTxHash    String?     // Transaction hash of the unlock
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([sellerId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+enum OrderStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }

@@ -1,6 +1,10 @@
+require("@nomicfoundation/hardhat-toolbox");
 require("@matterlabs/hardhat-zksync-solc");
 require("@matterlabs/hardhat-zksync-verify");
+require("dotenv").config();
 
+// Disable telemetry warnings
+process.env.HARDHAT_DISABLE_TELEMETRY_PROMPT = "true";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -14,6 +18,11 @@ module.exports = {
     },
   },
   networks: {
+    polygonAmoy: {
+      url: "https://rpc-amoy.polygon.technology/",
+      chainId: 80002,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
     zkSyncSepoliaTestnet: {
       url: "https://sepolia.era.zksync.dev",
       ethNetwork: "sepolia",
