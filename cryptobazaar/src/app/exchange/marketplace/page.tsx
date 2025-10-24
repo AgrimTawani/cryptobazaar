@@ -214,7 +214,7 @@ export default function MarketplacePage() {
         <h3 className="text-lg font-semibold text-white mb-2">How to Buy USDC</h3>
         <ol className="space-y-2 text-sm text-neutral-400">
           <li>1. Choose an order from the list above</li>
-          <li>2. Click "Buy" and confirm the transaction details</li>
+          <li>2. Click &quot;Buy&quot; and confirm the transaction details</li>
           <li>3. Pay the INR amount through our secure payment gateway</li>
           <li>4. Once payment is confirmed, USDC will be released to your wallet automatically</li>
         </ol>

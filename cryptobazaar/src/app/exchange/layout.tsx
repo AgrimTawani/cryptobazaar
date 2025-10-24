@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ConnectButton } from "thirdweb/react";
 import { client } from "../client";
+import NextImage from "next/image";
 
 export default function ExchangeLayout({ children }: { children: React.ReactNode }) {
   const { signOut } = useClerk();
@@ -107,9 +108,11 @@ export default function ExchangeLayout({ children }: { children: React.ReactNode
               !sidebarOpen && "justify-center"
             )}
           >
-            <img
+            <NextImage
               src={user?.imageUrl || "https://avatar.vercel.sh/user"}
               alt={user?.fullName || "User"}
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full border-2 border-yellow-500/30"
             />
             {sidebarOpen && (
