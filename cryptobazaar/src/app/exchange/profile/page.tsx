@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useActiveAccount, useActiveWalletChain } from "thirdweb/react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // USDC Contract address
 const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Polygon Amoy USDC
@@ -157,9 +158,11 @@ export default function ProfilePage() {
         {/* User Info Card */}
         <div className="p-6 rounded-xl border border-neutral-800 bg-gradient-to-br from-neutral-950 to-neutral-900">
           <div className="flex items-center gap-4 mb-4">
-            <img
+            <Image
               src={user?.imageUrl || "https://avatar.vercel.sh/user"}
               alt={user?.fullName || "User"}
+              width={64}
+              height={64}
               className="w-16 h-16 rounded-full border-2 border-yellow-500/30"
             />
             <div>

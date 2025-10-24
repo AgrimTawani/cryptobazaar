@@ -366,7 +366,7 @@ function WhyChooseUsSection() {
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
           <div className="inline-block mb-4 px-4 py-1.5 bg-neutral-800/50 border border-neutral-700 rounded-full">
-            <span className="text-sm text-neutral-400">🏆 World's First</span>
+            <span className="text-sm text-neutral-400">🏆 World&apos;s First</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 bg-clip-text text-transparent">
             Why Choose CryptoBazaar?
@@ -419,7 +419,7 @@ function WhyChooseUsSection() {
                 <Zap className="w-10 h-10 text-neutral-400 group-hover:text-blue-400 transition-colors" />
               </div>
               <div className="inline-block mb-4 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                <span className="text-xs font-bold text-blue-400">WORLD'S FIRST</span>
+                <span className="text-xs font-bold text-blue-400">WORLD&apos;S FIRST</span>
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
                 100% Automated P2P
