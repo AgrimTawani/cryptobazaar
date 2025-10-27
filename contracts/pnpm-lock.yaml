@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@openzeppelin/contracts':
+        specifier: ^5.4.0
+        version: 5.4.0
       '@thirdweb-dev/contracts':
         specifier: ^3.8.0
         version: 3.15.0
@@ -600,6 +603,9 @@ packages:
 
   '@openzeppelin/contracts@4.9.6':
     resolution: {integrity: sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==}
+
+  '@openzeppelin/contracts@5.4.0':
+    resolution: {integrity: sha512-eCYgWnLg6WO+X52I16TZt8uEjbtdkgLC0SUX/xnAksjjrQI4Xfn4iBRoI5j55dmlOhDv1Y7BoR3cU7e3WWhC6A==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3514,6 +3520,8 @@ snapshots:
   '@openzeppelin/contracts-upgradeable@4.9.6': {}
 
   '@openzeppelin/contracts@4.9.6': {}
+
+  '@openzeppelin/contracts@5.4.0': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

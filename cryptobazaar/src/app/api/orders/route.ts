@@ -32,11 +32,14 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
 
+    console.log("📥 POST /api/orders - User ID:", userId);
+
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
+    console.log("📥 Request body:", body);
     const { amount, rate, walletAddress, expiresAt, lockTxHash } = body;
 
     // Validate input
@@ -59,7 +62,10 @@ export async function POST(request: Request) {
       where: { clerkId: userId },
     });
 
+    console.log("👤 User profile:", userProfile);
+
     if (!userProfile) {
+      console.error("❌ User profile not found for clerkId:", userId);
       return NextResponse.json(
         { error: "User profile not found. Please complete onboarding." },
         { status: 404 }
@@ -70,6 +76,16 @@ export async function POST(request: Request) {
     const total = amount * rate;
 
     // Create order
+    console.log("📝 Creating order with data:", {
+      sellerId: userProfile.id,
+      amount,
+      rate,
+      total,
+      walletAddress,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      lockTxHash,
+    });
+
     const order = await prisma.order.create({
       data: {
         sellerId: userProfile.id,
@@ -86,11 +102,22 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log("✅ Order created successfully:", order);
     return NextResponse.json(order, { status: 201 });
-  } catch (error) {
-    console.error("Error creating order:", error);
+  } catch (error: any) {
+    console.error("❌ Error creating order:", error);
+    console.error("Error name:", error?.name);
+    console.error("Error message:", error?.message);
+    console.error("Error code:", error?.code);
+    console.error("Error meta:", error?.meta);
+    console.error("Full error:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    
     return NextResponse.json(
-      { error: "Failed to create order" },
+      { 
+        error: "Failed to create order",
+        details: error?.message || "Unknown error",
+        code: error?.code || "UNKNOWN"
+      },
       { status: 500 }
     );
   }

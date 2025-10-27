@@ -149,7 +149,52 @@ Property 'order' does not exist on type 'PrismaClient<PrismaClientOptions, never
 
 ---
 
-## Issue #6: Pino-Pretty Warning (Non-blocking)
+## Issue #6: Next.js Image Hostname Configuration
+**Date:** October 24, 2025  
+**Error:**
+```
+Error: Invalid src prop (https://img.clerk.com/...) on `next/image`, 
+hostname "img.clerk.com" is not configured under images in your `next.config.js`
+```
+
+**Cause:** Next.js Image component requires explicit configuration for external image domains (Clerk profile pictures).
+
+**Impact:** 🔴 **CRITICAL** - Prevents user profile images from loading after login.
+
+**Fix:**
+Add `remotePatterns` to `next.config.mjs`:
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  serverExternalPackages: ["pino-pretty"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.clerk.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatar.vercel.sh',
+      },
+    ],
+  },
+};
+```
+
+**Files Modified:**
+- `cryptobazaar/next.config.mjs`
+
+**Important:** ⚠️ Restart dev server after modifying `next.config.mjs`
+
+---
+
+## Issue #7: Pino-Pretty Warning (Non-blocking)
 **Date:** October 24, 2025  
 **Error:**
 ```

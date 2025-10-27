@@ -5,9 +5,10 @@ import { X, Plus, Lock, Wallet } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useActiveAccount } from "thirdweb/react";
 
-// Contract addresses
-const USDT_LOCKER_ADDRESS = "0xba098ad1a0B1aD9B02030E7F258AFf4d90634Ed3";
-const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4";
+// Contract addresses - TokenLocker.sol deployed on Polygon Amoy
+const TOKEN_LOCKER_ADDRESS = "0x00b72b00336C5128D8CAD431d7B7fE1496D9B536"; // ✅ DEPLOYED
+const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Polygon Amoy Test USDC
+const POLYGON_AMOY_CHAIN_ID = "0x13882"; // 80002 in hex
 
 interface CreateOrderModalProps {
   isOpen: boolean;
@@ -109,14 +110,14 @@ export default function CreateOrderModal({
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13882' }], // 80002 in hex
+          params: [{ chainId: POLYGON_AMOY_CHAIN_ID }],
         });
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId: '0x13882',
+              chainId: POLYGON_AMOY_CHAIN_ID,
               chainName: 'Polygon Amoy',
               nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
               rpcUrls: ['https://rpc-amoy.polygon.technology/'],
@@ -130,13 +131,13 @@ export default function CreateOrderModal({
 
       setStatus("Step 1/2: Approving USDC...");
 
-      // Calculate amount with 6 decimals
-      const amountWei = Math.floor(amountNum * 1_000_000);
+      // Calculate amount with 6 decimals (USDC has 6 decimals)
+      const amountWei = BigInt(Math.floor(amountNum * 1_000_000));
 
-      // Approve USDC
-      const approveData = '0x095ea7b3' + // approve(address,uint256)
-        USDT_LOCKER_ADDRESS.slice(2).padStart(64, '0') +
-        amountWei.toString(16).padStart(64, '0');
+      // 1️⃣ Approve USDC: approve(address spender, uint256 amount)
+      const approveData = '0x095ea7b3' + // approve(address,uint256) function selector
+        TOKEN_LOCKER_ADDRESS.slice(2).toLowerCase().padStart(64, '0') + // spender address
+        amountWei.toString(16).padStart(64, '0'); // amount
 
       const approveTx = await provider.request({
         method: 'eth_sendTransaction',
@@ -154,26 +155,56 @@ export default function CreateOrderModal({
 
       setStatus("Step 2/2: Locking USDC...");
 
-      // Lock tokens
-      const durationSeconds = durationHours * 3600;
-      const lockData = '0x6c0360eb' + // lock5USDT(uint256) - using same function
-        durationSeconds.toString(16).padStart(64, '0');
+      // 2️⃣ Lock tokens: lockTokens(uint256 amount, uint256 lockDuration)
+      const durationSeconds = BigInt(durationHours * 3600);
+      
+      // Function selector for lockTokens(uint256,uint256) = 0x7f9fadee
+      const lockData = '0x7f9fadee' + 
+        amountWei.toString(16).padStart(64, '0') + // amount parameter (uint256)
+        durationSeconds.toString(16).padStart(64, '0'); // lockDuration parameter (uint256)
 
       const lockTx = await provider.request({
         method: 'eth_sendTransaction',
         params: [{
           from: account.address,
-          to: USDT_LOCKER_ADDRESS,
+          to: TOKEN_LOCKER_ADDRESS,
           data: lockData,
-          gas: '0x30D40', // 200000
+          gas: '0x493E0', // 300000 gas limit
         }],
       });
 
       console.log("✅ Lock transaction:", lockTx);
+      setStatus("Waiting for lock confirmation...");
+      
+      // Wait for transaction to be mined and check receipt
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      // Verify transaction success
+      const receipt = await provider.request({
+        method: 'eth_getTransactionReceipt',
+        params: [lockTx],
+      });
+      
+      if (receipt && receipt.status === '0x0') {
+        throw new Error("Lock transaction failed on-chain. Please check Polygonscan.");
+      }
+      
+      console.log("✅ Lock confirmed:", receipt);
+      
       setStatus("Creating order in database...");
 
       // Calculate expiry time
-      const expiresAt = new Date(Date.now() + durationSeconds * 1000).toISOString();
+      const expiresAt = new Date(Date.now() + Number(durationSeconds) * 1000).toISOString();
+
+      const orderPayload = {
+        amount: amountNum,
+        rate: parseFloat(rate),
+        walletAddress: account.address,
+        expiresAt: expiresAt,
+        lockTxHash: lockTx,
+      };
+      
+      console.log("📤 Sending order payload:", orderPayload);
 
       // Create order in database
       const response = await fetch("/api/orders", {
@@ -192,8 +223,12 @@ export default function CreateOrderModal({
 
       if (!response.ok) {
         const data = await response.json();
+        console.error("API Error Response:", data);
         throw new Error(data.error || "Failed to create order");
       }
+
+      const orderData = await response.json();
+      console.log("✅ Order created:", orderData);
 
       // Success!
       setStatus("✅ Order created successfully!");
@@ -208,6 +243,12 @@ export default function CreateOrderModal({
 
     } catch (err: any) {
       console.error("Error creating order:", err);
+      console.error("Error details:", {
+        message: err.message,
+        code: err.code,
+        stack: err.stack,
+        fullError: JSON.stringify(err, Object.getOwnPropertyNames(err))
+      });
       
       let errorMessage = err.message || "Failed to create order";
       

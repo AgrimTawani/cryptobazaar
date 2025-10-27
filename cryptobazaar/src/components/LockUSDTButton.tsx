@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { Lock } from "lucide-react";
 
-// Contract addresses
-const USDT_LOCKER_ADDRESS = "0xba098ad1a0B1aD9B02030E7F258AFf4d90634Ed3";
-const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Test USDC on Polygon Amoy
+// Contract addresses - TokenLocker.sol deployed on Polygon Amoy
+const TOKEN_LOCKER_ADDRESS = "0x00b72b00336C5128D8CAD431d7B7fE1496D9B536"; // ✅ DEPLOYED
+const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Polygon Amoy Test USDC
+const POLYGON_AMOY_CHAIN_ID = "0x13882"; // 80002 in hex
 
 export default function LockUSDTButton() {
   const account = useActiveAccount();
@@ -100,10 +101,11 @@ export default function LockUSDTButton() {
 
       setStatus("Step 1/2: Approving USDC...");
 
-      // Encode approve function call
+      // 1️⃣ Approve USDC: approve(address spender, uint256 amount)
+      const amount = BigInt(5_000_000); // 5 USDC with 6 decimals
       const approveData = '0x095ea7b3' + // approve(address,uint256) function selector
-        USDT_LOCKER_ADDRESS.slice(2).padStart(64, '0') + // spender address
-        (5000000).toString(16).padStart(64, '0'); // amount (5 USDC with 6 decimals)
+        TOKEN_LOCKER_ADDRESS.slice(2).toLowerCase().padStart(64, '0') + // spender address
+        amount.toString(16).padStart(64, '0'); // amount
 
       // Send approve transaction
       const approveTx = await provider.request({
@@ -124,18 +126,20 @@ export default function LockUSDTButton() {
 
       setStatus("Step 2/2: Locking USDC...");
 
-      // Encode lock5USDT function call
-      const lockData = '0x6c0360eb' + // lock5USDT(uint256) function selector  
-        (3600).toString(16).padStart(64, '0'); // duration (1 hour = 3600 seconds)
+      // 2️⃣ Lock tokens: lockTokens(uint256 amount, uint256 lockDuration)
+      const duration = BigInt(3600); // 1 hour in seconds
+      const lockData = '0x7f9fadee' + // lockTokens(uint256,uint256) function selector  
+        amount.toString(16).padStart(64, '0') + // amount parameter
+        duration.toString(16).padStart(64, '0'); // duration parameter
 
       // Send lock transaction
       const lockTx = await provider.request({
         method: 'eth_sendTransaction',
         params: [{
           from: account.address,
-          to: USDT_LOCKER_ADDRESS,
+          to: TOKEN_LOCKER_ADDRESS,
           data: lockData,
-          gas: '0x30D40', // 200000 in hex
+          gas: '0x493E0', // 300000 in hex
         }],
       });
 
