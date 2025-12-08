@@ -5,10 +5,11 @@ import { X, Plus, Lock, Wallet } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useActiveAccount } from "thirdweb/react";
 
-// Contract addresses - TokenLocker.sol deployed on Polygon Amoy
-const TOKEN_LOCKER_ADDRESS = "0x00b72b00336C5128D8CAD431d7B7fE1496D9B536"; // ✅ DEPLOYED
+// Contract addresses - EscrowContract deployed on Polygon Amoy
+const ESCROW_CONTRACT_ADDRESS = "0x399741cD133a2B829775f043f8DcC63BEcb025D1";
 const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Polygon Amoy Test USDC
 const POLYGON_AMOY_CHAIN_ID = "0x13882"; // 80002 in hex
+const MIN_POL_BALANCE = "0.01"; // Minimum POL required for gas fees
 
 interface CreateOrderModalProps {
   isOpen: boolean;
@@ -27,15 +28,16 @@ export default function CreateOrderModal({
   const [rate, setRate] = useState("84.50");
   const [duration, setDuration] = useState("24"); // Duration in hours
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
+  const [polBalance, setPolBalance] = useState<string>("0");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
 
   const total = amount && rate ? (parseFloat(amount) * parseFloat(rate)).toFixed(2) : "0.00";
 
-  // Fetch USDC balance
+  // Fetch USDC and POL balance
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchBalances = async () => {
       if (!account || !isOpen) return;
 
       // @ts-ignore
@@ -45,24 +47,32 @@ export default function CreateOrderModal({
         // @ts-ignore
         const provider = window.ethereum;
         
+        // Fetch USDC balance
         const balanceData = '0x70a08231' + account.address.slice(2).padStart(64, '0');
-
-        const balance = await provider.request({
+        const usdcBal = await provider.request({
           method: 'eth_call',
           params: [{
             to: USDC_ADDRESS,
             data: balanceData,
           }, 'latest'],
         });
+        const usdcBalanceNum = parseInt(usdcBal, 16) / 1_000_000;
+        setUsdcBalance(usdcBalanceNum.toFixed(2));
 
-        const balanceNum = parseInt(balance, 16) / 1_000_000;
-        setUsdcBalance(balanceNum.toFixed(2));
+        // Fetch POL balance
+        const polBal = await provider.request({
+          method: 'eth_getBalance',
+          params: [account.address, 'latest'],
+        });
+        const polBalanceNum = parseInt(polBal, 16) / 1e18;
+        setPolBalance(polBalanceNum.toFixed(4));
+
       } catch (err) {
-        console.error("Error fetching balance:", err);
+        console.error("Error fetching balances:", err);
       }
     };
 
-    fetchBalance();
+    fetchBalances();
   }, [account, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,6 +96,13 @@ export default function CreateOrderModal({
 
       if (amountNum > balanceNum) {
         throw new Error(`Insufficient balance. You have ${usdcBalance} USDC`);
+      }
+
+      // Check POL balance for gas fees
+      const polBalanceNum = parseFloat(polBalance);
+      const minPolRequired = parseFloat(MIN_POL_BALANCE);
+      if (polBalanceNum < minPolRequired) {
+        throw new Error(`Insufficient POL for gas fees. You need at least ${MIN_POL_BALANCE} POL. Current balance: ${polBalance} POL. Get POL from faucet.`);
       }
 
       if (!rate || parseFloat(rate) <= 0) {
@@ -129,14 +146,16 @@ export default function CreateOrderModal({
         }
       }
 
-      setStatus("Step 1/2: Approving USDC...");
+      setStatus("Step 1/3: Approving USDC...");
 
       // Calculate amount with 6 decimals (USDC has 6 decimals)
       const amountWei = BigInt(Math.floor(amountNum * 1_000_000));
+      const durationSeconds = BigInt(durationHours * 3600);
+      const rateWei = BigInt(Math.floor(parseFloat(rate) * 100)); // Store rate as uint256
 
       // 1️⃣ Approve USDC: approve(address spender, uint256 amount)
       const approveData = '0x095ea7b3' + // approve(address,uint256) function selector
-        TOKEN_LOCKER_ADDRESS.slice(2).toLowerCase().padStart(64, '0') + // spender address
+        ESCROW_CONTRACT_ADDRESS.slice(2).toLowerCase().padStart(64, '0') + // spender address
         amountWei.toString(16).padStart(64, '0'); // amount
 
       const approveTx = await provider.request({
@@ -153,55 +172,84 @@ export default function CreateOrderModal({
       setStatus("Waiting for approval confirmation...");
       await new Promise(resolve => setTimeout(resolve, 3000));
 
-      setStatus("Step 2/2: Locking USDC...");
+      setStatus("Step 2/3: Creating order in escrow...");
 
-      // 2️⃣ Lock tokens: lockTokens(uint256 amount, uint256 lockDuration)
-      const durationSeconds = BigInt(durationHours * 3600);
-      
-      // Function selector for lockTokens(uint256,uint256) = 0x7f9fadee
-      const lockData = '0x7f9fadee' + 
-        amountWei.toString(16).padStart(64, '0') + // amount parameter (uint256)
-        durationSeconds.toString(16).padStart(64, '0'); // lockDuration parameter (uint256)
+      // 2️⃣ Create order in escrow: createOrder(uint256 amount, uint256 rate, uint256 duration)
+      // Function selector for createOrder(uint256,uint256,uint256)
+      const createOrderData = '0x' + 
+        'a1ba444d' + // createOrder(uint256,uint256,uint256) function selector
+        amountWei.toString(16).padStart(64, '0') + // amount parameter
+        rateWei.toString(16).padStart(64, '0') + // rate parameter
+        durationSeconds.toString(16).padStart(64, '0'); // duration parameter
 
-      const lockTx = await provider.request({
+      const escrowTx = await provider.request({
         method: 'eth_sendTransaction',
         params: [{
           from: account.address,
-          to: TOKEN_LOCKER_ADDRESS,
-          data: lockData,
+          to: ESCROW_CONTRACT_ADDRESS,
+          data: createOrderData,
           gas: '0x493E0', // 300000 gas limit
         }],
       });
 
-      console.log("✅ Lock transaction:", lockTx);
-      setStatus("Waiting for lock confirmation...");
+      console.log("✅ Escrow transaction:", escrowTx);
+      setStatus("Waiting for escrow confirmation...");
       
-      // Wait for transaction to be mined and check receipt
+      // Wait for transaction to be mined
       await new Promise(resolve => setTimeout(resolve, 5000));
       
-      // Verify transaction success
+      // Get transaction receipt to extract orderId from event
       const receipt = await provider.request({
         method: 'eth_getTransactionReceipt',
-        params: [lockTx],
+        params: [escrowTx],
       });
       
       if (receipt && receipt.status === '0x0') {
-        throw new Error("Lock transaction failed on-chain. Please check Polygonscan.");
+        throw new Error("Escrow transaction failed on-chain. Please check Polygonscan.");
       }
       
-      console.log("✅ Lock confirmed:", receipt);
+      console.log("✅ Escrow confirmed:", receipt);
+
+      // Extract orderId from OrderCreated event logs
+      let onChainOrderId = null;
+      if (receipt && receipt.logs && receipt.logs.length > 0) {
+        console.log("📋 All receipt logs:", receipt.logs);
+        
+        for (const log of receipt.logs) {
+          // Check if this log is from the escrow contract
+          if (log.address && log.address.toLowerCase() === ESCROW_CONTRACT_ADDRESS.toLowerCase()) {
+            // OrderCreated event has orderId as topics[1] (first indexed param)
+            if (log.topics && log.topics.length >= 2) {
+              const orderIdHex = log.topics[1];
+              console.log("📋 Raw orderId hex:", orderIdHex);
+              
+              // Convert hex to number safely
+              // Remove 0x prefix and convert
+              const orderIdNum = parseInt(orderIdHex.slice(2), 16);
+              onChainOrderId = orderIdNum;
+              console.log("📋 Extracted orderId:", onChainOrderId);
+              break;
+            }
+          }
+        }
+        
+        if (!onChainOrderId) {
+          console.warn("⚠️ Could not extract orderId from event logs");
+        }
+      }
       
-      setStatus("Creating order in database...");
+      setStatus("Step 3/3: Saving order to database...");
 
       // Calculate expiry time
       const expiresAt = new Date(Date.now() + Number(durationSeconds) * 1000).toISOString();
 
       const orderPayload = {
+        orderId: onChainOrderId ? String(onChainOrderId) : null, // Convert to string to avoid int overflow
         amount: amountNum,
         rate: parseFloat(rate),
         walletAddress: account.address,
         expiresAt: expiresAt,
-        lockTxHash: lockTx,
+        escrowTxHash: escrowTx,
       };
       
       console.log("📤 Sending order payload:", orderPayload);
@@ -212,13 +260,7 @@ export default function CreateOrderModal({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          amount: amountNum,
-          rate: parseFloat(rate),
-          walletAddress: account.address,
-          expiresAt: expiresAt,
-          lockTxHash: lockTx,
-        }),
+        body: JSON.stringify(orderPayload),
       });
 
       if (!response.ok) {
@@ -290,15 +332,31 @@ export default function CreateOrderModal({
         </div>
 
         {/* Balance Display */}
-        <div className="p-6 pb-0">
+        <div className="p-6 pb-0 space-y-3">
           <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wallet className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-green-400">Your Balance</span>
+                <span className="text-sm text-green-400">USDC Balance</span>
               </div>
               <span className="text-lg font-bold text-white">{usdcBalance} USDC</span>
             </div>
+          </div>
+          <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-blue-400">POL Balance (for gas)</span>
+              </div>
+              <span className={`text-lg font-bold ${parseFloat(polBalance) < parseFloat(MIN_POL_BALANCE) ? 'text-red-400' : 'text-white'}`}>
+                {polBalance} POL
+              </span>
+            </div>
+            {parseFloat(polBalance) < parseFloat(MIN_POL_BALANCE) && (
+              <p className="text-xs text-red-400 mt-2">
+                ⚠️ Need at least {MIN_POL_BALANCE} POL for gas fees
+              </p>
+            )}
           </div>
         </div>
 
