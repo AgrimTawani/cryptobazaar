@@ -19,7 +19,7 @@ importers:
         specifier: ^6.33.7
         version: 6.33.7(next@15.4.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@prisma/client':
-        specifier: ^6.17.1
+        specifier: 6.17.1
         version: 6.17.1(prisma@6.17.1(typescript@5.9.2))(typescript@5.9.2)
       '@tabler/icons-react':
         specifier: ^3.35.0
@@ -83,7 +83,7 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2
       prisma:
-        specifier: ^6.17.1
+        specifier: 6.17.1
         version: 6.17.1(typescript@5.9.2)
       tailwindcss:
         specifier: ^3.3.0

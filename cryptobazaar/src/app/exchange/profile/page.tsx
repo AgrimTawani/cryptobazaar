@@ -9,16 +9,18 @@ import Image from "next/image";
 
 // USDC Contract address
 const USDC_ADDRESS = "0x8B0180f2101c8260d49339abfEe87927412494B4"; // Polygon Amoy USDC
+const ESCROW_CONTRACT_ADDRESS = "0x399741cD133a2B829775f043f8DcC63BEcb025D1"; // Escrow contract
 
 interface Order {
   id: string;
+  orderId: string | null;
   amount: number;
   rate: number;
   total: number;
   walletAddress: string;
   status: string;
   expiresAt: string | null;
-  lockTxHash: string | null;
+  escrowTxHash: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -111,24 +113,82 @@ export default function ProfilePage() {
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    if (!confirm("Are you sure you want to cancel this order?")) return;
+    if (!confirm("Are you sure you want to cancel this order? This will return the USDC from escrow to your wallet.")) return;
 
     try {
       setCancellingOrderId(orderId);
+      
+      // Find the order to get the on-chain orderId
+      const order = myOrders.find(o => o.id === orderId);
+      console.log("📋 Found order:", order);
+      
+      if (!order || !order.orderId) {
+        throw new Error("Order not found or missing on-chain ID");
+      }
+
+      if (!account) {
+        throw new Error("Please connect your wallet");
+      }
+
+      // @ts-ignore
+      if (!window.ethereum) {
+        throw new Error("MetaMask not found");
+      }
+
+      // @ts-ignore
+      const provider = window.ethereum;
+
+      // Convert string orderId to number
+      const onChainOrderId = parseInt(order.orderId, 10);
+      console.log("🔢 On-chain orderId:", onChainOrderId);
+
+      // Call cancelOrder(uint256 orderId) on escrow contract
+      const cancelOrderData = '0x' + 
+        '514fcac7' + // cancelOrder(uint256) function selector
+        onChainOrderId.toString(16).padStart(64, '0'); // orderId parameter
+
+      console.log("📤 Cancel order data:", cancelOrderData);
+
+      const cancelTx = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: account.address,
+          to: ESCROW_CONTRACT_ADDRESS,
+          data: cancelOrderData,
+          gas: '0x493E0', // 300000
+        }],
+      });
+
+      console.log("✅ Cancel transaction:", cancelTx);
+      alert("Transaction sent! Waiting for confirmation...");
+
+      // Wait for transaction confirmation
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // Update database with cancel tx hash
       const response = await fetch(`/api/orders/${orderId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cancelTxHash: cancelTx }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to cancel order");
+        throw new Error(data.error || "Failed to update order status");
       }
 
       // Refresh orders
       fetchMyOrders();
-      alert("Order cancelled successfully!");
+      alert("Order cancelled successfully! USDC returned to your wallet.");
     } catch (error: any) {
       console.error("Error cancelling order:", error);
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       alert(error.message || "Failed to cancel order");
     } finally {
       setCancellingOrderId(null);
@@ -292,17 +352,32 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleCancelOrder(order.id)}
-                      disabled={cancellingOrderId === order.id}
-                      className="ml-4 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-colors disabled:opacity-50"
-                    >
-                      {cancellingOrderId === order.id ? (
-                        <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <X className="w-4 h-4" />
+                    <div className="flex items-center gap-2 ml-4">
+                      {order.escrowTxHash && (
+                        <a
+                          href={`https://amoy.polygonscan.com/tx/${order.escrowTxHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 transition-colors"
+                          title="View on Polygonscan"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                          </svg>
+                        </a>
                       )}
-                    </button>
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        disabled={cancellingOrderId === order.id}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-colors disabled:opacity-50"
+                      >
+                        {cancellingOrderId === order.id ? (
+                          <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <X className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {order.lockTxHash && (
                     <div className="mt-3 pt-3 border-t border-neutral-800">

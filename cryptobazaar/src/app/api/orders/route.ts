@@ -40,7 +40,11 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     console.log("📥 Request body:", body);
-    const { amount, rate, walletAddress, expiresAt, lockTxHash } = body;
+    const { orderId, amount, rate, walletAddress, buyerAddress, expiresAt, escrowTxHash } = body;
+    
+    // Convert orderId to string to avoid integer overflow
+    const orderIdString = orderId != null ? String(orderId) : null;
+    console.log("📋 OrderId converted:", { original: orderId, asString: orderIdString });
 
     // Validate input
     if (!amount || !rate || !walletAddress) {
@@ -57,7 +61,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get or create user profile
+    // Get user profile
     let userProfile = await prisma.userProfile.findUnique({
       where: { clerkId: userId },
     });
@@ -77,25 +81,29 @@ export async function POST(request: Request) {
 
     // Create order
     console.log("📝 Creating order with data:", {
+      orderId: orderIdString,
       sellerId: userProfile.id,
       amount,
       rate,
       total,
       walletAddress,
+      buyerAddress,
       expiresAt: expiresAt ? new Date(expiresAt) : null,
-      lockTxHash,
+      escrowTxHash,
     });
 
     const order = await prisma.order.create({
       data: {
+        orderId: orderIdString,
         sellerId: userProfile.id,
         amount: amount,
         rate: rate,
         total: total,
         walletAddress: walletAddress,
+        buyerAddress: buyerAddress || null,
         status: "ACTIVE",
         expiresAt: expiresAt ? new Date(expiresAt) : null,
-        lockTxHash: lockTxHash || null,
+        escrowTxHash: escrowTxHash || null,
       },
       include: {
         seller: true,

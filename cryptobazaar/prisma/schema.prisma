@@ -28,6 +28,7 @@ model UserProfile {
 
 model Order {
   id              String      @id @default(cuid())
+  orderId         String?     @unique // On-chain order ID from escrow contract (as string to avoid int overflow)
   sellerId        String
   seller          UserProfile @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
   
@@ -35,12 +36,14 @@ model Order {
   rate            Float       // Rate in INR per USDC
   total           Float       // Total INR (amount * rate)
   walletAddress   String      // Seller's wallet address
+  buyerAddress    String?     // Buyer's wallet address (set when released)
   
   status          OrderStatus @default(ACTIVE)
   
   expiresAt       DateTime?   // When the order expires
-  lockTxHash      String?     // Transaction hash of the lock
-  unlockTxHash    String?     // Transaction hash of the unlock
+  escrowTxHash    String?     // Transaction hash of createOrder
+  releaseTxHash   String?     // Transaction hash of releaseOrder
+  cancelTxHash    String?     // Transaction hash of cancelOrder
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -48,10 +51,12 @@ model Order {
   @@index([sellerId])
   @@index([status])
   @@index([expiresAt])
+  @@index([orderId])
 }
 
 enum OrderStatus {
   ACTIVE
   COMPLETED
   CANCELLED
+  EXPIRED
 }
