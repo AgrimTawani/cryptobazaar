@@ -2,8 +2,12 @@
 const nextConfig = {
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
   turbopack: {
-    // Empty config to acknowledge we're using Turbopack
-    // The serverExternalPackages above handles the pino/thread-stream issues
+    resolveAlias: {
+      // Exclude problematic pino dependencies from bundling
+      'pino': false,
+      'thread-stream': false,
+      'pino-pretty': false,
+    },
   },
   images: {
     remotePatterns: [
