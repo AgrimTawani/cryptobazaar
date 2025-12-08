@@ -379,16 +379,16 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   </div>
-                  {order.lockTxHash && (
+                  {order.escrowTxHash && (
                     <div className="mt-3 pt-3 border-t border-neutral-800">
-                      <p className="text-xs text-neutral-500">Lock Transaction</p>
+                      <p className="text-xs text-neutral-500">Escrow Transaction</p>
                       <a
-                        href={`https://amoy.polygonscan.com/tx/${order.lockTxHash}`}
+                        href={`https://amoy.polygonscan.com/tx/${order.escrowTxHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-blue-400 hover:text-blue-300 font-mono"
                       >
-                        {order.lockTxHash.slice(0, 10)}...{order.lockTxHash.slice(-8)}
+                        {order.escrowTxHash.slice(0, 10)}...{order.escrowTxHash.slice(-8)}
                       </a>
                     </div>
                   )}
@@ -575,17 +575,17 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {order.lockTxHash && (
+                  {order.escrowTxHash && (
                     <div className="mt-3 pt-3 border-t border-neutral-700">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-neutral-500">Lock Transaction</span>
+                        <span className="text-xs text-neutral-500">Escrow Transaction</span>
                         <a
-                          href={`https://amoy.polygonscan.com/tx/${order.lockTxHash}`}
+                          href={`https://amoy.polygonscan.com/tx/${order.escrowTxHash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors font-mono"
                         >
-                          {order.lockTxHash.slice(0, 10)}...{order.lockTxHash.slice(-8)} →
+                          {order.escrowTxHash.slice(0, 10)}...{order.escrowTxHash.slice(-8)} →
                         </a>
                       </div>
                     </div>
