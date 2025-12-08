@@ -1,17 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
-  webpack: (config, { isServer }) => {
-    // Exclude test files from bundling
-    config.module = config.module || {};
-    config.module.rules = config.module.rules || [];
-    
-    config.module.rules.push({
-      test: /node_modules\/thread-stream\/test\/.*/,
-      loader: 'ignore-loader',
-    });
-
-    return config;
+  experimental: {
+    turbopack: {
+      // Empty config to acknowledge we're using Turbopack
+      // The serverExternalPackages above handles the pino/thread-stream issues
+    },
   },
   images: {
     remotePatterns: [
