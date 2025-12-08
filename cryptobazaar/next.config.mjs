@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
-  experimental: {
-    turbopack: {
-      // Empty config to acknowledge we're using Turbopack
-      // The serverExternalPackages above handles the pino/thread-stream issues
-    },
+  turbopack: {
+    // Empty config to acknowledge we're using Turbopack
+    // The serverExternalPackages above handles the pino/thread-stream issues
   },
   images: {
     remotePatterns: [
