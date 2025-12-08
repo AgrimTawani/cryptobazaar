@@ -1,6 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ["pino-pretty"],
+  serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
+  webpack: (config, { isServer }) => {
+    // Exclude test files from bundling
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    
+    config.module.rules.push({
+      test: /node_modules\/thread-stream\/test\/.*/,
+      loader: 'ignore-loader',
+    });
+
+    return config;
+  },
   images: {
     remotePatterns: [
       {
