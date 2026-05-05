@@ -1,7 +1,5 @@
 import { Hono } from 'hono'
 import { db } from '@/db/client'
-import { users } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 import { verifyWalletSignature, createSessionToken } from '@/lib/auth'
 import { createDIDForUser } from '@/lib/identus'
 import { walletAuthMiddleware, type AuthEnv } from '@/api/middleware/wallet-auth'
@@ -24,22 +22,17 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
     return c.json({ error: 'Invalid signature' }, 400)
   }
 
-  const existing = await db.select().from(users).where(eq(users.wallet_address, walletAddress))
-  if (existing.length > 0) {
-    const token = await createSessionToken(walletAddress, existing[0].did ?? '')
-    return c.json({ user: existing[0], token }, 200)
+  const existing = await db.user.findUnique({ where: { walletAddress } })
+  if (existing) {
+    const token = await createSessionToken(walletAddress, existing.did ?? '')
+    return c.json({ user: existing, token }, 200)
   }
 
   const did = await createDIDForUser(walletAddress)
 
-  const [newUser] = await db
-    .insert(users)
-    .values({
-      wallet_address: walletAddress,
-      did,
-      onboarding_status: 'REGISTERED',
-    })
-    .returning()
+  const newUser = await db.user.create({
+    data: { walletAddress, did, onboardingStatus: 'REGISTERED' },
+  })
 
   const token = await createSessionToken(walletAddress, did)
   return c.json({ user: newUser, token }, 201)
@@ -47,7 +40,7 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
 
 usersRouter.get('/me', walletAuthMiddleware, async (c) => {
   const walletAddress = c.get('walletAddress')
-  const [user] = await db.select().from(users).where(eq(users.wallet_address, walletAddress))
+  const user = await db.user.findUnique({ where: { walletAddress } })
   if (!user) return c.json({ error: 'User not found' }, 404)
   return c.json({ user })
 })
