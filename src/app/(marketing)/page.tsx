@@ -9,385 +9,403 @@ import {
   ArrowRight,
   Check,
   BadgeCheck,
+  Zap,
 } from 'lucide-react'
+import { HeroSection } from '@/components/marketing/hero-section'
+import { FeatureCard } from '@/components/marketing/feature-card'
+import { Reveal, RevealGroup, RevealItem } from '@/components/marketing/reveal'
 
 export const metadata = {
   title: 'CryptoBazaar — Trade Crypto P2P Without Bank Freeze Risk',
   description:
-    'India\'s first gated P2P stablecoin exchange. Every trader is vetted through 3 layers of EDD. Smart contract escrow. Insurance fund. Trade USDT and USDC safely.',
+    "India's first gated P2P stablecoin exchange. 3-layer EDD. Smart contract escrow. Bank freeze insurance up to ₹5L.",
 }
-
-const steps = [
-  {
-    num: '01',
-    icon: ScanFace,
-    title: 'Get Verified',
-    desc: 'Pass KYC (Aadhaar + PAN), bank statement ML scoring, and an AI interview. All 3 layers required. Takes about 15 minutes.',
-  },
-  {
-    num: '02',
-    icon: Wallet,
-    title: 'Subscribe',
-    desc: 'Pick a monthly tier — Starter, Trader, or Pro — based on your trading volume. Your subscription also funds the INR insurance pool.',
-  },
-  {
-    num: '03',
-    icon: ShieldCheck,
-    title: 'Trade Safely',
-    desc: 'USDT/USDC locks in a smart contract escrow. You confirm INR receipt before it releases. 0.75% of every trade flows into the insurance fund.',
-  },
-]
 
 const pillars = [
   {
-    icon: ScanFace,
-    title: '3-Layer EDD',
-    desc: 'KYC via HyperVerge, bank statement ML scoring for AML patterns, and an AI-evaluated source-of-funds interview. All three must pass.',
+    icon: <ScanFace className="h-5 w-5 text-slate-300" strokeWidth={1.5} aria-hidden="true" />,
+    title: '3-Layer EDD Verification',
+    desc: 'KYC, bank statement ML scoring, and an AI source-of-funds interview. All three must pass before a single trade.',
+    accent: false,
   },
   {
-    icon: Lock,
+    icon: <Lock className="h-5 w-5 text-slate-300" strokeWidth={1.5} aria-hidden="true" />,
     title: 'Smart Contract Escrow',
-    desc: 'Seller\'s USDT/USDC is locked on-chain from the moment a trade starts. CryptoBazaar never touches your funds.',
+    desc: "Seller's crypto locks on-chain from the moment a trade opens. CryptoBazaar never touches your funds.",
+    accent: false,
   },
   {
-    icon: ShieldCheck,
-    title: 'Insurance Fund',
-    desc: '0.75% of every trade builds an on-chain pool. If your bank account gets frozen from a CryptoBazaar trade, you can claim up to ₹5,00,000.',
+    icon: <ShieldCheck className="h-5 w-5 text-green-400" strokeWidth={1.5} aria-hidden="true" />,
+    title: 'Bank Freeze Insurance',
+    desc: '0.75% of every trade builds an on-chain fund. Wrongful freeze on a CryptoBazaar trade? Claim up to ₹5,00,000.',
+    accent: true,
   },
   {
-    icon: BadgeCheck,
+    icon: <BadgeCheck className="h-5 w-5 text-slate-300" strokeWidth={1.5} aria-hidden="true" />,
     title: 'Decentralised Identity',
-    desc: 'Powered by Hyperledger Identus. Your verification lives on-chain as a cryptographic credential — not on our servers.',
+    desc: 'Hyperledger Identus issues you cryptographic credentials. Your verified status lives on-chain — not on our servers.',
+    accent: false,
   },
 ]
 
-const stats = [
-  { value: '₹5L', label: 'Max insurance payout' },
-  { value: '3-Layer', label: 'EDD verification' },
-  { value: '0%', label: 'Platform custody' },
+const eddLayers = [
+  {
+    num: '01',
+    icon: ScanFace,
+    title: 'KYC — Identity Verification',
+    time: '~3 min',
+    desc: 'Aadhaar OTP, PAN match, liveness check via HyperVerge. Issues a cryptographic KYCCredential to your on-chain DID.',
+  },
+  {
+    num: '02',
+    icon: FileText,
+    title: 'Bank Statement EDD',
+    time: '~5 min',
+    desc: '6 months of statements processed by Perfios. ML model scores for AML patterns — structuring, rapid pass-throughs, counterparty anomalies. Score ≤40 auto-approves. 41–70 is human review. 71+ rejected.',
+  },
+  {
+    num: '03',
+    icon: MessageSquare,
+    title: 'AI Interview',
+    time: '~7 min',
+    desc: 'Text questionnaire: source of funds, trading purpose, volume. Claude scores for consistency and red flags. Borderline cases escalate to a video interview.',
+  },
+]
+
+const howItWorks = [
+  {
+    icon: ScanFace,
+    title: 'Get Verified',
+    desc: 'Complete all 3 EDD layers. Credentials are issued to your on-chain identity.',
+  },
+  {
+    icon: Wallet,
+    title: 'Subscribe',
+    desc: 'Pick Starter, Trader, or Pro based on your monthly volume. Your fee funds the INR insurance pool.',
+  },
+  {
+    icon: Zap,
+    title: 'Trade',
+    desc: "Escrow opens. Buyer pays INR bank-to-bank. Seller confirms. Crypto releases. 0.75% flows to insurance.",
+  },
 ]
 
 export default function LandingPage() {
   return (
     <div className="min-h-dvh">
-      {/* Hero */}
-      <section className="relative min-h-dvh flex flex-col items-center justify-center px-6 pt-24 pb-20 text-center overflow-hidden">
-        {/* Subtle radial glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 flex items-center justify-center"
-        >
-          <div className="h-[600px] w-[600px] rounded-full bg-green-500/5 blur-[120px]" />
-        </div>
-
-        <div className="relative max-w-3xl mx-auto space-y-6">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1 text-xs text-zinc-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" aria-hidden="true" />
-            Invite-Only Beta · India
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-zinc-50 leading-[1.1]">
-            Trade crypto P2P without the fear of{' '}
-            <span className="text-green-500">bank freezes.</span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            CryptoBazaar is a gated P2P exchange for India. Every member passes 3-layer EDD before
-            trading. Smart contract escrow. On-chain insurance. No tainted fiat.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link
-              href="/login"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-medium px-6 py-3 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
-            >
-              Apply for Early Access
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <a
-              href="#how-it-works"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-zinc-700 text-zinc-300 text-sm font-medium px-6 py-3 rounded-lg hover:border-zinc-500 hover:text-white transition-colors cursor-pointer"
-            >
-              See How It Works
-            </a>
-          </div>
-
-          {/* Stats strip */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 pt-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl font-bold text-zinc-50 tabular-nums">{s.value}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Problem */}
-      <section className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-            The Problem
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-6 leading-tight">
-            Indian P2P traders lose their bank accounts every day.
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-              <p className="text-sm font-medium text-zinc-200 mb-2">The freeze chain</p>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                A buyer pays with money from a scam or fraud. Police trace it. Every account
-                the money touched gets frozen — including yours, even though you had no idea.
-              </p>
-            </div>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-              <p className="text-sm font-medium text-zinc-200 mb-2">The standard P2P response</p>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Binance, WazirX, and others don&apos;t vet buyers&apos; funds. Anyone can
-                trade. The seller bears all the risk. There&apos;s no insurance. You fight alone.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 rounded-lg border border-green-500/20 bg-green-500/5 p-5">
-            <p className="text-sm font-medium text-green-400 mb-1">CryptoBazaar&apos;s answer</p>
-            <p className="text-sm text-zinc-300 leading-relaxed">
-              Gate every user with 3-layer EDD before they can trade. If someone with tainted
-              money tries to enter — the ML model and interview catches it. And if something still
-              slips through, the insurance fund covers you up to ₹5,00,000.
+      <section className="relative px-6 py-24 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-1/2 h-[400px] w-[400px] -translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-500/8 blur-[100px]" />
+        <div className="relative max-w-4xl mx-auto">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">The Problem</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-4 leading-tight tracking-tight">
+              Indian P2P traders lose their bank accounts every day.
+            </h2>
+            <p className="text-base text-slate-400 max-w-2xl mb-12 leading-relaxed">
+              Buying crypto from a scammer — even unknowingly — can trace tainted money to your
+              account. Police freeze it. You fight alone for months. Standard P2P platforms do
+              nothing to prevent this.
             </p>
-          </div>
-        </div>
-      </section>
+          </Reveal>
 
-      {/* How it works */}
-      <section id="how-it-works" className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-            How It Works
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-12 leading-tight">
-            Three steps to protected trading.
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {steps.map((step) => (
-              <div key={step.num} className="relative rounded-lg border border-zinc-800 bg-zinc-900 p-6">
-                <span className="text-3xl font-bold text-zinc-800 tabular-nums select-none">
-                  {step.num}
-                </span>
-                <step.icon
-                  className="h-5 w-5 text-green-500 mt-3 mb-3"
-                  aria-hidden="true"
-                />
-                <h3 className="text-sm font-semibold text-zinc-100 mb-2">{step.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{step.desc}</p>
+          <RevealGroup className="grid sm:grid-cols-2 gap-4" stagger={0.1}>
+            <RevealItem>
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 h-full">
+                <div className="text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/20 rounded-full px-2.5 py-0.5 inline-block mb-4">
+                  The Status Quo
+                </div>
+                <p className="text-sm text-slate-300 font-medium mb-2">The freeze chain</p>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  A buyer pays with scam-sourced money. Police trace it. Every account it
+                  passed through gets frozen — including yours, even though you had no idea.
+                </p>
               </div>
-            ))}
-          </div>
+            </RevealItem>
+            <RevealItem>
+              <div className="rounded-2xl border border-green-500/20 bg-green-500/[0.04] p-6 h-full">
+                <div className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 rounded-full px-2.5 py-0.5 inline-block mb-4">
+                  CryptoBazaar
+                </div>
+                <p className="text-sm text-slate-300 font-medium mb-2">Gated entry + insurance</p>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Every user is ML-scored for AML risk before they can trade. If a freeze
+                  still happens, the on-chain insurance fund covers you up to ₹5,00,000.
+                </p>
+              </div>
+            </RevealItem>
+          </RevealGroup>
         </div>
       </section>
 
       {/* Pillars */}
-      <section className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-            Platform Pillars
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-12 leading-tight">
-            Built for traders who take risk seriously.
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-5">
+      <section className="relative px-6 py-24 border-t border-white/[0.04]">
+        <div aria-hidden="true" className="pointer-events-none absolute left-0 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-500/6 blur-[120px]" />
+        <div className="relative max-w-4xl mx-auto">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Platform Pillars</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-12 leading-tight tracking-tight">
+              Built for traders who take risk seriously.
+            </h2>
+          </Reveal>
+          <RevealGroup className="grid sm:grid-cols-2 gap-4" stagger={0.08}>
             {pillars.map((p) => (
-              <div key={p.title} className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-                <div className="flex-shrink-0 h-9 w-9 rounded-lg bg-zinc-800 flex items-center justify-center">
-                  <p.icon className="h-4 w-4 text-green-500" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-zinc-100 mb-1">{p.title}</h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{p.desc}</p>
-                </div>
-              </div>
+              <RevealItem key={p.title}>
+                <FeatureCard icon={p.icon} title={p.title} desc={p.desc} accent={p.accent} />
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
-      {/* Assets supported */}
-      <section className="border-t border-zinc-800 px-6 py-16">
+      {/* How it works */}
+      <section id="how-it-works" className="relative px-6 py-24 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">How It Works</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-12 leading-tight tracking-tight">
+              Three steps to protected trading.
+            </h2>
+          </Reveal>
+          <RevealGroup className="grid sm:grid-cols-3 gap-4" stagger={0.1}>
+            {howItWorks.map((step, i) => (
+              <RevealItem key={step.title}>
+                <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 h-full">
+                  <span className="absolute top-4 right-4 text-4xl font-bold text-white/[0.04] tabular-nums select-none">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] mb-4">
+                    <step.icon className="h-5 w-5 text-slate-300" aria-hidden="true" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-100 mb-2">{step.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
+                </div>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+
+      {/* EDD Detail */}
+      <section className="relative px-6 py-24 border-t border-white/[0.04] overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-[600px] w-[400px] translate-x-1/3 rounded-full bg-indigo-500/6 blur-[120px]" />
+        <div className="relative max-w-3xl mx-auto">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Verification</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-4 leading-tight tracking-tight">
+              The hardest gate on any Indian P2P platform.
+            </h2>
+            <p className="text-sm text-slate-400 mb-12 max-w-lg leading-relaxed">
+              All three layers must pass and remain unexpired to trade. Credentials refresh every 6 months.
+            </p>
+          </Reveal>
+
+          <RevealGroup className="space-y-3" stagger={0.1}>
+            {eddLayers.map((layer) => (
+              <RevealItem key={layer.num}>
+                <div className="group flex gap-5 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-white/[0.10] hover:bg-white/[0.03] transition-all duration-300">
+                  <div className="flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04]">
+                      <layer.icon className="h-5 w-5 text-green-400" aria-hidden="true" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="text-xs font-mono text-slate-600">{layer.num}</span>
+                      <h3 className="text-sm font-semibold text-slate-100">{layer.title}</h3>
+                      <span className="ml-auto text-xs text-slate-600 font-mono">{layer.time}</span>
+                    </div>
+                    <p className="text-sm text-slate-400 leading-relaxed">{layer.desc}</p>
+                  </div>
+                </div>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+
+      {/* Assets */}
+      <section className="px-6 py-16 border-t border-white/[0.04]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-8">
-            Supported Assets & Chains
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {['USDT · Polygon', 'USDT · Solana', 'USDT · Tron (TRC-20)', 'USDC · Polygon', 'USDC · Solana'].map(
-              (a) => (
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-8">
+              Supported Assets &amp; Networks
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              {[
+                'USDT · Polygon',
+                'USDT · Solana',
+                'USDT · Tron TRC-20',
+                'USDC · Polygon',
+                'USDC · Solana',
+              ].map((a) => (
                 <span
                   key={a}
-                  className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-300"
+                  className="rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-xs text-slate-400 font-mono"
                 >
                   {a}
                 </span>
-              )
-            )}
-          </div>
-          <p className="text-xs text-zinc-600 mt-4">Cross-chain USDC via Circle CCTP v2 · Cross-chain USDT via Wormhole</p>
+              ))}
+            </div>
+            <p className="text-xs text-slate-600 mt-5">
+              Cross-chain USDC · Circle CCTP v2 &nbsp;·&nbsp; Cross-chain USDT · Wormhole
+            </p>
+          </Reveal>
         </div>
       </section>
 
-      {/* Pricing preview */}
-      <section className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-            Pricing
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-3 leading-tight">
-            Simple monthly subscription.
-          </h2>
-          <p className="text-sm text-zinc-400 mb-12 max-w-md">
-            Your subscription fees fund the INR insurance pool. The more members, the larger
-            the coverage.
-          </p>
+      {/* Pricing */}
+      <section className="relative px-6 py-24 border-t border-white/[0.04] overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-green-500/5 blur-[120px]" />
+        <div className="relative max-w-4xl mx-auto">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Pricing</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-3 leading-tight tracking-tight">
+              Simple monthly subscription.
+            </h2>
+            <p className="text-sm text-slate-400 mb-12 max-w-md leading-relaxed">
+              Your subscription directly funds the INR insurance pool. The more members, the larger the coverage for everyone.
+            </p>
+          </Reveal>
 
-          <div className="grid sm:grid-cols-3 gap-5">
+          <RevealGroup className="grid sm:grid-cols-3 gap-4 mb-6" stagger={0.08}>
             {[
               {
                 name: 'Starter',
                 price: '₹200',
-                cap: '₹5 lakh / month',
-                features: ['All EDD verification', 'Smart contract escrow', 'Insurance eligibility', 'UPI / IMPS / NEFT'],
+                period: '/mo',
+                cap: '₹5L / month',
                 highlight: false,
+                features: ['3-Layer EDD', 'Smart contract escrow', 'Insurance eligibility', 'UPI · IMPS · NEFT'],
               },
               {
                 name: 'Trader',
                 price: '₹500',
-                cap: '₹20 lakh / month',
-                features: ['All EDD verification', 'Smart contract escrow', 'Insurance eligibility', 'Priority support'],
+                period: '/mo',
+                cap: '₹20L / month',
                 highlight: true,
+                features: ['Everything in Starter', '₹20L monthly cap', 'Priority dispute resolution', 'Priority support'],
               },
               {
                 name: 'Pro',
                 price: '₹1,000',
+                period: '/mo',
                 cap: 'Unlimited',
-                features: ['All EDD verification', 'Smart contract escrow', 'Insurance eligibility', 'Dedicated compliance agent'],
                 highlight: false,
+                features: ['Everything in Trader', 'Unlimited cap', 'Dedicated compliance agent', 'Phone support'],
               },
             ].map((tier) => (
-              <div
-                key={tier.name}
-                className={`rounded-lg p-6 flex flex-col ${
-                  tier.highlight
-                    ? 'border border-green-500/40 bg-green-500/5'
-                    : 'border border-zinc-800 bg-zinc-900'
-                }`}
-              >
-                {tier.highlight && (
-                  <span className="self-start text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 rounded-full px-2 py-0.5 mb-3">
-                    Most Popular
-                  </span>
-                )}
-                <p className="text-sm font-semibold text-zinc-200 mb-1">{tier.name}</p>
-                <p className="text-3xl font-bold text-zinc-50 tabular-nums">
-                  {tier.price}
-                  <span className="text-sm font-normal text-zinc-500">/mo</span>
-                </p>
-                <p className="text-xs text-zinc-500 mt-1 mb-5">Monthly cap: {tier.cap}</p>
-                <ul className="space-y-2 mb-6 flex-1">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-400">
-                      <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0" aria-hidden="true" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/login"
-                  className={`text-sm font-medium text-center py-2.5 rounded-lg transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500 ${
+              <RevealItem key={tier.name}>
+                <div
+                  className={`relative flex flex-col rounded-2xl p-6 h-full transition-all duration-300 ${
                     tier.highlight
-                      ? 'bg-green-500 text-black hover:bg-green-400'
-                      : 'border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white'
+                      ? 'border border-green-500/30 bg-green-500/[0.04]'
+                      : 'border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.10]'
                   }`}
                 >
-                  Get Started
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs text-zinc-600 mt-6">
-            All plans require completing 3-layer EDD before the first trade.{' '}
-            <Link href="/pricing" className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer">
-              See full pricing details
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* EDD detail */}
-      <section className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-            Verification Layers
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-10 leading-tight">
-            The hardest gate on any Indian P2P platform.
-          </h2>
-          <div className="space-y-4">
-            {[
-              {
-                num: 'Layer 1',
-                icon: ScanFace,
-                title: 'KYC — Identity Verification',
-                desc: 'Aadhaar OTP, PAN match, and liveness check via HyperVerge. Takes ~3 minutes. Issues a cryptographic KYC credential to your on-chain identity.',
-              },
-              {
-                num: 'Layer 2',
-                icon: FileText,
-                title: 'EDD — Bank Statement Analysis',
-                desc: '6 months of bank statements processed by Perfios. ML model scores for AML patterns: structuring, pass-throughs, counterparty anomalies. Score below 40 auto-approves. 41–70 goes to human review. 71+ is rejected.',
-              },
-              {
-                num: 'Layer 3',
-                icon: MessageSquare,
-                title: 'AI Interview — Source of Funds',
-                desc: 'Text questionnaire: source of funds, trading purpose, expected volume. Claude scores for consistency and red flags. Borderline cases escalate to a video interview.',
-              },
-            ].map((layer) => (
-              <div key={layer.num} className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-                <div className="flex-shrink-0 pt-0.5">
-                  <div className="h-8 w-8 rounded-md bg-zinc-800 flex items-center justify-center">
-                    <layer.icon className="h-4 w-4 text-green-500" aria-hidden="true" />
+                  {tier.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-semibold text-green-400 bg-[#020617] border border-green-500/30 rounded-full px-3 py-0.5">
+                      Most Popular
+                    </span>
+                  )}
+                  <div className="mb-5">
+                    <p className="text-sm font-semibold text-slate-300 mb-2">{tier.name}</p>
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="text-3xl font-bold text-slate-50 tabular-nums">{tier.price}</span>
+                      <span className="text-sm text-slate-500">{tier.period}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Cap: {tier.cap}</p>
                   </div>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-slate-400">
+                        <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/login"
+                    className={`text-sm font-semibold text-center py-2.5 rounded-xl transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500 ${
+                      tier.highlight
+                        ? 'bg-green-500 text-black hover:bg-green-400'
+                        : 'border border-white/[0.08] bg-white/[0.03] text-slate-300 hover:bg-white/[0.07] hover:text-white'
+                    }`}
+                  >
+                    Get Started
+                  </Link>
                 </div>
-                <div>
-                  <p className="text-xs text-zinc-500 mb-0.5">{layer.num}</p>
-                  <h3 className="text-sm font-semibold text-zinc-100 mb-1">{layer.title}</h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{layer.desc}</p>
-                </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
+
+          <Reveal>
+            <p className="text-center text-xs text-slate-600">
+              All plans require 3-layer EDD before first trade.{' '}
+              <Link href="/pricing" className="text-slate-400 hover:text-slate-200 underline underline-offset-2 cursor-pointer">
+                See full pricing details &rarr;
+              </Link>
+            </p>
+          </Reveal>
         </div>
       </section>
 
-      {/* CTA banner */}
-      <section className="border-t border-zinc-800 px-6 py-20">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-4 leading-tight">
-            Ready to trade without the risk?
-          </h2>
-          <p className="text-sm text-zinc-400 mb-8 leading-relaxed">
-            Apply for early access. Complete EDD verification in under 15 minutes. Start trading
-            USDT and USDC with verified counterparties only.
-          </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-8 py-3 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
-          >
-            Apply for Early Access
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-          <p className="text-xs text-zinc-600 mt-4">Invite-only beta · India only · USDT &amp; USDC</p>
+      {/* Trust strip */}
+      <section className="px-6 py-12 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
+          <Reveal>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden border border-white/[0.04]">
+              {[
+                { icon: ScanFace, label: 'Aadhaar + PAN KYC', sub: 'via HyperVerge' },
+                { icon: FileText, label: 'Bank Statement ML', sub: 'via Perfios' },
+                { icon: Lock, label: 'On-chain Escrow', sub: 'Polygon · Solana · Tron' },
+                { icon: ShieldCheck, label: 'Insurance Fund', sub: 'Up to ₹5,00,000' },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-2 bg-[#020617] px-4 py-6 text-center"
+                >
+                  <item.icon className="h-5 w-5 text-green-500" aria-hidden="true" strokeWidth={1.5} />
+                  <p className="text-xs font-medium text-slate-300">{item.label}</p>
+                  <p className="text-xs text-slate-600">{item.sub}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative px-6 py-24 border-t border-white/[0.04] overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div className="blob-1 absolute left-1/3 top-1/2 h-[400px] w-[400px] -translate-y-1/2 rounded-full bg-green-500/8 blur-[100px]" />
+          <div className="blob-2 absolute right-1/3 top-1/2 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-indigo-500/8 blur-[100px]" />
+        </div>
+        <div className="relative max-w-2xl mx-auto text-center">
+          <Reveal>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-50 mb-4 leading-tight tracking-tight">
+              Ready to trade without the risk?
+            </h2>
+            <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+              Complete EDD in ~15 minutes. Pick your tier. Trade USDT and USDC with verified
+              counterparties only — backed by on-chain insurance.
+            </p>
+            <Link
+              href="/login"
+              className="group inline-flex items-center gap-2 bg-white text-black text-sm font-semibold px-8 py-3.5 rounded-xl hover:bg-zinc-100 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
+            >
+              Apply for Early Access
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
+            <p className="text-xs text-slate-600 mt-4">
+              Invite-only beta &nbsp;·&nbsp; India only &nbsp;·&nbsp; USDT &amp; USDC
+            </p>
+          </Reveal>
         </div>
       </section>
     </div>
