@@ -100,7 +100,7 @@ export default function RefundPolicyPage() {
             Email{' '}
             <a
               href="mailto:support@cryptobazaar.co.in"
-              className="text-green-500 hover:text-green-400 cursor-pointer"
+              className="text-amber-400 hover:text-amber-400 cursor-pointer"
             >
               support@cryptobazaar.co.in
             </a>{' '}

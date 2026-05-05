@@ -100,12 +100,12 @@ export default function PricingPage() {
               key={tier.name}
               className={`rounded-xl p-6 flex flex-col ${
                 tier.highlight
-                  ? 'border border-green-500/40 bg-green-500/5'
+                  ? 'border border-amber-500/20 bg-amber-500/4'
                   : 'border border-zinc-800 bg-zinc-900'
               }`}
             >
               {tier.highlight && (
-                <span className="self-start text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 rounded-full px-2 py-0.5 mb-3">
+                <span className="self-start text-xs font-semibold text-amber-400 bg-amber-500/4 border border-amber-500/20 rounded-full px-2 py-0.5 mb-3">
                   Most Popular
                 </span>
               )}
@@ -120,7 +120,7 @@ export default function PricingPage() {
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-zinc-400">
                     <Check
-                      className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5"
+                      className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
                     {f}
@@ -130,7 +130,7 @@ export default function PricingPage() {
 
               <Link
                 href="/login"
-                className={`text-sm font-medium text-center py-2.5 rounded-lg transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500 ${
+                className={`text-sm font-medium text-center py-2.5 rounded-lg transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 ${
                   tier.highlight
                     ? 'bg-green-500 text-black hover:bg-green-400'
                     : 'border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white'
@@ -156,7 +156,7 @@ export default function PricingPage() {
             ].map((item) => (
               <div key={item.text} className="flex items-start gap-2.5">
                 <item.icon
-                  className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
                 <span className="text-sm text-zinc-400">{item.text}</span>
@@ -212,7 +212,7 @@ export default function PricingPage() {
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-6 py-3 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
+            className="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-6 py-3 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
           >
             Apply for Early Access
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
