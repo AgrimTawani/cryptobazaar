@@ -1,0 +1,453 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserStatus {
+  LOGIN_DONE
+  ONBOARDING_PENDING
+  WALLET_PENDING
+  VERIFICATION_PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum OnboardingLayer {
+  KYC
+  EDD
+  INTERVIEW
+}
+
+enum OnboardingLayerStatus {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+}
+
+enum SubscriptionTier {
+  STARTER
+  TRADER
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum Asset {
+  USDT
+  USDC
+}
+
+enum Chain {
+  POLYGON
+  SOLANA
+  TRON
+}
+
+enum PaymentMethod {
+  UPI
+  IMPS
+  NEFT
+}
+
+// Seller posts order → tokens move to escrow instantly → LISTED
+// Buyer clicks Buy → pre-checks pass → BUYER_MATCHED + chat room opens
+// Buyer sends INR → clicks "I paid" + UTR → BUYER_PAID (seller loses cancel)
+// Seller confirms → COMPLETED / raises dispute → DISPUTED
+// Buyer didn't pay in 30 min → EXPIRED (order returns to LISTED)
+// Seller cancels before buyer matches → CANCELLED (tokens returned)
+enum OrderStatus {
+  LISTED
+  BUYER_MATCHED
+  BUYER_PAID
+  COMPLETED
+  DISPUTED
+  DISPUTE_RESOLVED_BUYER
+  DISPUTE_RESOLVED_SELLER
+  EXPIRED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  EVIDENCE_SUBMITTED
+  UNDER_REVIEW
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+}
+
+enum ClaimTier {
+  EMERGENCY
+  STANDARD
+  FULL
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  DISBURSED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  BLOCKED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id      String     @id @default(uuid())
+  clerkId String     @unique @map("clerk_id")
+  status  UserStatus @default(LOGIN_DONE)
+
+  // Identity — from Google / Clerk
+  email     String? @unique
+  name      String?
+  avatarUrl String? @map("avatar_url")
+
+  // Identity — from Didit KYC (reference only, no raw PII)
+  phone        String?
+  dateOfBirth  DateTime? @map("date_of_birth")
+  gender       String?
+  aadhaarLast4 String?   @map("aadhaar_last4")
+  panMasked    String?   @map("pan_masked")
+  address      String?
+  city         String?
+  state        String?
+  pincode      String?
+
+  // Didit session reference
+  kycSessionId  String?   @map("kyc_session_id")
+  kycProvider   String?   @default("didit") @map("kyc_provider")
+  kycVerifiedAt DateTime? @map("kyc_verified_at")
+  kycExpiresAt  DateTime? @map("kyc_expires_at")
+
+  // Hyperledger Identus
+  did             String? @unique
+  kycCredentialId String? @map("kyc_credential_id")
+  eddCredentialId String? @map("edd_credential_id")
+  interviewCredId String? @map("interview_cred_id")
+
+  // Wallet
+  walletAddress    String?   @unique @map("wallet_address")
+  walletChain      String?   @map("wallet_chain")
+  walletVerifiedAt DateTime? @map("wallet_verified_at")
+
+  // Subscription
+  subscriptionTier      SubscriptionTier? @map("subscription_tier")
+  subscriptionExpiresAt DateTime?         @map("subscription_expires_at")
+
+  // Trade volume tracking
+  monthlyTradeVolumeInr Decimal  @default(0) @map("monthly_trade_volume_inr") @db.Decimal(20, 2)
+  totalTradeVolumeInr   Decimal  @default(0) @map("total_trade_volume_inr") @db.Decimal(20, 2)
+  totalTradeCount       Int      @default(0) @map("total_trade_count")
+  weeklyTradeCount      Int      @default(0) @map("weekly_trade_count")
+  monthlyTradeCount     Int      @default(0) @map("monthly_trade_count")
+  volumeResetAt         DateTime? @map("volume_reset_at")
+  weeklyResetAt         DateTime? @map("weekly_reset_at")
+
+  // Rating aggregates — as buyer
+  avgBuyerRating          Decimal? @map("avg_buyer_rating") @db.Decimal(3, 2)
+  avgBuyerSpeedRating     Decimal? @map("avg_buyer_speed_rating") @db.Decimal(3, 2)
+  avgBuyerPoliteness      Decimal? @map("avg_buyer_politeness") @db.Decimal(3, 2)
+  buyerRatingCount        Int      @default(0) @map("buyer_rating_count")
+  avgBuyerPaymentTimeSecs Int?     @map("avg_buyer_payment_time_secs")
+
+  // Rating aggregates — as seller
+  avgSellerRating          Decimal? @map("avg_seller_rating") @db.Decimal(3, 2)
+  avgSellerSpeedRating     Decimal? @map("avg_seller_speed_rating") @db.Decimal(3, 2)
+  avgSellerPoliteness      Decimal? @map("avg_seller_politeness") @db.Decimal(3, 2)
+  sellerRatingCount        Int      @default(0) @map("seller_rating_count")
+  avgSellerConfirmTimeSecs Int?     @map("avg_seller_confirm_time_secs")
+
+  // Dispute record
+  disputesRaisedCount Int @default(0) @map("disputes_raised_count")
+  disputesLostCount   Int @default(0) @map("disputes_lost_count")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  onboardingRecords    OnboardingRecord[]
+  walletScreenings     WalletScreen[]
+  subscriptions        Subscription[]
+  ordersAsSeller       Order[]              @relation("SellerOrders")
+  ordersAsBuyer        Order[]              @relation("BuyerOrders")
+  disputesRaised       Dispute[]            @relation("DisputeRaiser")
+  protectionFundClaims ProtectionFundClaim[]
+  chatMessages         ChatMessage[]
+  ratingsGiven         TradeRating[]        @relation("RatingsGiven")
+  ratingsReceived      TradeRating[]        @relation("RatingsReceived")
+
+  @@map("users")
+}
+
+model OnboardingRecord {
+  id              String                @id @default(uuid())
+  userId          String                @map("user_id")
+  layer           OnboardingLayer
+  status          OnboardingLayerStatus @default(PENDING)
+  attemptNumber   Int                   @default(1) @map("attempt_number")
+  score           Float?
+  result          Json?
+  rejectionReason String?               @map("rejection_reason")
+  vcCredentialId  String?               @map("vc_credential_id")
+  reapplyAfter    DateTime?             @map("reapply_after")
+  completedAt     DateTime?             @map("completed_at")
+  expiresAt       DateTime?             @map("expires_at")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("onboarding_records")
+}
+
+model WalletScreen {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  walletAddress String    @map("wallet_address")
+  provider      String    @default("nominis")
+  riskScore     Float?    @map("risk_score")
+  riskLevel     RiskLevel @map("risk_level")
+  flags         Json?
+  isPassed      Boolean   @map("is_passed")
+  rawResponse   Json?     @map("raw_response")
+  screenedAt    DateTime  @default(now()) @map("screened_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("wallet_screens")
+}
+
+model Subscription {
+  id         String             @id @default(uuid())
+  userId     String             @map("user_id")
+  tier       SubscriptionTier
+  status     SubscriptionStatus @default(ACTIVE)
+  amountPaid Decimal            @map("amount_paid") @db.Decimal(10, 2)
+  utr        String?
+  paidAt     DateTime?          @map("paid_at")
+  validFrom  DateTime           @map("valid_from")
+  validUntil DateTime           @map("valid_until")
+  notes      String?
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Order {
+  id      String @id @default(uuid())
+  orderId String @unique @map("order_id")
+
+  // Parties
+  sellerId String  @map("seller_id")
+  buyerId  String? @map("buyer_id")
+
+  // Asset
+  asset         Asset
+  chain         Chain
+  amount        Decimal @db.Decimal(20, 8)
+  pricePerUnit  Decimal @map("price_per_unit") @db.Decimal(20, 2)
+  totalValueInr Decimal @map("total_value_inr") @db.Decimal(20, 2)
+
+  // Trade constraints
+  minTradeSize           Decimal?       @map("min_trade_size") @db.Decimal(20, 2)
+  maxTradeSize           Decimal?       @map("max_trade_size") @db.Decimal(20, 2)
+  acceptedPaymentMethods PaymentMethod[] @map("accepted_payment_methods")
+
+  // Seller payment details (encrypted at app layer)
+  sellerUpiId       String? @map("seller_upi_id")
+  sellerBankAccount String? @map("seller_bank_account")
+  sellerIfsc        String? @map("seller_ifsc")
+
+  // Status
+  status OrderStatus @default(LISTED)
+
+  // Escrow (funded at order creation time)
+  escrowContractAddress String? @map("escrow_contract_address")
+  escrowTxHash          String? @map("escrow_tx_hash")
+  releaseTxHash         String? @map("release_tx_hash")
+  levyTxHash            String? @map("levy_tx_hash")
+
+  // Payment (from buyer)
+  utr                   String?
+  paymentMethod         PaymentMethod? @map("payment_method")
+  paymentScreenshotIpfs String?        @map("payment_screenshot_ipfs")
+
+  // Trade timing (seconds — used for rating computation)
+  buyerPaymentTimeSecs  Int? @map("buyer_payment_time_secs")
+  sellerConfirmTimeSecs Int? @map("seller_confirm_time_secs")
+
+  // Timestamps
+  buyerMatchedAt               DateTime? @map("buyer_matched_at")
+  paymentWindowExpiresAt       DateTime? @map("payment_window_expires_at")
+  paymentSubmittedAt           DateTime? @map("payment_submitted_at")
+  confirmationWindowExpiresAt  DateTime? @map("confirmation_window_expires_at")
+  sellerConfirmedAt            DateTime? @map("seller_confirmed_at")
+  cancelledAt                  DateTime? @map("cancelled_at")
+  completedAt                  DateTime? @map("completed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  seller User  @relation("SellerOrders", fields: [sellerId], references: [id])
+  buyer  User? @relation("BuyerOrders", fields: [buyerId], references: [id])
+
+  chatRoom             ChatRoom?
+  dispute              Dispute?
+  ratings              TradeRating[]
+  protectionFundClaims ProtectionFundClaim[]
+
+  @@index([sellerId])
+  @@index([buyerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model ChatRoom {
+  id       String  @id @default(uuid())
+  orderId  String  @unique @map("order_id")
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  closedAt  DateTime? @map("closed_at")
+
+  order    Order         @relation(fields: [orderId], references: [id])
+  messages ChatMessage[]
+
+  @@map("chat_rooms")
+}
+
+model ChatMessage {
+  id         String      @id @default(uuid())
+  chatRoomId String      @map("chat_room_id")
+  senderId   String?     @map("sender_id")
+  type       MessageType @default(TEXT)
+  content    String
+  isRead     Boolean     @default(false) @map("is_read")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender   User?    @relation(fields: [senderId], references: [id])
+
+  @@index([chatRoomId])
+  @@index([createdAt])
+  @@map("chat_messages")
+}
+
+model TradeRating {
+  id          String @id @default(uuid())
+  orderId     String @map("order_id")
+  raterId     String @map("rater_id")
+  ratedUserId String @map("rated_user_id")
+  raterRole   String @map("rater_role")
+
+  // Scores 1–5
+  speedRating      Int @map("speed_rating")
+  politenessRating Int @map("politeness_rating")
+  overallRating    Int @map("overall_rating")
+
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order     Order @relation(fields: [orderId], references: [id])
+  rater     User  @relation("RatingsGiven", fields: [raterId], references: [id])
+  ratedUser User  @relation("RatingsReceived", fields: [ratedUserId], references: [id])
+
+  @@unique([orderId, raterId])
+  @@index([ratedUserId])
+  @@map("trade_ratings")
+}
+
+model Dispute {
+  id           String @id @default(uuid())
+  orderId      String @unique @map("order_id")
+  raisedById   String @map("raised_by_id")
+  raisedByRole String @map("raised_by_role")
+
+  status           DisputeStatus @default(OPEN)
+  evidenceDeadline DateTime?     @map("evidence_deadline")
+
+  buyerBankStatementIpfs   String?   @map("buyer_bank_statement_ipfs")
+  buyerStatement           String?   @map("buyer_statement")
+  buyerEvidenceSubmittedAt DateTime? @map("buyer_evidence_submitted_at")
+  buyerStatementTampered   Boolean?  @map("buyer_statement_tampered")
+
+  sellerBankStatementIpfs   String?   @map("seller_bank_statement_ipfs")
+  sellerStatement           String?   @map("seller_statement")
+  sellerEvidenceSubmittedAt DateTime? @map("seller_evidence_submitted_at")
+  sellerStatementTampered   Boolean?  @map("seller_statement_tampered")
+
+  resolution String?
+  resolvedBy String?   @map("resolved_by")
+  resolvedAt DateTime? @map("resolved_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order  Order @relation(fields: [orderId], references: [id])
+  raiser User  @relation("DisputeRaiser", fields: [raisedById], references: [id])
+
+  @@map("disputes")
+}
+
+model ProtectionFundClaim {
+  id      String @id @default(uuid())
+  userId  String @map("user_id")
+  orderId String @map("order_id")
+
+  tier   ClaimTier
+  status ClaimStatus @default(SUBMITTED)
+
+  bankFreezeNoticeIpfs    String? @map("bank_freeze_notice_ipfs")
+  firOrComplaintIpfs      String? @map("fir_or_complaint_ipfs")
+  legalRepresentationIpfs String? @map("legal_representation_ipfs")
+  nocIpfs                 String? @map("noc_ipfs")
+
+  requestedAmount Decimal  @map("requested_amount") @db.Decimal(12, 2)
+  approvedAmount  Decimal? @map("approved_amount") @db.Decimal(12, 2)
+  disbursedAmount Decimal? @map("disbursed_amount") @db.Decimal(12, 2)
+
+  reviewNotes        String?   @map("review_notes")
+  reviewedBy         String?   @map("reviewed_by")
+  reviewedAt         DateTime? @map("reviewed_at")
+  disbursedAt        DateTime? @map("disbursed_at")
+  disbursementTxHash String?   @map("disbursement_tx_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([userId])
+  @@map("protection_fund_claims")
+}
