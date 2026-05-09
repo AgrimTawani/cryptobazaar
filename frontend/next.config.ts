@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   serverExternalPackages: ["@prisma/client", "prisma", "pdf-parse"],
+
 };
 
 export default nextConfig;
