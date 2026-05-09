@@ -6,58 +6,18 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#fafafa",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {/* Top bar */}
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "20px 40px",
-          background: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-        }}
-      >
-        <Link
-          href="/"
-          style={{
-            fontFamily: "var(--condensed)",
-            fontSize: "1rem",
-            letterSpacing: "3px",
-            color: "#000",
-            textDecoration: "none",
-          }}
-        >
+      <header className="flex items-center justify-between py-5 px-10 bg-white border-b border-[#f0f0f0]">
+        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
           CRYPTOBAZAAR
         </Link>
-        <span
-          style={{
-            fontFamily: "var(--sans)",
-            fontSize: "0.78rem",
-            color: "#999",
-            letterSpacing: "0.5px",
-          }}
-        >
+        <span className="font-sans text-[0.78rem] text-[#999] tracking-[0.5px]">
           Secure Onboarding
         </span>
       </header>
 
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "48px 24px 80px",
-        }}
-      >
+      <main className="flex-1 flex flex-col items-center pt-12 px-6 pb-20">
         {children}
       </main>
     </div>

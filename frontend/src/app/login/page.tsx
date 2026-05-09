@@ -29,100 +29,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <div className="flex h-screen overflow-hidden">
       {/* ── Left panel ── */}
-      <div
-        style={{
-          flex: "0 0 55%",
-          background: "#000",
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "48px 56px",
-          overflow: "hidden",
-        }}
-      >
+      <div className="basis-[55%] shrink-0 bg-black relative flex flex-col justify-between py-12 px-14 overflow-hidden">
         {/* Dot grid */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "radial-gradient(circle, rgba(212,255,0,0.13) 1.5px, transparent 1.5px)",
-            backgroundSize: "28px 28px",
-            pointerEvents: "none",
-          }}
-        />
+        <div className="absolute inset-0 pointer-events-none [background-image:radial-gradient(circle,rgba(212,255,0,0.13)_1.5px,transparent_1.5px)] [background-size:28px_28px]" />
 
         {/* Lime gradient fade at bottom */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "240px",
-            background:
-              "linear-gradient(to top, rgba(212,255,0,0.06) 0%, transparent 100%)",
-            pointerEvents: "none",
-          }}
-        />
+        <div className="absolute bottom-0 left-0 right-0 h-[240px] pointer-events-none [background:linear-gradient(to_top,rgba(212,255,0,0.06)_0%,transparent_100%)]" />
 
         {/* Logo */}
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <span
-            style={{
-              fontFamily: "var(--condensed)",
-              fontSize: "1.1rem",
-              letterSpacing: "4px",
-              color: "#D4FF00",
-            }}
-          >
+        <div className="relative z-[1]">
+          <span className="font-condensed text-[1.1rem] tracking-[4px] text-lime">
             CRYPTOBAZAAR
           </span>
         </div>
 
         {/* Headline */}
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <h1
-            style={{
-              fontFamily: "var(--condensed)",
-              fontSize: "clamp(3.2rem, 5.5vw, 5.2rem)",
-              lineHeight: 0.95,
-              letterSpacing: "1px",
-              color: "#fff",
-              marginBottom: "20px",
-            }}
-          >
+        <div className="relative z-[1]">
+          <h1 className="font-condensed text-[clamp(3.2rem,5.5vw,5.2rem)] leading-[0.95] tracking-[1px] text-white mb-5">
             TRADE USDT.
             <br />
-            <span style={{ color: "#D4FF00" }}>STAY INSURED.</span>
+            <span className="text-lime">STAY INSURED.</span>
           </h1>
-          <p
-            style={{
-              fontFamily: "var(--sans)",
-              fontSize: "0.9rem",
-              color: "rgba(255,255,255,0.45)",
-              maxWidth: "300px",
-              lineHeight: 1.65,
-            }}
-          >
+          <p className="font-sans text-[0.9rem] text-white/[0.45] max-w-[300px] leading-[1.65]">
             The only gated P2P exchange in India. Every member verified. Every
             trade insured.
           </p>
         </div>
 
         {/* Stats */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "28px 40px",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        <div className="grid grid-cols-2 gap-[28px_40px] relative z-[1]">
           {[
             { value: "3-Layer", label: "Verification" },
             { value: "0.75%", label: "Insurance Levy" },
@@ -130,27 +67,10 @@ export default function LoginPage() {
             { value: "0", label: "Custody Risk" },
           ].map((stat) => (
             <div key={stat.label}>
-              <div
-                style={{
-                  fontFamily: "var(--condensed)",
-                  fontSize: "1.9rem",
-                  color: "#D4FF00",
-                  letterSpacing: "1px",
-                  lineHeight: 1,
-                }}
-              >
+              <div className="font-condensed text-[1.9rem] text-lime tracking-[1px] leading-none">
                 {stat.value}
               </div>
-              <div
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.7rem",
-                  color: "rgba(255,255,255,0.35)",
-                  letterSpacing: "1.5px",
-                  textTransform: "uppercase",
-                  marginTop: "4px",
-                }}
-              >
+              <div className="font-sans text-[0.7rem] text-white/[0.35] tracking-[1.5px] uppercase mt-1">
                 {stat.label}
               </div>
             </div>
@@ -159,78 +79,22 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel ── */}
-      <div
-        style={{
-          flex: 1,
-          background: "#fff",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "flex-start",
-          padding: "64px 56px",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: "340px" }}>
-          <h2
-            style={{
-              fontFamily: "var(--condensed)",
-              fontSize: "2.6rem",
-              letterSpacing: "1px",
-              color: "#000",
-              marginBottom: "8px",
-              lineHeight: 1,
-            }}
-          >
+      <div className="flex-1 bg-white flex flex-col justify-center items-start py-16 px-14">
+        <div className="w-full max-w-[340px]">
+          <h2 className="font-condensed text-[2.6rem] tracking-[1px] text-black mb-2 leading-none">
             GET STARTED
           </h2>
-          <p
-            style={{
-              fontFamily: "var(--sans)",
-              fontSize: "0.875rem",
-              color: "#777",
-              marginBottom: "40px",
-              lineHeight: 1.6,
-            }}
-          >
+          <p className="font-sans text-sm text-[#777] mb-10 leading-[1.6]">
             Sign in to begin your verification. Only verified members can trade.
           </p>
 
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px",
-              width: "100%",
-              padding: "13px 20px",
-              border: "1.5px solid #e0e0e0",
-              borderRadius: "10px",
-              background: loading ? "#fafafa" : "#fff",
-              cursor: loading ? "wait" : "pointer",
-              fontFamily: "var(--sans)",
-              fontSize: "0.925rem",
-              fontWeight: 500,
-              color: "#111",
-              transition: "border-color 0.15s, box-shadow 0.15s",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "#bbb";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  "0 2px 8px rgba(0,0,0,0.1)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#e0e0e0";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                "0 1px 3px rgba(0,0,0,0.06)";
-            }}
+            className={`flex items-center justify-center gap-3 w-full py-[13px] px-5 border-[1.5px] border-solid border-[#e0e0e0] rounded-[10px] font-sans text-[0.925rem] font-medium text-[#111] transition-all duration-150 shadow-sm hover:border-[#bbb] hover:shadow-md ${loading ? "bg-[#fafafa] cursor-wait" : "bg-white cursor-pointer"}`}
           >
             {loading ? (
-              <span style={{ opacity: 0.5 }}>Redirecting…</span>
+              <span className="opacity-50">Redirecting…</span>
             ) : (
               <>
                 <GoogleIcon />
@@ -239,21 +103,8 @@ export default function LoginPage() {
             )}
           </button>
 
-          <div
-            style={{
-              marginTop: "20px",
-              paddingTop: "20px",
-              borderTop: "1px solid #f0f0f0",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--sans)",
-                fontSize: "0.72rem",
-                color: "#bbb",
-                lineHeight: 1.7,
-              }}
-            >
+          <div className="mt-5 pt-5 border-t border-[#f0f0f0]">
+            <p className="font-sans text-[0.72rem] text-[#bbb] leading-[1.7]">
               By continuing, you agree to our Terms of Service and Privacy
               Policy. Only Indian residents are eligible to trade on
               CryptoBazaar.

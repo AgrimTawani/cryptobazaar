@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "skills": {
+    "didit-aml-screening": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-aml-screening/SKILL.md",
+      "computedHash": "e32e08024b5c32a5d4c4d8671e6ce360ce654da187ca2d8f2bf904adcf4cadaf"
+    },
+    "didit-biometric-age-estimation": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-biometric-age-estimation/SKILL.md",
+      "computedHash": "61935085c4aedb93ac0c2fdfd6ed71bf709a9e720a0614685f117b4576e3a7d9"
+    },
+    "didit-database-validation": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-database-validation/SKILL.md",
+      "computedHash": "f2ba6548c2d616db94a927e559f4a50b3735036158035d1798fb78d0a9873fc6"
+    },
+    "didit-email-verification": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-email-verification/SKILL.md",
+      "computedHash": "56d7c99d07d0e14adf49b665a4573fba6828e2a181c16b23ed7dde452d987ea9"
+    },
+    "didit-face-match": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-face-match/SKILL.md",
+      "computedHash": "06c431934c35d70339581dfc5b5492dcc5c7244fde5f62b14613c10a920d6a4c"
+    },
+    "didit-face-search": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-face-search/SKILL.md",
+      "computedHash": "6c94203fcd53399d14666fbde1b130eac6b508f7304cc423ffab770834d3f763"
+    },
+    "didit-id-document-verification": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-id-document-verification/SKILL.md",
+      "computedHash": "304124df77847a9941f2e5d518ea1a930ed299fcf6ddf27b49ca0b985d6ea1b9"
+    },
+    "didit-kyc-onboarding": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-kyc-onboarding/SKILL.md",
+      "computedHash": "f592414b220bb67d87cc3fe2bbcc17172b75116e30db5a9ad0cf7837a6d1780f"
+    },
+    "didit-liveness-detection": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-liveness-detection/SKILL.md",
+      "computedHash": "df7424454c67a2e19835782a81ad3572b8f8370e75bfa6c66c531a8269020695"
+    },
+    "didit-phone-verification": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-phone-verification/SKILL.md",
+      "computedHash": "b0f5fe31c6ebe6626ce3501e936a39a031291d10efe4b64990a3d2612592bb3d"
+    },
+    "didit-proof-of-address": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-proof-of-address/SKILL.md",
+      "computedHash": "525c578dbe02e463f4c0834334fdd88f924db16b1674e12c299274868ab25fad"
+    },
+    "didit-verification-management": {
+      "source": "didit-protocol/skills",
+      "sourceType": "github",
+      "skillPath": "skills/didit-verification-management/SKILL.md",
+      "computedHash": "ea63a4e88eacfbe3f7c9bfcde14ac56e12fea6463c6e639f6ab23c4ca27d6cea"
+    }
+  }
+}

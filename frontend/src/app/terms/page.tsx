@@ -304,36 +304,34 @@ Notices to us must be sent in writing to the legal email above. Notices to you w
 
 export default function TermsPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#fff" }}>
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header style={{ background: "#000", padding: "40px", borderBottom: "1px solid #222" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <Link href="/" style={{ fontFamily: "var(--condensed)", fontSize: "1rem", letterSpacing: "3px", color: "#D4FF00", textDecoration: "none", display: "inline-block", marginBottom: "32px" }}>
+      <header className="bg-black px-10 py-10 border-b border-[#222]">
+        <div className="max-w-225 mx-auto">
+          <Link href="/" className="font-condensed text-base tracking-[3px] text-lime no-underline inline-block mb-8">
             ← CRYPTOBAZAAR
           </Link>
-          <h1 style={{ fontFamily: "var(--condensed)", fontSize: "clamp(2.5rem, 6vw, 5rem)", color: "#fff", lineHeight: 1, letterSpacing: "1px", marginBottom: "12px" }}>
+          <h1 className="font-condensed text-[clamp(2.5rem,6vw,5rem)] text-white leading-none tracking-[1px] mb-3">
             TERMS OF USE
           </h1>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.4)" }}>
+          <p className="font-sans text-[0.85rem] text-white/40">
             Last updated: May 2026 · Effective for all users from the date of account creation
           </p>
         </div>
       </header>
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "60px 40px", display: "flex", gap: "60px", alignItems: "flex-start" }}>
+      <div className="max-w-225 mx-auto py-15 px-10 flex gap-15 items-start">
         {/* Sidebar TOC */}
-        <aside style={{ flexShrink: 0, width: "200px", position: "sticky", top: "32px" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.65rem", color: "#bbb", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "16px" }}>
+        <aside className="shrink-0 w-50 sticky top-8">
+          <p className="font-sans text-[0.65rem] text-[#bbb] tracking-[2px] uppercase mb-4">
             Contents
           </p>
-          <nav style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <nav className="flex flex-col gap-1">
             {SECTIONS.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
-                style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", color: "#888", lineHeight: 1.5, textDecoration: "none", padding: "4px 0", borderLeft: "2px solid transparent", paddingLeft: "10px", transition: "all 0.15s" }}
-                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = "#000"; (e.target as HTMLElement).style.borderLeftColor = "#D4FF00"; }}
-                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = "#888"; (e.target as HTMLElement).style.borderLeftColor = "transparent"; }}
+                className="font-sans text-[0.78rem] text-[#888] leading-normal no-underline py-1 border-l-2 border-transparent pl-2.5 transition-all duration-150 hover:text-black hover:border-l-lime"
               >
                 {s.title.replace(/^\d+\.\s/, "")}
               </a>
@@ -342,21 +340,25 @@ export default function TermsPage() {
         </aside>
 
         {/* Content */}
-        <main style={{ flex: 1, minWidth: 0 }}>
+        <main className="flex-1 min-w-0">
           {/* Important notice */}
-          <div style={{ background: "#fffbeb", border: "1.5px solid #fde68a", borderRadius: "12px", padding: "20px 24px", marginBottom: "48px" }}>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.85rem", color: "#92400e", lineHeight: 1.7 }}>
+          <div className="bg-[#fffbeb] border-[1.5px] border-[#fde68a] rounded-xl py-5 px-6 mb-12">
+            <p className="font-sans text-[0.85rem] text-[#92400e] leading-[1.7]">
               <strong>Important:</strong> The Member Protection Fund described in Section 8 is a voluntary member benefit. It is <strong>not an insurance product</strong> and is not regulated as such. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully before making any decisions based on the Fund.
             </p>
           </div>
 
           {SECTIONS.map((section, i) => (
-            <section key={section.id} id={section.id} style={{ marginBottom: "52px", paddingBottom: "52px", borderBottom: i < SECTIONS.length - 1 ? "1px solid #f0f0f0" : "none" }}>
-              <h2 style={{ fontFamily: "var(--condensed)", fontSize: "1.6rem", color: "#000", letterSpacing: "0.5px", marginBottom: "20px" }}>
+            <section
+              key={section.id}
+              id={section.id}
+              className={`mb-13 pb-13 ${i < SECTIONS.length - 1 ? "border-b border-[#f0f0f0]" : ""}`}
+            >
+              <h2 className="font-condensed text-[1.6rem] text-black tracking-[0.5px] mb-5">
                 {section.title}
               </h2>
               {section.content.split("\n\n").map((para, j) => (
-                <p key={j} style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: "#444", lineHeight: 1.85, marginBottom: "16px", whiteSpace: "pre-line" }}>
+                <p key={j} className="font-sans text-sm text-[#444] leading-[1.85] mb-4 whitespace-pre-line">
                   {para}
                 </p>
               ))}
@@ -364,9 +366,13 @@ export default function TermsPage() {
           ))}
 
           {/* Footer note */}
-          <div style={{ background: "#fafafa", border: "1px solid #e5e5e5", borderRadius: "12px", padding: "24px", marginTop: "16px" }}>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.8rem", color: "#888", lineHeight: 1.7 }}>
-              These Terms were last reviewed by the CryptoBazaar compliance team in May 2026. If you have any questions about these Terms, please contact us at <a href="mailto:legal@cryptobazaar.in" style={{ color: "#000", textDecoration: "underline" }}>legal@cryptobazaar.in</a> before using the Platform.
+          <div className="bg-[#fafafa] border border-[#e5e5e5] rounded-xl p-6 mt-4">
+            <p className="font-sans text-[0.8rem] text-[#888] leading-[1.7]">
+              These Terms were last reviewed by the CryptoBazaar compliance team in May 2026. If you have any questions about these Terms, please contact us at{" "}
+              <a href="mailto:legal@cryptobazaar.in" className="text-black underline">
+                legal@cryptobazaar.in
+              </a>{" "}
+              before using the Platform.
             </p>
           </div>
         </main>

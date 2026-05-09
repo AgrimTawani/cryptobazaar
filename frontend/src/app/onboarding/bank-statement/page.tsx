@@ -37,23 +37,16 @@ export default function BankStatementPage() {
     router.push("/onboarding/questionnaire");
   };
 
+  const devSkip = async () => {
+    await fetch("/api/verification/dev-approve-edd", { method: "POST" });
+    router.push("/onboarding/questionnaire");
+  };
+
   return (
-    <div style={{ width: "100%", maxWidth: "520px" }}>
+    <div className="w-full max-w-[520px]">
       <button
         onClick={() => router.back()}
-        style={{
-          fontFamily: "var(--sans)",
-          fontSize: "0.8rem",
-          color: "#999",
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          marginBottom: "28px",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-        }}
+        className="font-sans text-[0.8rem] text-[#999] flex items-center gap-[6px] mb-7 bg-transparent border-0 cursor-pointer p-0"
       >
         ← Back
       </button>
@@ -62,52 +55,16 @@ export default function BankStatementPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        style={{
-          background: "#fff",
-          border: "1.5px solid #e5e5e5",
-          borderRadius: "20px",
-          padding: "40px",
-        }}
+        className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-10"
       >
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "#D4FF00",
-            borderRadius: "999px",
-            padding: "4px 14px",
-            fontFamily: "var(--sans)",
-            fontSize: "0.72rem",
-            fontWeight: 600,
-            letterSpacing: "1px",
-            textTransform: "uppercase",
-            marginBottom: "20px",
-          }}
-        >
+        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1 px-[14px] font-sans text-[0.72rem] font-semibold tracking-[1px] uppercase mb-5">
           Step 02 of 04
         </div>
 
-        <h1
-          style={{
-            fontFamily: "var(--condensed)",
-            fontSize: "2.2rem",
-            letterSpacing: "1px",
-            marginBottom: "10px",
-            lineHeight: 1,
-          }}
-        >
+        <h1 className="font-condensed text-[2.2rem] tracking-[1px] mb-[10px] leading-none">
           Bank Statement Review
         </h1>
-        <p
-          style={{
-            fontFamily: "var(--sans)",
-            fontSize: "0.875rem",
-            color: "#666",
-            marginBottom: "32px",
-            lineHeight: 1.6,
-          }}
-        >
+        <p className="font-sans text-sm text-[#666] mb-8 leading-[1.6]">
           Upload your last 6 months of bank statements. Our ML system checks for
           income patterns and flags. PDF only, max 10MB.
         </p>
@@ -117,39 +74,19 @@ export default function BankStatementPage() {
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          style={{
-            border: `2px dashed ${file ? "#D4FF00" : "#ddd"}`,
-            borderRadius: "14px",
-            padding: "40px 24px",
-            textAlign: "center",
-            cursor: "pointer",
-            background: file ? "rgba(212,255,0,0.04)" : "#fafafa",
-            transition: "border-color 0.2s, background 0.2s",
-            marginBottom: "20px",
-          }}
+          className={`border-2 border-dashed rounded-[14px] py-10 px-6 text-center cursor-pointer mb-5 transition-colors duration-200 ${
+            file
+              ? "border-lime bg-lime/[0.04]"
+              : "border-[#ddd] bg-[#fafafa]"
+          }`}
         >
           {file ? (
             <>
-              <div style={{ fontSize: "2rem", marginBottom: "10px" }}>📄</div>
-              <p
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "#111",
-                  marginBottom: "4px",
-                }}
-              >
+              <div className="text-[2rem] mb-[10px]">📄</div>
+              <p className="font-sans text-sm font-semibold text-[#111] mb-1">
                 {file.name}
               </p>
-              <p
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.75rem",
-                  color: "#999",
-                  marginBottom: "12px",
-                }}
-              >
+              <p className="font-sans text-[0.75rem] text-[#999] mb-3">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
               <button
@@ -157,40 +94,18 @@ export default function BankStatementPage() {
                   e.stopPropagation();
                   setFile(null);
                 }}
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.75rem",
-                  color: "#999",
-                  textDecoration: "underline",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="font-sans text-[0.75rem] text-[#999] underline bg-transparent border-0 cursor-pointer"
               >
                 Replace file
               </button>
             </>
           ) : (
             <>
-              <div style={{ fontSize: "2rem", marginBottom: "12px" }}>📁</div>
-              <p
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "#333",
-                  marginBottom: "4px",
-                }}
-              >
+              <div className="text-[2rem] mb-3">📁</div>
+              <p className="font-sans text-sm font-semibold text-[#333] mb-1">
                 Drop your PDF here
               </p>
-              <p
-                style={{
-                  fontFamily: "var(--sans)",
-                  fontSize: "0.78rem",
-                  color: "#aaa",
-                }}
-              >
+              <p className="font-sans text-[0.78rem] text-[#aaa]">
                 or click to browse
               </p>
             </>
@@ -201,61 +116,40 @@ export default function BankStatementPage() {
           ref={fileInputRef}
           type="file"
           accept="application/pdf"
-          style={{ display: "none" }}
+          className="hidden"
           onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
         />
 
         {error && (
-          <p
-            style={{
-              fontFamily: "var(--sans)",
-              fontSize: "0.8rem",
-              color: "#e53e3e",
-              marginBottom: "16px",
-            }}
-          >
+          <p className="font-sans text-[0.8rem] text-[#e53e3e] mb-4">
             {error}
           </p>
+        )}
+
+        {process.env.NODE_ENV === "development" && (
+          <button
+            onClick={devSkip}
+            className="w-full py-[11px] bg-transparent text-[#999] border-[1.5px] border-dashed border-[#ddd] rounded-[10px] font-sans text-[0.8rem] cursor-pointer mb-[10px]"
+          >
+            [DEV] Skip Bank Statement
+          </button>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={!file || analyzing}
-          style={{
-            width: "100%",
-            padding: "14px",
-            background: file && !analyzing ? "#000" : "#f0f0f0",
-            color: file && !analyzing ? "#fff" : "#aaa",
-            border: "none",
-            borderRadius: "10px",
-            fontFamily: "var(--sans)",
-            fontSize: "0.925rem",
-            fontWeight: 600,
-            cursor: file && !analyzing ? "pointer" : "not-allowed",
-            transition: "background 0.2s",
-          }}
+          className={`w-full py-[14px] border-0 rounded-[10px] font-sans text-[0.925rem] font-semibold transition-colors duration-200 ${
+            file && !analyzing
+              ? "bg-black text-white cursor-pointer"
+              : "bg-[#f0f0f0] text-[#aaa] cursor-not-allowed"
+          }`}
         >
           {analyzing ? "Analysing…" : "Submit Statement →"}
         </button>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            marginTop: "24px",
-            paddingTop: "20px",
-            borderTop: "1px solid #f0f0f0",
-          }}
-        >
+        <div className="flex items-center gap-2 mt-6 pt-5 border-t border-[#f0f0f0]">
           <span>🔒</span>
-          <span
-            style={{
-              fontFamily: "var(--sans)",
-              fontSize: "0.72rem",
-              color: "#bbb",
-            }}
-          >
+          <span className="font-sans text-[0.72rem] text-[#bbb]">
             Analysed and discarded instantly. Never stored on our servers.
           </span>
         </div>

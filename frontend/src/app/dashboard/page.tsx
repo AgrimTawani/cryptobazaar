@@ -65,55 +65,63 @@ export default function DashboardPage() {
 
   if (!isLoaded) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa" }}>
-        <div style={{ width: "32px", height: "32px", border: "3px solid #D4FF00", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <div className="w-8 h-8 border-[3px] border-lime border-t-transparent rounded-full animate-spin-fast" />
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa" }}>
+    <div className="min-h-screen bg-[#fafafa]">
       {/* Top bar */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", padding: "0 40px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ fontFamily: "var(--condensed)", fontSize: "1rem", letterSpacing: "3px", color: "#000", textDecoration: "none" }}>
+      <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between">
+        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
           CRYPTOBAZAAR
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link href="/marketplace" style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "#555", textDecoration: "none" }}>
+        <div className="flex items-center gap-3">
+          <Link href="/marketplace" className="font-sans text-[0.82rem] text-[#555] no-underline">
             Marketplace
           </Link>
           <button
             onClick={handleSignOut}
-            style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "#888", background: "none", border: "1px solid #e5e5e5", borderRadius: "999px", padding: "6px 16px", cursor: "pointer" }}
+            className="font-sans text-[0.82rem] text-[#888] bg-transparent border border-[#e5e5e5] rounded-full py-[6px] px-4 cursor-pointer"
           >
             Sign out
           </button>
         </div>
       </header>
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "48px 24px" }}>
+      <div className="max-w-[900px] mx-auto py-12 px-6">
         {/* Profile card */}
-        <div style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "20px", padding: "32px", display: "flex", alignItems: "center", gap: "24px", marginBottom: "24px", flexWrap: "wrap" }}>
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-8 flex items-center gap-6 mb-6 flex-wrap">
           {user?.imageUrl && (
             <img
               src={user.imageUrl}
               alt={user.fullName ?? ""}
               width={72}
               height={72}
-              style={{ borderRadius: "50%", flexShrink: 0, border: "3px solid #f0f0f0" }}
+              className="rounded-full shrink-0 border-[3px] border-[#f0f0f0]"
             />
           )}
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontFamily: "var(--condensed)", fontSize: "2rem", letterSpacing: "0.5px", lineHeight: 1, marginBottom: "4px" }}>
+          <div className="flex-1">
+            <h1 className="font-condensed text-[2rem] tracking-[0.5px] leading-none mb-1">
               {user?.fullName ?? "Welcome"}
             </h1>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: "#888", marginBottom: "12px" }}>
+            <p className="font-sans text-sm text-[#888] mb-3">
               {user?.primaryEmailAddress?.emailAddress}
             </p>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", background: statusConfig.bg, borderRadius: "999px" }}>
-              <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: statusConfig.color, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", fontWeight: 600, color: statusConfig.color }}>
+            <div
+              className="inline-flex items-center gap-2 py-[6px] px-[14px] rounded-full"
+              style={{ background: statusConfig.bg }}
+            >
+              <span
+                className="w-[7px] h-[7px] rounded-full shrink-0"
+                style={{ background: statusConfig.color }}
+              />
+              <span
+                className="font-sans text-[0.78rem] font-semibold"
+                style={{ color: statusConfig.color }}
+              >
                 {statusConfig.label}
               </span>
             </div>
@@ -123,7 +131,7 @@ export default function DashboardPage() {
           {userStatus !== "VERIFIED" && userStatus !== "SUSPENDED" && (
             <Link
               href="/onboarding"
-              style={{ padding: "12px 24px", background: "#000", color: "#fff", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none", flexShrink: 0 }}
+              className="py-3 px-6 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline shrink-0"
             >
               {userStatus === "LOGIN_DONE" ? "Start Verification →" : "Continue →"}
             </Link>
@@ -131,24 +139,33 @@ export default function DashboardPage() {
         </div>
 
         {/* Status description */}
-        <div style={{ background: statusConfig.bg, border: `1.5px solid ${statusConfig.color}22`, borderRadius: "12px", padding: "16px 20px", marginBottom: "24px" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: statusConfig.color, lineHeight: 1.6 }}>
+        <div
+          className="rounded-xl py-4 px-5 mb-6"
+          style={{
+            background: statusConfig.bg,
+            border: `1.5px solid ${statusConfig.color}22`,
+          }}
+        >
+          <p
+            className="font-sans text-sm leading-[1.6]"
+            style={{ color: statusConfig.color }}
+          >
             {statusConfig.desc}
           </p>
         </div>
 
         {/* Stats grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {[
             { label: "Total Trades", value: "0" },
             { label: "Trade Volume", value: "₹0" },
             { label: "Member Rating", value: "—" },
           ].map((stat) => (
-            <div key={stat.label} style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "14px", padding: "20px 24px" }}>
-              <div style={{ fontFamily: "var(--condensed)", fontSize: "2rem", letterSpacing: "0.5px", marginBottom: "4px" }}>
+            <div key={stat.label} className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[14px] py-5 px-6">
+              <div className="font-condensed text-[2rem] tracking-[0.5px] mb-1">
                 {stat.value}
               </div>
-              <div style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "#999", textTransform: "uppercase", letterSpacing: "1px" }}>
+              <div className="font-sans text-[0.75rem] text-[#999] uppercase tracking-[1px]">
                 {stat.label}
               </div>
             </div>
@@ -156,8 +173,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Verification checklist */}
-        <div style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "20px", padding: "28px 32px", marginBottom: "24px" }}>
-          <h2 style={{ fontFamily: "var(--condensed)", fontSize: "1.4rem", letterSpacing: "0.5px", marginBottom: "20px" }}>
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-7 px-8 mb-6">
+          <h2 className="font-condensed text-[1.4rem] tracking-[0.5px] mb-5">
             Verification Status
           </h2>
           {[
@@ -167,11 +184,17 @@ export default function DashboardPage() {
             { label: "AI Interview", done: false },
             { label: "Wallet Connection", done: false },
           ].map((step) => (
-            <div key={step.label} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 0", borderBottom: "1px solid #f5f5f5" }}>
-              <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: step.done ? "#D4FF00" : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "0.75rem", fontWeight: 700 }}>
+            <div key={step.label} className="flex items-center gap-3 py-3 border-b border-[#f5f5f5]">
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[0.75rem] font-bold ${
+                  step.done ? "bg-lime" : "bg-[#f0f0f0]"
+                }`}
+              >
                 {step.done ? "✓" : ""}
               </div>
-              <span style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: step.done ? "#000" : "#999" }}>
+              <span
+                className={`font-sans text-sm ${step.done ? "text-black" : "text-[#999]"}`}
+              >
                 {step.label}
               </span>
             </div>
@@ -179,17 +202,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent activity */}
-        <div style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "20px", padding: "28px 32px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h2 style={{ fontFamily: "var(--condensed)", fontSize: "1.4rem", letterSpacing: "0.5px" }}>
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-7 px-8">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="font-condensed text-[1.4rem] tracking-[0.5px]">
               Recent Activity
             </h2>
-            <Link href="/marketplace" style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", color: "#888", textDecoration: "none" }}>
+            <Link href="/marketplace" className="font-sans text-[0.78rem] text-[#888] no-underline">
               View marketplace →
             </Link>
           </div>
-          <div style={{ textAlign: "center", padding: "40px 0" }}>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: "#bbb" }}>
+          <div className="text-center py-10">
+            <p className="font-sans text-sm text-[#bbb]">
               No trades yet. Complete verification to start trading.
             </p>
           </div>

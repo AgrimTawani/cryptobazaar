@@ -17,20 +17,20 @@ export default function MarketplacePage() {
   const orders: never[] = [];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa" }}>
+    <div className="min-h-screen bg-[#fafafa]">
       {/* Top bar */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", padding: "0 40px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <Link href="/" style={{ fontFamily: "var(--condensed)", fontSize: "1rem", letterSpacing: "3px", color: "#000", textDecoration: "none" }}>
+      <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between sticky top-0 z-50">
+        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
           CRYPTOBAZAAR
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Link href="/" style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "#888", textDecoration: "none" }}>Home</Link>
-          <span style={{ color: "#ddd" }}>·</span>
-          <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", padding: "5px 14px 5px 5px", border: "1.5px solid #e0e0e0", borderRadius: "999px", background: "#fff" }}>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="font-sans text-[0.82rem] text-[#888] no-underline">Home</Link>
+          <span className="text-[#ddd]">·</span>
+          <Link href="/dashboard" className="flex items-center gap-2 no-underline pt-[5px] pr-[14px] pb-[5px] pl-[5px] border-[1.5px] border-solid border-[#e0e0e0] rounded-full bg-white">
             {user?.imageUrl && (
-              <img src={user.imageUrl} alt="" width={24} height={24} style={{ borderRadius: "50%" }} />
+              <img src={user.imageUrl} alt="" width={24} height={24} className="rounded-full" />
             )}
-            <span style={{ fontFamily: "var(--sans)", fontSize: "0.8rem", fontWeight: 500, color: "#111" }}>
+            <span className="font-sans text-[0.8rem] font-medium text-[#111]">
               {user?.firstName ?? "Dashboard"}
             </span>
           </Link>
@@ -39,24 +39,24 @@ export default function MarketplacePage() {
 
       {/* Verification banner */}
       {!isVerified && (
-        <div style={{ background: "#000", padding: "12px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.7)" }}>
-            👀 <strong style={{ color: "#fff" }}>View only.</strong> Complete your verification to buy or sell.
+        <div className="bg-black py-3 px-10 flex items-center justify-between flex-wrap gap-3">
+          <p className="font-sans text-[0.82rem] text-white/70">
+            👀 <strong className="text-white">View only.</strong> Complete your verification to buy or sell.
           </p>
-          <Link href="/onboarding" style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", fontWeight: 600, color: "#000", background: "#D4FF00", padding: "6px 16px", borderRadius: "999px", textDecoration: "none" }}>
+          <Link href="/onboarding" className="font-sans text-[0.78rem] font-semibold text-black bg-lime py-[6px] px-4 rounded-full no-underline">
             Complete Verification →
           </Link>
         </div>
       )}
 
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px" }}>
+      <div className="max-w-[1100px] mx-auto py-10 px-6">
         {/* Header row */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
+        <div className="flex justify-between items-end mb-8 flex-wrap gap-4">
           <div>
-            <h1 style={{ fontFamily: "var(--condensed)", fontSize: "2.4rem", letterSpacing: "1px", lineHeight: 1, marginBottom: "6px" }}>
+            <h1 className="font-condensed text-[2.4rem] tracking-[1px] leading-none mb-[6px]">
               LIVE LISTINGS
             </h1>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.85rem", color: "#888" }}>
+            <p className="font-sans text-[0.85rem] text-[#888]">
               {orders.length} active orders · INR ↔ USDT / USDC
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function MarketplacePage() {
           {isVerified && (
             <Link
               href="/marketplace/sell"
-              style={{ padding: "12px 28px", background: "#000", color: "#fff", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none" }}
+              className="py-3 px-7 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline"
             >
               + Post Order
             </Link>
@@ -72,22 +72,30 @@ export default function MarketplacePage() {
         </div>
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+        <div className="flex gap-2 mb-6 flex-wrap">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setAssetFilter(f)}
-              style={{ padding: "7px 18px", borderRadius: "999px", border: "1.5px solid", borderColor: assetFilter === f ? "#000" : "#e5e5e5", background: assetFilter === f ? "#000" : "#fff", color: assetFilter === f ? "#fff" : "#555", fontFamily: "var(--sans)", fontSize: "0.8rem", fontWeight: 500, cursor: "pointer" }}
+              className={`py-[7px] px-[18px] rounded-full border-[1.5px] border-solid font-sans text-[0.8rem] font-medium cursor-pointer ${
+                assetFilter === f
+                  ? "border-black bg-black text-white"
+                  : "border-[#e5e5e5] bg-white text-[#555]"
+              }`}
             >
               {f}
             </button>
           ))}
-          <div style={{ width: "1px", background: "#e5e5e5", margin: "0 4px" }} />
+          <div className="w-px bg-[#e5e5e5] mx-1" />
           {CHAINS.map((c) => (
             <button
               key={c}
               onClick={() => setChainFilter(c)}
-              style={{ padding: "7px 18px", borderRadius: "999px", border: "1.5px solid", borderColor: chainFilter === c ? "#000" : "#e5e5e5", background: chainFilter === c ? "#000" : "#fff", color: chainFilter === c ? "#fff" : "#555", fontFamily: "var(--sans)", fontSize: "0.8rem", fontWeight: 500, cursor: "pointer" }}
+              className={`py-[7px] px-[18px] rounded-full border-[1.5px] border-solid font-sans text-[0.8rem] font-medium cursor-pointer ${
+                chainFilter === c
+                  ? "border-black bg-black text-white"
+                  : "border-[#e5e5e5] bg-white text-[#555]"
+              }`}
             >
               {c}
             </button>
@@ -95,28 +103,28 @@ export default function MarketplacePage() {
         </div>
 
         {/* Table header */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 140px 140px 100px 140px", gap: "12px", padding: "10px 20px", background: "#f5f5f5", borderRadius: "10px", marginBottom: "8px" }}>
+        <div className="grid grid-cols-[1fr_120px_140px_140px_100px_140px] gap-3 py-[10px] px-5 bg-[#f5f5f5] rounded-[10px] mb-2">
           {["Seller", "Asset", "Price / unit", "Available", "Payment", ""].map((h) => (
-            <span key={h} style={{ fontFamily: "var(--sans)", fontSize: "0.68rem", color: "#999", letterSpacing: "1px", textTransform: "uppercase" }}>{h}</span>
+            <span key={h} className="font-sans text-[0.68rem] text-[#999] tracking-[1px] uppercase">{h}</span>
           ))}
         </div>
 
         {/* Empty state */}
         {orders.length === 0 && (
-          <div style={{ textAlign: "center", padding: "80px 24px" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "16px" }}>📭</div>
-            <h3 style={{ fontFamily: "var(--condensed)", fontSize: "1.6rem", letterSpacing: "0.5px", marginBottom: "8px" }}>
+          <div className="text-center py-20 px-6">
+            <div className="text-5xl mb-4">📭</div>
+            <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-2">
               No listings yet
             </h3>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: "#888", maxWidth: "320px", margin: "0 auto 24px", lineHeight: 1.6 }}>
+            <p className="font-sans text-sm text-[#888] max-w-[320px] mx-auto mb-6 leading-[1.6]">
               Be the first to post a sell order. The marketplace opens to verified members only.
             </p>
             {isVerified ? (
-              <Link href="/marketplace/sell" style={{ padding: "12px 28px", background: "#000", color: "#fff", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none" }}>
+              <Link href="/marketplace/sell" className="py-3 px-7 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline">
                 Post First Order →
               </Link>
             ) : (
-              <Link href="/onboarding" style={{ padding: "12px 28px", background: "#D4FF00", color: "#000", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none" }}>
+              <Link href="/onboarding" className="py-3 px-7 bg-lime text-black rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline">
                 Get Verified →
               </Link>
             )}

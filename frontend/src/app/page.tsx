@@ -191,20 +191,20 @@ export default function Home() {
           transition: "all 0.3s ease",
         }}
       >
-        <Link href="/" className="nav-logo" style={{ textDecoration: "none", color: "#000" }}>
+        <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
         <div className="nav-links">
-          <Link href="/marketplace" style={{ fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "0.05em", color: "var(--text-sub)" }}>
+          <Link href="/marketplace" className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
             Marketplace
           </Link>
-          <button onClick={() => scrollTo("how")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "0.05em", color: "var(--text-sub)" }}>
+          <button onClick={() => scrollTo("how")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
             How It Works
           </button>
-          <button onClick={() => scrollTo("pricing")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "0.05em", color: "var(--text-sub)" }}>
+          <button onClick={() => scrollTo("pricing")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
             Pricing
           </button>
-          <button onClick={() => scrollTo("faq")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "0.05em", color: "var(--text-sub)" }}>
+          <button onClick={() => scrollTo("faq")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
             FAQ
           </button>
         </div>
@@ -212,7 +212,7 @@ export default function Home() {
           {isSignedIn ? (
             <Link
               href="/dashboard"
-              style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", padding: "6px 18px 6px 6px", border: "1.5px solid #000", borderRadius: "999px", background: "#000" }}
+              className="flex items-center gap-[10px] no-underline pt-[6px] pr-[18px] pb-[6px] pl-[6px] border-[1.5px] border-solid border-black rounded-full bg-black"
             >
               {user?.imageUrl && (
                 <img
@@ -220,10 +220,10 @@ export default function Home() {
                   alt={user.firstName ?? ""}
                   width={28}
                   height={28}
-                  style={{ borderRadius: "50%", objectFit: "cover" }}
+                  className="rounded-full object-cover"
                 />
               )}
-              <span style={{ fontFamily: "var(--condensed)", fontSize: "1rem", letterSpacing: "1px", color: "#fff" }}>
+              <span className="font-condensed text-base tracking-[1px] text-white">
                 Dashboard
               </span>
             </Link>
@@ -245,7 +245,7 @@ export default function Home() {
           >
             THE{" "}
             <span className="shader-title-accent">{currentWord}</span>
-            <span style={{ opacity: showCursor ? 1 : 0, fontWeight: 300 }}>|</span>
+            <span className={`font-light ${showCursor ? "opacity-100" : "opacity-0"}`}>|</span>
             <br />
             P2P BAZAAR
           </motion.h1>
@@ -287,20 +287,20 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" style={{ background: "#000", padding: "100px 40px" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "#D4FF00", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px" }}>
+      <section id="how" className="bg-black py-[100px] px-10">
+        <div className="max-w-[900px] mx-auto">
+          <p className="font-sans text-[0.75rem] text-lime tracking-[3px] uppercase mb-4">
             How It Works
           </p>
-          <h2 style={{ fontFamily: "var(--condensed)", fontSize: "clamp(2.8rem, 6vw, 5rem)", color: "#fff", lineHeight: 1, letterSpacing: "1px", marginBottom: "20px" }}>
+          <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px] mb-5">
             TRADE P2P.<br />
-            <span style={{ color: "#D4FF00" }}>THE RIGHT WAY.</span>
+            <span className="text-lime">THE RIGHT WAY.</span>
           </h2>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "1rem", color: "rgba(255,255,255,0.5)", maxWidth: "520px", lineHeight: 1.7, marginBottom: "64px" }}>
+          <p className="font-sans text-base text-white/50 max-w-[520px] leading-[1.7] mb-16">
             CryptoBazaar is not just another P2P app. Every member is vetted, every trade is protected by a smart contract, and there is a Member Protection Fund for when things go wrong.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          <div className="flex flex-col">
             {HOW_IT_WORKS.map((item, i) => (
               <motion.div
                 key={item.step}
@@ -308,22 +308,18 @@ export default function Home() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                style={{
-                  display: "flex",
-                  gap: "32px",
-                  padding: "32px 0",
-                  borderBottom: i < HOW_IT_WORKS.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none",
-                  alignItems: "flex-start",
-                }}
+                className={`flex gap-8 py-8 items-start ${
+                  i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.08]" : ""
+                }`}
               >
-                <div style={{ flexShrink: 0, fontFamily: "var(--condensed)", fontSize: "3rem", color: "#D4FF00", lineHeight: 1, width: "72px" }}>
+                <div className="shrink-0 font-condensed text-5xl text-lime leading-none w-[72px]">
                   {item.step}
                 </div>
                 <div>
-                  <div style={{ fontFamily: "var(--condensed)", fontSize: "1.6rem", color: "#fff", letterSpacing: "0.5px", marginBottom: "8px" }}>
+                  <div className="font-condensed text-[1.6rem] text-white tracking-[0.5px] mb-2">
                     {item.title}
                   </div>
-                  <div style={{ fontFamily: "var(--sans)", fontSize: "0.925rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: "560px" }}>
+                  <div className="font-sans text-[0.925rem] text-white/50 leading-[1.7] max-w-[560px]">
                     {item.desc}
                   </div>
                 </div>
@@ -337,38 +333,32 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            style={{
-              marginTop: "64px",
-              background: "rgba(212,255,0,0.06)",
-              border: "1px solid rgba(212,255,0,0.2)",
-              borderRadius: "16px",
-              padding: "36px 40px",
-            }}
+            className="mt-16 bg-lime/[0.06] border border-lime/20 rounded-2xl py-9 px-10"
           >
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.7rem", color: "#D4FF00", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "12px" }}>
+            <p className="font-sans text-[0.7rem] text-lime tracking-[2px] uppercase mb-3">
               Member Protection Fund
             </p>
-            <h3 style={{ fontFamily: "var(--condensed)", fontSize: "1.8rem", color: "#fff", letterSpacing: "0.5px", marginBottom: "12px" }}>
+            <h3 className="font-condensed text-[1.8rem] text-white tracking-[0.5px] mb-3">
               What happens if your bank account gets frozen?
             </h3>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.9rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: "600px", marginBottom: "24px" }}>
+            <p className="font-sans text-[0.9rem] text-white/[0.55] leading-[1.7] max-w-[600px] mb-6">
               Sometimes, even after every precaution, a bank will freeze an account linked to a transaction it deems suspicious. If that happens because of a CryptoBazaar trade, you can apply for a disbursement from our Member Protection Fund — built from 0.75% of every completed trade on the platform.
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="grid grid-cols-3 gap-5">
               {[
                 { tier: "Emergency", amount: "Up to ₹10,000", time: "Within 24 hours", desc: "Bank freeze notice + complaint number" },
                 { tier: "Standard", amount: "Up to ₹1,00,000", time: "Within 7 days", desc: "Above + proof of legal representation" },
                 { tier: "Full", amount: "Up to ₹5,00,000", time: "Within 30 days", desc: "Above + account unfrozen / NOC issued" },
               ].map((t) => (
-                <div key={t.tier} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "20px" }}>
-                  <div style={{ fontFamily: "var(--condensed)", fontSize: "1rem", color: "#D4FF00", letterSpacing: "1px", marginBottom: "6px" }}>{t.tier}</div>
-                  <div style={{ fontFamily: "var(--condensed)", fontSize: "1.4rem", color: "#fff", marginBottom: "4px" }}>{t.amount}</div>
-                  <div style={{ fontFamily: "var(--sans)", fontSize: "0.72rem", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>{t.time}</div>
-                  <div style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>{t.desc}</div>
+                <div key={t.tier} className="bg-white/[0.04] rounded-[10px] p-5">
+                  <div className="font-condensed text-base text-lime tracking-[1px] mb-[6px]">{t.tier}</div>
+                  <div className="font-condensed text-[1.4rem] text-white mb-1">{t.amount}</div>
+                  <div className="font-sans text-[0.72rem] text-white/40 mb-2">{t.time}</div>
+                  <div className="font-sans text-[0.75rem] text-white/[0.35] leading-[1.5]">{t.desc}</div>
                 </div>
               ))}
             </div>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.7rem", color: "rgba(255,255,255,0.25)", marginTop: "20px", lineHeight: 1.6 }}>
+            <p className="font-sans text-[0.7rem] text-white/25 mt-5 leading-[1.6]">
               * Disbursements are subject to fund availability and eligibility verification. The Member Protection Fund is a voluntary member benefit, not an insurance product. Payouts are not guaranteed.
             </p>
           </motion.div>
@@ -376,19 +366,19 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" style={{ background: "#fff", padding: "100px 40px" }}>
-        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "#999", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px" }}>
+      <section id="pricing" className="bg-white py-[100px] px-10">
+        <div className="max-w-[960px] mx-auto">
+          <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Membership Plans
           </p>
-          <h2 style={{ fontFamily: "var(--condensed)", fontSize: "clamp(2.8rem, 6vw, 5rem)", color: "#000", lineHeight: 1, letterSpacing: "1px", marginBottom: "16px" }}>
+          <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-black leading-none tracking-[1px] mb-4">
             SIMPLE PRICING.
           </h2>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "1rem", color: "#666", maxWidth: "480px", lineHeight: 1.7, marginBottom: "56px" }}>
+          <p className="font-sans text-base text-[#666] max-w-[480px] leading-[1.7] mb-14">
             Pick a plan based on how much you trade per month. Every plan includes full escrow protection and Member Protection Fund contribution on every trade.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+          <div className="grid grid-cols-3 gap-5">
             {TIERS.map((tier) => (
               <motion.div
                 key={tier.name}
@@ -396,54 +386,43 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
-                style={{
-                  border: tier.highlight ? "2px solid #000" : "1.5px solid #e5e5e5",
-                  borderRadius: "16px",
-                  padding: "32px 28px",
-                  background: tier.highlight ? "#000" : "#fff",
-                  position: "relative",
-                }}
+                className={`rounded-2xl py-8 px-7 relative ${
+                  tier.highlight
+                    ? "border-2 border-solid border-black bg-black"
+                    : "border-[1.5px] border-solid border-[#e5e5e5] bg-white"
+                }`}
               >
                 {tier.highlight && (
-                  <div style={{ position: "absolute", top: "-13px", left: "50%", transform: "translateX(-50%)", background: "#D4FF00", borderRadius: "999px", padding: "3px 16px", fontFamily: "var(--sans)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  <div className="absolute -top-[13px] left-1/2 -translate-x-1/2 bg-lime rounded-full py-[3px] px-4 font-sans text-[0.68rem] font-bold tracking-[1px] uppercase whitespace-nowrap">
                     Most Popular
                   </div>
                 )}
-                <div style={{ fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "2px", color: tier.highlight ? "#D4FF00" : "#999", marginBottom: "12px" }}>
+                <div className={`font-condensed text-[1.1rem] tracking-[2px] mb-3 ${tier.highlight ? "text-lime" : "text-[#999]"}`}>
                   {tier.name.toUpperCase()}
                 </div>
-                <div style={{ fontFamily: "var(--condensed)", fontSize: "3rem", color: tier.highlight ? "#fff" : "#000", lineHeight: 1, marginBottom: "4px" }}>
+                <div className={`font-condensed text-5xl leading-none mb-1 ${tier.highlight ? "text-white" : "text-black"}`}>
                   {tier.price}
                 </div>
-                <div style={{ fontFamily: "var(--sans)", fontSize: "0.8rem", color: tier.highlight ? "rgba(255,255,255,0.4)" : "#999", marginBottom: "8px" }}>
+                <div className={`font-sans text-[0.8rem] mb-2 ${tier.highlight ? "text-white/40" : "text-[#999]"}`}>
                   per month
                 </div>
-                <div style={{ background: tier.highlight ? "rgba(212,255,0,0.1)" : "#f5f5f5", borderRadius: "8px", padding: "10px 14px", marginBottom: "24px" }}>
-                  <span style={{ fontFamily: "var(--condensed)", fontSize: "1.3rem", color: tier.highlight ? "#D4FF00" : "#000" }}>{tier.cap}</span>
-                  <span style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: tier.highlight ? "rgba(255,255,255,0.4)" : "#888", marginLeft: "6px" }}>{tier.capLabel}</span>
+                <div className={`rounded-lg py-[10px] px-[14px] mb-6 ${tier.highlight ? "bg-lime/10" : "bg-[#f5f5f5]"}`}>
+                  <span className={`font-condensed text-[1.3rem] ${tier.highlight ? "text-lime" : "text-black"}`}>{tier.cap}</span>
+                  <span className={`font-sans text-[0.75rem] ml-[6px] ${tier.highlight ? "text-white/40" : "text-[#888]"}`}>{tier.capLabel}</span>
                 </div>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "10px", marginBottom: "28px" }}>
+                <ul className="list-none flex flex-col gap-[10px] mb-7">
                   {tier.features.map((f) => (
-                    <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontFamily: "var(--sans)", fontSize: "0.82rem", color: tier.highlight ? "rgba(255,255,255,0.65)" : "#555", lineHeight: 1.5 }}>
-                      <span style={{ color: "#D4FF00", flexShrink: 0, marginTop: "1px" }}>✓</span>
+                    <li key={f} className={`flex items-start gap-2 font-sans text-[0.82rem] leading-[1.5] ${tier.highlight ? "text-white/[0.65]" : "text-[#555]"}`}>
+                      <span className="text-lime shrink-0 mt-[1px]">✓</span>
                       {f}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href="/login"
-                  style={{
-                    display: "block",
-                    textAlign: "center",
-                    padding: "12px",
-                    borderRadius: "10px",
-                    background: tier.highlight ? "#D4FF00" : "#000",
-                    color: tier.highlight ? "#000" : "#fff",
-                    fontFamily: "var(--condensed)",
-                    fontSize: "1.1rem",
-                    letterSpacing: "1px",
-                    textDecoration: "none",
-                  }}
+                  className={`block text-center py-3 rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline ${
+                    tier.highlight ? "bg-lime text-black" : "bg-black text-white"
+                  }`}
                 >
                   Get Started →
                 </Link>
@@ -451,7 +430,7 @@ export default function Home() {
             ))}
           </div>
 
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", color: "#bbb", marginTop: "32px", textAlign: "center", lineHeight: 1.7 }}>
+          <p className="font-sans text-[0.78rem] text-[#bbb] mt-8 text-center leading-[1.7]">
             Membership fees are currently collected via manual UPI transfer to our registered business account.
             You will receive payment instructions after completing verification.
             All plans are month-to-month. No automatic renewals without explicit confirmation.
@@ -460,40 +439,33 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" style={{ background: "#fafafa", padding: "100px 40px" }}>
-        <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "#999", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px" }}>
+      <section id="faq" className="bg-[#fafafa] py-[100px] px-10">
+        <div className="max-w-[720px] mx-auto">
+          <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Frequently Asked Questions
           </p>
-          <h2 style={{ fontFamily: "var(--condensed)", fontSize: "clamp(2.8rem, 6vw, 4.5rem)", color: "#000", lineHeight: 1, letterSpacing: "1px", marginBottom: "56px" }}>
+          <h2 className="font-condensed text-[clamp(2.8rem,6vw,4.5rem)] text-black leading-none tracking-[1px] mb-14">
             GOT QUESTIONS?
           </h2>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          <div className="flex flex-col">
             {FAQS.map((faq, i) => (
               <div
                 key={i}
-                style={{ borderBottom: "1px solid #e5e5e5" }}
+                className="border-b border-[#e5e5e5]"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "22px 0",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    gap: "16px",
-                  }}
+                  className="w-full flex justify-between items-center py-[22px] bg-transparent border-0 cursor-pointer text-left gap-4"
                 >
-                  <span style={{ fontFamily: "var(--condensed)", fontSize: "1.2rem", letterSpacing: "0.5px", color: "#000", lineHeight: 1.2 }}>
+                  <span className="font-condensed text-[1.2rem] tracking-[0.5px] text-black leading-[1.2]">
                     {faq.q}
                   </span>
-                  <span style={{ flexShrink: 0, width: "28px", height: "28px", borderRadius: "50%", background: openFaq === i ? "#000" : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--sans)", fontSize: "1rem", color: openFaq === i ? "#fff" : "#000", transition: "all 0.2s" }}>
+                  <span
+                    className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${
+                      openFaq === i ? "bg-black text-white" : "bg-[#f0f0f0] text-black"
+                    }`}
+                  >
                     {openFaq === i ? "−" : "+"}
                   </span>
                 </button>
@@ -506,7 +478,7 @@ export default function Home() {
                       transition={{ duration: 0.25 }}
                       style={{ overflow: "hidden" }}
                     >
-                      <p style={{ fontFamily: "var(--sans)", fontSize: "0.9rem", color: "#555", lineHeight: 1.75, paddingBottom: "22px", maxWidth: "600px" }}>
+                      <p className="font-sans text-[0.9rem] text-[#555] leading-[1.75] pb-[22px] max-w-[600px]">
                         {faq.a}
                       </p>
                     </motion.div>
@@ -519,19 +491,19 @@ export default function Home() {
       </section>
 
       {/* ── TERMS SUMMARY ── */}
-      <section id="terms" style={{ background: "#fff", padding: "80px 40px" }}>
-        <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "#999", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px" }}>
+      <section id="terms" className="bg-white py-20 px-10">
+        <div className="max-w-[720px] mx-auto">
+          <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Terms of Use
           </p>
-          <h2 style={{ fontFamily: "var(--condensed)", fontSize: "clamp(2.4rem, 5vw, 4rem)", color: "#000", lineHeight: 1, letterSpacing: "1px", marginBottom: "16px" }}>
+          <h2 className="font-condensed text-[clamp(2.4rem,5vw,4rem)] text-black leading-none tracking-[1px] mb-4">
             THE KEY POINTS.
           </h2>
-          <p style={{ fontFamily: "var(--sans)", fontSize: "0.9rem", color: "#888", marginBottom: "40px", lineHeight: 1.6 }}>
+          <p className="font-sans text-[0.9rem] text-[#888] mb-10 leading-[1.6]">
             Here are the things that matter most. Read the full terms before trading.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "40px" }}>
+          <div className="flex flex-col gap-4 mb-10">
             {[
               { icon: "🇮🇳", title: "Indian residents only", body: "You must be 18+ and a resident of India. You must trade on your own behalf, not as an agent for someone else." },
               { icon: "🔒", title: "Verification is mandatory and recurring", body: "All 3 layers must be completed and renewed every 6 months. Providing false information during verification may result in a criminal complaint." },
@@ -539,11 +511,11 @@ export default function Home() {
               { icon: "🛡️", title: "The Member Protection Fund is NOT insurance", body: "It is a voluntary member benefit. Payouts are discretionary and subject to fund availability. No amount is guaranteed. It is not a regulated financial product." },
               { icon: "⚖️", title: "Fraud has serious consequences", body: "Submitting forged bank statements or fabricated freeze notices results in permanent suspension and may be reported to law enforcement. All users are Aadhaar-linked." },
             ].map((item) => (
-              <div key={item.title} style={{ display: "flex", gap: "16px", alignItems: "flex-start", padding: "20px", background: "#fafafa", borderRadius: "12px", border: "1px solid #f0f0f0" }}>
-                <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>{item.icon}</span>
+              <div key={item.title} className="flex gap-4 items-start py-5 px-5 bg-[#fafafa] rounded-xl border border-[#f0f0f0]">
+                <span className="text-[1.4rem] shrink-0">{item.icon}</span>
                 <div>
-                  <div style={{ fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "0.5px", marginBottom: "4px" }}>{item.title}</div>
-                  <div style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "#666", lineHeight: 1.6 }}>{item.body}</div>
+                  <div className="font-condensed text-[1.1rem] tracking-[0.5px] mb-1">{item.title}</div>
+                  <div className="font-sans text-[0.82rem] text-[#666] leading-[1.6]">{item.body}</div>
                 </div>
               </div>
             ))}
@@ -551,7 +523,7 @@ export default function Home() {
 
           <Link
             href="/terms"
-            style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "13px 28px", background: "#000", color: "#fff", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none" }}
+            className="inline-flex items-center gap-2 py-[13px] px-7 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline"
           >
             Read Full Terms of Use →
           </Link>
@@ -559,21 +531,21 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ background: "#000" }}>
+      <footer className="bg-black">
         {/* Contact bar */}
-        <div style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "48px 40px" }}>
-          <div style={{ maxWidth: "960px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "24px" }}>
+        <div className="border-b border-white/[0.06] py-12 px-10">
+          <div className="max-w-[960px] mx-auto flex justify-between items-center flex-wrap gap-6">
             <div>
-              <p style={{ fontFamily: "var(--condensed)", fontSize: "2rem", color: "#fff", letterSpacing: "1px", marginBottom: "6px" }}>
+              <p className="font-condensed text-[2rem] text-white tracking-[1px] mb-[6px]">
                 HAVE A QUESTION?
               </p>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.875rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>
+              <p className="font-sans text-sm text-white/40 leading-[1.5]">
                 We&apos;re a small team. We read every message.
               </p>
             </div>
             <a
               href="mailto:support@cryptobazaar.in"
-              style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "14px 28px", background: "#D4FF00", color: "#000", borderRadius: "10px", fontFamily: "var(--condensed)", fontSize: "1.1rem", letterSpacing: "1px", textDecoration: "none" }}
+              className="inline-flex items-center gap-[10px] py-[14px] px-7 bg-lime text-black rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline"
             >
               ✉ support@cryptobazaar.in
             </a>
@@ -581,25 +553,25 @@ export default function Home() {
         </div>
 
         {/* Main footer grid */}
-        <div style={{ padding: "56px 40px 40px", maxWidth: "960px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "40px", marginBottom: "48px" }}>
+        <div className="pt-14 px-10 pb-10 max-w-[960px] mx-auto">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-12">
             {/* Brand */}
             <div>
-              <div style={{ fontFamily: "var(--condensed)", fontSize: "1.4rem", letterSpacing: "3px", color: "#fff", marginBottom: "12px" }}>
+              <div className="font-condensed text-[1.4rem] tracking-[3px] text-white mb-3">
                 CRYPTOBAZAAR
               </div>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.3)", lineHeight: 1.7, marginBottom: "20px" }}>
+              <p className="font-sans text-[0.78rem] text-white/30 leading-[1.7] mb-5">
                 The only gated P2P stablecoin exchange for India. Every member verified. Every trade protected.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div className="flex flex-col gap-[6px]">
                 {[
                   { label: "General", email: "support@cryptobazaar.in" },
                   { label: "Disputes", email: "disputes@cryptobazaar.in" },
                   { label: "Legal", email: "legal@cryptobazaar.in" },
                 ].map((c) => (
-                  <div key={c.label} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                    <span style={{ fontFamily: "var(--sans)", fontSize: "0.68rem", color: "rgba(255,255,255,0.25)", letterSpacing: "1px", textTransform: "uppercase", width: "50px" }}>{c.label}</span>
-                    <a href={`mailto:${c.email}`} style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "rgba(255,255,255,0.45)", textDecoration: "none" }}>{c.email}</a>
+                  <div key={c.label} className="flex gap-2 items-center">
+                    <span className="font-sans text-[0.68rem] text-white/25 tracking-[1px] uppercase w-[50px]">{c.label}</span>
+                    <a href={`mailto:${c.email}`} className="font-sans text-[0.75rem] text-white/[0.45] no-underline">{c.email}</a>
                   </div>
                 ))}
               </div>
@@ -607,45 +579,45 @@ export default function Home() {
 
             {/* Platform links */}
             <div>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "16px" }}>Platform</p>
+              <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Platform</p>
               {[
                 { label: "How It Works", id: "how" },
                 { label: "Pricing", id: "pricing" },
                 { label: "FAQ", id: "faq" },
               ].map((l) => (
-                <button key={l.label} onClick={() => scrollTo(l.id)} style={{ display: "block", fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.45)", background: "none", border: "none", cursor: "pointer", marginBottom: "10px", padding: 0, textAlign: "left" }}>
+                <button key={l.label} onClick={() => scrollTo(l.id)} className="block font-sans text-[0.82rem] text-white/[0.45] bg-transparent border-0 cursor-pointer mb-[10px] p-0 text-left">
                   {l.label}
                 </button>
               ))}
-              <Link href="/login" style={{ display: "block", fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.45)", marginBottom: "10px" }}>
+              <Link href="/login" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
                 Sign Up
               </Link>
             </div>
 
             {/* Legal links */}
             <div>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "16px" }}>Legal</p>
-              <Link href="/terms" style={{ display: "block", fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.45)", marginBottom: "10px" }}>
+              <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Legal</p>
+              <Link href="/terms" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
                 Terms of Use
               </Link>
-              <button onClick={() => scrollTo("terms")} style={{ display: "block", fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.45)", background: "none", border: "none", cursor: "pointer", marginBottom: "10px", padding: 0, textAlign: "left" }}>
+              <button onClick={() => scrollTo("terms")} className="block font-sans text-[0.82rem] text-white/[0.45] bg-transparent border-0 cursor-pointer mb-[10px] p-0 text-left">
                 Key Points
               </button>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.25)", marginBottom: "10px" }}>Privacy Policy</p>
+              <p className="font-sans text-[0.82rem] text-white/25 mb-[10px]">Privacy Policy</p>
             </div>
 
             {/* Contact */}
             <div>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "16px" }}>Contact Us</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <a href="mailto:support@cryptobazaar.in" style={{ fontFamily: "var(--sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", textDecoration: "none" }}>
+              <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Contact Us</p>
+              <div className="flex flex-col gap-3">
+                <a href="mailto:support@cryptobazaar.in" className="font-sans text-[0.78rem] text-white/[0.45] no-underline">
                   ✉ support@cryptobazaar.in
                 </a>
-                <p style={{ fontFamily: "var(--sans)", fontSize: "0.75rem", color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>
+                <p className="font-sans text-[0.75rem] text-white/25 leading-[1.5]">
                   Response time:<br />within 24 hours
                 </p>
-                <div style={{ marginTop: "4px", padding: "10px 14px", background: "rgba(212,255,0,0.07)", border: "1px solid rgba(212,255,0,0.15)", borderRadius: "8px" }}>
-                  <p style={{ fontFamily: "var(--sans)", fontSize: "0.7rem", color: "rgba(212,255,0,0.7)", lineHeight: 1.5 }}>
+                <div className="mt-1 py-[10px] px-[14px] bg-lime/[0.07] border border-lime/[0.15] rounded-lg">
+                  <p className="font-sans text-[0.7rem] text-lime/70 leading-[1.5]">
                     Udyam Registered<br />Indian Business
                   </p>
                 </div>
@@ -654,11 +626,11 @@ export default function Home() {
           </div>
 
           {/* Bottom bar */}
-          <div style={{ paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.7rem", color: "rgba(255,255,255,0.18)" }}>
+          <div className="pt-6 border-t border-white/[0.06] flex justify-between flex-wrap gap-4">
+            <p className="font-sans text-[0.7rem] text-white/[0.18]">
               © 2026 CryptoBazaar. All rights reserved.
             </p>
-            <p style={{ fontFamily: "var(--sans)", fontSize: "0.7rem", color: "rgba(255,255,255,0.18)", maxWidth: "560px", lineHeight: 1.6, textAlign: "right" }}>
+            <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] text-right">
               The Member Protection Fund is a voluntary member benefit — not an insurance product and not regulated as such. Payouts are subject to fund availability and eligibility verification. No guarantee of any amount is made or implied.
             </p>
           </div>
