@@ -22,6 +22,18 @@ export default function KYCPage() {
     }
   };
 
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin === window.location.origin && e.data === "didit:complete") {
+        stopPolling();
+        setPollStatus("PASSED");
+        setTimeout(() => router.push("/onboarding/bank-statement"), 1200);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [router]);
+
   const startPolling = () => {
     stopPolling();
     setPollStatus("IN_PROGRESS");
