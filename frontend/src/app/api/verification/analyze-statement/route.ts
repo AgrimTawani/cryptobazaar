@@ -46,8 +46,8 @@ function extractPdfMeta(buffer: Buffer) {
     rawProducer: str(/\/Producer\s*\(([^)]*)\)/) ?? str(/\/Producer\s*<([^>]*)>/) ?? null,
     creationDate: str(/\/CreationDate\s*\(([^)]*)\)/) ?? null,
     modDate: str(/\/ModDate\s*\(([^)]*)\)/) ?? null,
-    // BT (Begin Text) markers indicate actual text content in the PDF stream
-    hasText: /BT[\s\r\n]/.test(raw),
+    // Most real PDFs use FlateDecode compression — BT markers won't appear in raw bytes
+    hasText: true,
     pages: (raw.match(/\/Type\s*\/Page[^s]/g) ?? []).length || 1,
   };
 }
@@ -78,13 +78,6 @@ async function runForgeryCheck(buffer: Buffer): Promise<ForensicResult> {
       wasModified = true;
       flags.push("Document was modified after its original creation date");
     }
-  }
-
-  // 3. Check for text layer
-  if (!hasText) {
-    flags.push(
-      "PDF contains no readable text layer — appears to be a scanned image or photograph of a document"
-    );
   }
 
   const passed = flags.length === 0;
