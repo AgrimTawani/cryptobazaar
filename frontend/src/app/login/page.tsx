@@ -1,29 +1,33 @@
 "use client";
 
-import { useClerk, useUser } from "@clerk/nextjs";
+import { useSignIn, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
-  const clerk = useClerk();
+  const { signIn, isLoaded } = useSignIn();
   const { isSignedIn } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isSignedIn) router.replace("/onboarding");
   }, [isSignedIn, router]);
 
   const handleGoogleSignIn = async () => {
-    if (loading || !clerk.client) return;
+    if (loading || !isLoaded || !signIn) return;
     setLoading(true);
+    setError(null);
     try {
-      await clerk.client.signIn.authenticateWithRedirect({
+      await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sso-callback`,
         redirectUrlComplete: `${window.location.origin}/onboarding`,
       });
-    } catch {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Sign in failed. Please try again.";
+      setError(msg);
       setLoading(false);
     }
   };
@@ -88,9 +92,12 @@ export default function LoginPage() {
             Sign in to begin your verification. Only verified members can trade.
           </p>
 
+          {/* Required by Clerk for Smart CAPTCHA on production instances */}
+          <div id="clerk-captcha" />
+
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading}
+            disabled={loading || !isLoaded}
             className={`flex items-center justify-center gap-3 w-full py-[13px] px-5 border-[1.5px] border-solid border-[#e0e0e0] rounded-[10px] font-sans text-[0.925rem] font-medium text-[#111] transition-all duration-150 shadow-sm hover:border-[#bbb] hover:shadow-md ${loading ? "bg-[#fafafa] cursor-wait" : "bg-white cursor-pointer"}`}
           >
             {loading ? (
@@ -102,6 +109,12 @@ export default function LoginPage() {
               </>
             )}
           </button>
+
+          {error && (
+            <p className="mt-3 font-sans text-[0.78rem] text-[#e53e3e] leading-normal">
+              {error}
+            </p>
+          )}
 
           <div className="mt-5 pt-5 border-t border-[#f0f0f0]">
             <p className="font-sans text-[0.72rem] text-[#bbb] leading-[1.7]">
