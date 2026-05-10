@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
     const base64 = buffer.toString("base64");
 
     const genai = new GoogleGenerativeAI(apiKey);
-    const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const result = await model.generateContent([
       { inlineData: { data: base64, mimeType: "application/pdf" } },
