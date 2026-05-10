@@ -1,11 +1,11 @@
 "use client";
 
-import { useSignIn, useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
-  const { signIn, isLoaded } = useSignIn();
+  const clerk = useClerk();
   const { isSignedIn } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -16,11 +16,11 @@ export default function LoginPage() {
   }, [isSignedIn, router]);
 
   const handleGoogleSignIn = async () => {
-    if (loading || !isLoaded || !signIn) return;
+    if (loading || !clerk.client) return;
     setLoading(true);
     setError(null);
     try {
-      await signIn.authenticateWithRedirect({
+      await clerk.client.signIn.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sso-callback`,
         redirectUrlComplete: `${window.location.origin}/onboarding`,
@@ -97,7 +97,7 @@ export default function LoginPage() {
 
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading || !isLoaded}
+            disabled={loading || !clerk.client}
             className={`flex items-center justify-center gap-3 w-full py-[13px] px-5 border-[1.5px] border-solid border-[#e0e0e0] rounded-[10px] font-sans text-[0.925rem] font-medium text-[#111] transition-all duration-150 shadow-sm hover:border-[#bbb] hover:shadow-md ${loading ? "bg-[#fafafa] cursor-wait" : "bg-white cursor-pointer"}`}
           >
             {loading ? (
