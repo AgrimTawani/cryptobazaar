@@ -1,7 +1,29 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "@/lib/db";
+
+const r2 = new S3Client({
+  region: "auto",
+  endpoint: process.env.R2_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
+async function uploadToR2(buffer: Buffer, userId: string, attemptNumber: number): Promise<string> {
+  const key = `statements/${userId}/${Date.now()}-attempt${attemptNumber}.pdf`;
+  await r2.send(new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: key,
+    Body: buffer,
+    ContentType: "application/pdf",
+    // R2 encrypts at rest by default — no extra config needed
+  }));
+  return key;
+}
 
 export const maxDuration = 60;
 
@@ -179,7 +201,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── Step 2: AI income analysis with Gemini ────────────────────────────────
+    // ── Step 2: Upload to R2 ─────────────────────────────────────────────────
+    const existing = await db.onboardingRecord.findFirst({
+      where: { userId: user.id, layer: "EDD" },
+      orderBy: { attemptNumber: "desc" },
+    });
+    const attemptNumber = existing ? existing.attemptNumber + 1 : 1;
+    const r2Key = await uploadToR2(buffer, user.id, attemptNumber);
+
+    // ── Step 3: AI income analysis with Gemini ────────────────────────────────
     const base64 = buffer.toString("base64");
 
     const genai = new GoogleGenerativeAI(apiKey);
@@ -211,20 +241,15 @@ export async function POST(req: NextRequest) {
     const score = Math.max(0, Math.min(100, analysis.score ?? 0));
     const passed = score >= 60 && !analysis.flagged;
 
-    // ── Step 3: Write result to DB ────────────────────────────────────────────
-    const existing = await db.onboardingRecord.findFirst({
-      where: { userId: user.id, layer: "EDD" },
-      orderBy: { attemptNumber: "desc" },
-    });
-
+    // ── Step 4: Write result to DB ────────────────────────────────────────────
     await db.onboardingRecord.create({
       data: {
         userId: user.id,
         layer: "EDD",
         status: passed ? "PASSED" : "FAILED",
-        attemptNumber: existing ? existing.attemptNumber + 1 : 1,
+        attemptNumber,
         score,
-        result: { ...analysis, forensic } as object,
+        result: { ...analysis, forensic, r2Key } as object,
         rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
         completedAt: new Date(),
       },
