@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
@@ -16,7 +16,25 @@ export async function GET() {
       },
     });
 
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!user) {
+      // Auto-create user on first visit (handles cases where sync wasn't called)
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress ?? null;
+      const name = [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || null;
+      const avatarUrl = clerkUser?.imageUrl ?? null;
+
+      await db.user.create({
+        data: { clerkId, email, name, avatarUrl, status: "LOGIN_DONE" },
+      });
+
+      return NextResponse.json({
+        userStatus: "LOGIN_DONE",
+        walletAddress: null,
+        kyc: "NOT_STARTED",
+        edd: "NOT_STARTED",
+        interview: "NOT_STARTED",
+      });
+    }
 
     const latestByLayer = (layer: string) =>
       user.onboardingRecords.find((r) => r.layer === layer);
