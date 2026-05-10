@@ -32,29 +32,31 @@ type ForensicResult = {
   };
 };
 
+function extractPdfMeta(buffer: Buffer) {
+  // Read PDF as latin1 to safely inspect raw bytes without browser APIs
+  const raw = buffer.toString("latin1");
+
+  const str = (pattern: RegExp) => {
+    const m = raw.match(pattern);
+    return m ? m[1].trim() : null;
+  };
+
+  return {
+    rawCreator: str(/\/Creator\s*\(([^)]*)\)/) ?? str(/\/Creator\s*<([^>]*)>/) ?? null,
+    rawProducer: str(/\/Producer\s*\(([^)]*)\)/) ?? str(/\/Producer\s*<([^>]*)>/) ?? null,
+    creationDate: str(/\/CreationDate\s*\(([^)]*)\)/) ?? null,
+    modDate: str(/\/ModDate\s*\(([^)]*)\)/) ?? null,
+    // BT (Begin Text) markers indicate actual text content in the PDF stream
+    hasText: /BT[\s\r\n]/.test(raw),
+    pages: (raw.match(/\/Type\s*\/Page[^s]/g) ?? []).length || 1,
+  };
+}
+
 async function runForgeryCheck(buffer: Buffer): Promise<ForensicResult> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{
-    text: string;
-    numpages: number;
-    info: Record<string, string | undefined>;
-  }>;
+  const { rawCreator, rawProducer, creationDate, modDate, hasText, pages } = extractPdfMeta(buffer);
 
-  let data: Awaited<ReturnType<typeof pdfParse>>;
-  try {
-    data = await pdfParse(buffer);
-  } catch {
-    return {
-      passed: false,
-      flags: ["Could not parse PDF — file may be corrupt or encrypted"],
-      metadata: { creator: null, producer: null, pages: 0, hasText: false, wasModified: false },
-    };
-  }
-
-  const creator = (data.info?.Creator ?? "").toLowerCase();
-  const producer = (data.info?.Producer ?? "").toLowerCase();
-  const rawCreator: string | null = data.info?.Creator ?? null;
-  const rawProducer: string | null = data.info?.Producer ?? null;
+  const creator = (rawCreator ?? "").toLowerCase();
+  const producer = (rawProducer ?? "").toLowerCase();
 
   const flags: string[] = [];
 
@@ -69,23 +71,16 @@ async function runForgeryCheck(buffer: Buffer): Promise<ForensicResult> {
   }
 
   // 2. Check modification date vs creation date
-  const creationDate: string | undefined = data.info?.CreationDate;
-  const modDate: string | undefined = data.info?.ModDate;
-
   let wasModified = false;
   if (creationDate && modDate && creationDate !== modDate) {
-    // Strip timezone suffixes and compare first 14 chars (YYYYMMDDHHmmss)
     const normalize = (d: string) => d.replace(/^D:/, "").slice(0, 14);
-    const created = normalize(creationDate);
-    const modified = normalize(modDate);
-    if (created !== modified) {
+    if (normalize(creationDate) !== normalize(modDate)) {
       wasModified = true;
       flags.push("Document was modified after its original creation date");
     }
   }
 
   // 3. Check for text layer
-  const hasText = (data.text ?? "").trim().length > 50;
   if (!hasText) {
     flags.push(
       "PDF contains no readable text layer — appears to be a scanned image or photograph of a document"
@@ -100,7 +95,7 @@ async function runForgeryCheck(buffer: Buffer): Promise<ForensicResult> {
     metadata: {
       creator: rawCreator,
       producer: rawProducer,
-      pages: data.numpages ?? 0,
+      pages,
       hasText,
       wasModified,
     },
