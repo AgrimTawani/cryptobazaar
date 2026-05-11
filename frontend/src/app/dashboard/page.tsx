@@ -3,6 +3,7 @@
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
   LOGIN_DONE: {
@@ -49,14 +50,29 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   },
 };
 
+interface OnboardingStatus {
+  userStatus: string;
+  walletAddress: string | null;
+  kyc: string;
+  edd: string;
+  interview: string;
+}
+
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
+  const [dbStatus, setDbStatus] = useState<OnboardingStatus | null>(null);
 
-  // Placeholder — will be replaced with real DB data
-  const userStatus: keyof typeof STATUS_CONFIG = "LOGIN_DONE";
-  const statusConfig = STATUS_CONFIG[userStatus];
+  useEffect(() => {
+    fetch("/api/onboarding/status")
+      .then((r) => r.json())
+      .then((d: OnboardingStatus) => setDbStatus(d))
+      .catch(() => null);
+  }, []);
+
+  const userStatus = (dbStatus?.userStatus ?? "LOGIN_DONE") as keyof typeof STATUS_CONFIG;
+  const statusConfig = STATUS_CONFIG[userStatus] ?? STATUS_CONFIG["LOGIN_DONE"];
 
   const handleSignOut = async () => {
     await signOut();
@@ -179,10 +195,10 @@ export default function DashboardPage() {
           </h2>
           {[
             { label: "Google Login", done: true },
-            { label: "KYC — Identity Verification", done: false },
-            { label: "Bank Statement Review", done: false },
-            { label: "AI Questionnaire", done: false },
-            { label: "Wallet Connection", done: false },
+            { label: "KYC — Identity Verification", done: dbStatus?.kyc === "PASSED" },
+            { label: "Bank Statement Review", done: dbStatus?.edd === "PASSED" },
+            { label: "AI Questionnaire", done: dbStatus?.interview === "PASSED" },
+            { label: "Wallet Connection", done: !!dbStatus?.walletAddress },
           ].map((step) => (
             <div key={step.label} className="flex items-center gap-3 py-3 border-b border-[#f5f5f5]">
               <div
