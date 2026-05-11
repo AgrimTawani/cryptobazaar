@@ -29,7 +29,16 @@ interface OrderRow {
   acceptedPaymentMethods: string[];
   escrowTxHash: string | null;
   escrowContractAddress: string | null;
+  status: string;
+  statusLabel: string;
 }
+
+const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
+  LISTED:        { color: "#555",    bg: "#f5f5f5" },
+  BUYER_MATCHED: { color: "#1e40af", bg: "#eff6ff" },
+  BUYER_PAID:    { color: "#92400e", bg: "#fffbeb" },
+  DISPUTED:      { color: "#991b1b", bg: "#fef2f2" },
+};
 
 export default function MarketplacePage() {
   const { user } = useUser();
@@ -37,6 +46,7 @@ export default function MarketplacePage() {
   const [chainFilter, setChainFilter] = useState("All Chains");
   const [isVerified, setIsVerified] = useState(false);
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [myOrders, setMyOrders] = useState<OrderRow[]>([]);
 
   useEffect(() => {
     fetch("/api/onboarding/status")
@@ -48,9 +58,11 @@ export default function MarketplacePage() {
   useEffect(() => {
     fetch("/api/orders")
       .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setOrders(data);
-      })
+      .then((data) => { if (Array.isArray(data)) setOrders(data); })
+      .catch(() => {});
+    fetch("/api/orders?mine=true")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setMyOrders(data); })
       .catch(() => {});
   }, []);
 
@@ -119,6 +131,48 @@ export default function MarketplacePage() {
       )}
 
       <div className="max-w-[1100px] mx-auto py-10 px-6">
+
+        {/* Your active orders */}
+        {myOrders.length > 0 && (
+          <div className="mb-10">
+            <h2 className="font-condensed text-[1.4rem] tracking-[1px] mb-3">YOUR ACTIVE ORDERS</h2>
+            <div className="flex flex-col gap-2">
+              {myOrders.map((o) => {
+                const cfg = MY_STATUS_COLOR[o.status] ?? MY_STATUS_COLOR.LISTED;
+                return (
+                  <Link
+                    key={o.id}
+                    href={`/marketplace/${o.id}`}
+                    className="flex items-center justify-between bg-white border border-[#e5e5e5] rounded-[12px] px-5 py-4 no-underline hover:border-[#bbb] transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <p className="font-sans text-[0.85rem] font-semibold text-[#111]">
+                          {o.amount} {o.asset}
+                        </p>
+                        <p className="font-sans text-[0.75rem] text-[#888]">
+                          ₹{parseFloat(o.pricePerUnit).toFixed(2)}/unit · ₹{parseFloat(o.totalValueInr).toLocaleString("en-IN")} total
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="font-sans text-[0.72rem] font-semibold px-3 py-[4px] rounded-full"
+                        style={{ color: cfg.color, background: cfg.bg }}
+                      >
+                        {o.statusLabel}
+                      </span>
+                      <span className="font-sans text-[0.8rem] text-[#7b3fe4] font-semibold">
+                        Manage →
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Header row */}
         <div className="flex justify-between items-end mb-8 flex-wrap gap-4">
           <div>
