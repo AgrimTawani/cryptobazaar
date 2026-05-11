@@ -242,7 +242,7 @@ export default function MarketplacePage() {
             {/* Action */}
             <div className="flex flex-col items-start gap-[5px]">
               <Link
-                href={`/marketplace/${order.orderId}`}
+                href={`/marketplace/${order.id}`}
                 className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#333] transition-colors"
               >
                 Buy
