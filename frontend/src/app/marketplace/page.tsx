@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const FILTERS = ["All", "USDT", "USDC"];
 const CHAINS = ["All Chains", "Polygon", "Solana", "Tron"];
@@ -11,10 +11,15 @@ export default function MarketplacePage() {
   const { user } = useUser();
   const [assetFilter, setAssetFilter] = useState("All");
   const [chainFilter, setChainFilter] = useState("All Chains");
-
-  // Placeholder — will be replaced with real DB query
-  const isVerified = false;
+  const [isVerified, setIsVerified] = useState(false);
   const orders: never[] = [];
+
+  useEffect(() => {
+    fetch("/api/onboarding/status")
+      .then((r) => r.json())
+      .then((d) => setIsVerified(d.userStatus === "VERIFIED"))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
