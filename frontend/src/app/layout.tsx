@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThirdwebProvider } from "thirdweb/react";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,7 +30,9 @@ export default function RootLayout({
           <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
         </head>
         <body className={`${inter.variable}`}>
-          {children}
+          <ThirdwebProvider>
+            {children}
+          </ThirdwebProvider>
         </body>
       </html>
     </ClerkProvider>
