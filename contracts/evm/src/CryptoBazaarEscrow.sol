@@ -3,191 +3,178 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
-/// @title CryptoBazaar P2P Escrow
-/// @notice One master contract handles all orders for all whitelisted tokens (USDT + USDC).
-///         Seller deposits → buyer locks → buyer marks paid → seller confirms → funds released.
-contract CryptoBazaarEscrow is ReentrancyGuard, AccessControl {
+/// @title CryptoBazaar P2P Escrow (lean version)
+contract CryptoBazaarEscrow {
     using SafeERC20 for IERC20;
 
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    // Custom errors — far cheaper than string messages
+    error Unauthorized();
+    error InvalidToken();
+    error InvalidState();
+    error NotParty();
+    error TimeoutNotReached();
+    error ZeroAmount();
+    error InvalidAddress();
 
     enum Status { OPEN, LOCKED, PAID, DISPUTED, COMPLETED, CANCELLED }
 
+    // Tightly packed struct — fits in 4 storage slots instead of 6
     struct Order {
-        uint256  id;
-        address  seller;
-        address  buyer;       // address(0) until lockOrder()
-        address  token;       // USDT or USDC contract address
-        uint256  amount;      // in token's native units
-        uint256  priceInr;    // INR per unit × 100  (e.g. 9500 = ₹95.00) — display only
-        Status   status;
-        uint256  createdAt;
-        uint256  lockedAt;    // set in lockOrder — drives 30-min buyer timeout
-        uint256  paidAt;      // set in markPaid  — drives 15-min seller timeout (off-chain)
+        address seller;    // slot 1 (20 bytes)
+        uint96  priceInr;  // slot 1 (12 bytes) — packed with seller
+        address buyer;     // slot 2 (20 bytes)
+        uint64  lockedAt;  // slot 2 (8 bytes) — packed with buyer
+        address token;     // slot 3 (20 bytes)
+        uint64  paidAt;    // slot 3 (8 bytes) — packed with token
+        uint128 amount;    // slot 4 (16 bytes)
+        Status  status;    // slot 4 (1 byte)  — packed with amount
     }
 
-    mapping(uint256 => Order)  public orders;
-    mapping(address => bool)   public whitelistedTokens;
-    uint256                    public nextOrderId;
-    address                    public insuranceFund;
-    uint256                    public feeBps = 75; // 0.75%
+    address public admin;
+    address public insuranceFund;
+    uint16  public feeBps = 75; // 0.75%
+    uint256 public nextOrderId;
 
-    // ─── Events ────────────────────────────────────────────────────────────────
-    event OrderCreated   (uint256 indexed id, address indexed seller, address token, uint256 amount, uint256 priceInr);
+    mapping(uint256 => Order) public orders;
+    mapping(address => bool)  public whitelisted;
+
+    event OrderCreated   (uint256 indexed id, address indexed seller, address token, uint128 amount, uint96 priceInr);
     event OrderLocked    (uint256 indexed id, address indexed buyer);
     event PaymentMarked  (uint256 indexed id);
-    event OrderCompleted (uint256 indexed id, address indexed buyer, uint256 amountOut, uint256 fee);
+    event OrderCompleted (uint256 indexed id, address indexed buyer, uint128 payout, uint128 fee);
     event DisputeRaised  (uint256 indexed id, address indexed raisedBy);
     event DisputeResolved(uint256 indexed id, address indexed winner);
     event OrderCancelled (uint256 indexed id);
     event OrderTimedOut  (uint256 indexed id);
-    event TokenWhitelisted(address indexed token, bool status);
 
-    // ─── Constructor ───────────────────────────────────────────────────────────
-    constructor(address _insuranceFund) {
-        require(_insuranceFund != address(0), "Invalid insurance fund");
+    modifier onlyAdmin() {
+        if (msg.sender != admin) revert Unauthorized();
+        _;
+    }
+
+    constructor(address _insuranceFund, address _initialToken) {
+        if (_insuranceFund == address(0)) revert InvalidAddress();
+        admin         = msg.sender;
         insuranceFund = _insuranceFund;
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(ADMIN_ROLE, msg.sender);
+        if (_initialToken != address(0)) whitelisted[_initialToken] = true;
     }
 
     // ─── Admin ─────────────────────────────────────────────────────────────────
 
-    function setTokenWhitelist(address token, bool status) external onlyRole(ADMIN_ROLE) {
-        whitelistedTokens[token] = status;
-        emit TokenWhitelisted(token, status);
+    function setWhitelist(address token, bool status) external onlyAdmin {
+        whitelisted[token] = status;
     }
 
-    function setInsuranceFund(address _insuranceFund) external onlyRole(ADMIN_ROLE) {
-        require(_insuranceFund != address(0), "Invalid address");
-        insuranceFund = _insuranceFund;
+    function setInsuranceFund(address _fund) external onlyAdmin {
+        if (_fund == address(0)) revert InvalidAddress();
+        insuranceFund = _fund;
     }
 
-    function setFeeBps(uint256 _feeBps) external onlyRole(ADMIN_ROLE) {
-        require(_feeBps <= 200, "Max fee 2%");
+    function setFeeBps(uint16 _feeBps) external onlyAdmin {
+        if (_feeBps > 200) revert Unauthorized();
         feeBps = _feeBps;
     }
 
     // ─── Seller ────────────────────────────────────────────────────────────────
 
-    /// @notice Seller deposits tokens and lists an order.
-    ///         Seller must call token.approve(escrow, amount) first.
-    function createOrder(address token, uint256 amount, uint256 priceInr) external nonReentrant {
-        require(whitelistedTokens[token], "Token not whitelisted");
-        require(amount > 0, "Amount must be > 0");
+    function createOrder(address token, uint128 amount, uint96 priceInr) external {
+        if (!whitelisted[token]) revert InvalidToken();
+        if (amount == 0) revert ZeroAmount();
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-        uint256 id = nextOrderId++;
-        orders[id] = Order({
-            id:        id,
-            seller:    msg.sender,
-            buyer:     address(0),
-            token:     token,
-            amount:    amount,
-            priceInr:  priceInr,
-            status:    Status.OPEN,
-            createdAt: block.timestamp,
-            lockedAt:  0,
-            paidAt:    0
-        });
+        uint256 id    = nextOrderId++;
+        Order storage o = orders[id];
+        o.seller   = msg.sender;
+        o.token    = token;
+        o.amount   = amount;
+        o.priceInr = priceInr;
+        // status defaults to OPEN (0)
 
         emit OrderCreated(id, msg.sender, token, amount, priceInr);
     }
 
-    /// @notice Seller cancels before any buyer has locked.
-    function cancelOrder(uint256 id) external nonReentrant {
+    function cancelOrder(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.OPEN, "Only open orders can be cancelled");
-        require(msg.sender == o.seller, "Only seller");
+        if (o.status != Status.OPEN) revert InvalidState();
+        if (msg.sender != o.seller)  revert Unauthorized();
 
         o.status = Status.CANCELLED;
         IERC20(o.token).safeTransfer(o.seller, o.amount);
-
         emit OrderCancelled(id);
     }
 
-    /// @notice Seller reclaims funds if buyer locked but didn't mark paid within 30 minutes.
-    function timeoutCancel(uint256 id) external nonReentrant {
+    function timeoutCancel(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.LOCKED, "Order not locked");
-        require(msg.sender == o.seller, "Only seller");
-        require(block.timestamp >= o.lockedAt + 30 minutes, "Timeout not reached yet");
+        if (o.status != Status.LOCKED)                      revert InvalidState();
+        if (msg.sender != o.seller)                         revert Unauthorized();
+        if (block.timestamp < o.lockedAt + 30 minutes)      revert TimeoutNotReached();
 
         o.status = Status.CANCELLED;
         IERC20(o.token).safeTransfer(o.seller, o.amount);
-
         emit OrderTimedOut(id);
     }
 
-    /// @notice Seller confirms INR was received — releases funds to buyer minus fee.
-    function confirmPayment(uint256 id) external nonReentrant {
+    // State updated BEFORE transfer (checks-effects-interactions — no reentrancy guard needed)
+    function confirmPayment(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.PAID, "Order not in PAID state");
-        require(msg.sender == o.seller, "Only seller");
+        if (o.status != Status.PAID)    revert InvalidState();
+        if (msg.sender != o.seller)     revert Unauthorized();
 
-        uint256 fee    = (o.amount * feeBps) / 10000;
-        uint256 payout = o.amount - fee;
+        uint128 fee    = uint128((uint256(o.amount) * feeBps) / 10000);
+        uint128 payout = o.amount - fee;
+        address buyer  = o.buyer;
+        address token  = o.token;
 
-        o.status = Status.COMPLETED;
+        o.status = Status.COMPLETED; // effect before interaction
 
-        IERC20(o.token).safeTransfer(insuranceFund, fee);
-        IERC20(o.token).safeTransfer(o.buyer, payout);
-
-        emit OrderCompleted(id, o.buyer, payout, fee);
+        IERC20(token).safeTransfer(insuranceFund, fee);
+        IERC20(token).safeTransfer(buyer, payout);
+        emit OrderCompleted(id, buyer, payout, fee);
     }
 
     // ─── Buyer ─────────────────────────────────────────────────────────────────
 
-    /// @notice Buyer locks the order — their address is bound here, not before.
-    function lockOrder(uint256 id) external nonReentrant {
+    function lockOrder(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.OPEN, "Order not open");
-        require(msg.sender != o.seller, "Seller cannot buy own order");
+        if (o.status != Status.OPEN)    revert InvalidState();
+        if (msg.sender == o.seller)     revert Unauthorized();
 
         o.buyer    = msg.sender;
         o.status   = Status.LOCKED;
-        o.lockedAt = block.timestamp;
-
+        o.lockedAt = uint64(block.timestamp);
         emit OrderLocked(id, msg.sender);
     }
 
-    /// @notice Buyer marks INR payment as sent (after sending via UPI/IMPS/NEFT).
     function markPaid(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.LOCKED, "Order not locked");
-        require(msg.sender == o.buyer, "Only buyer");
+        if (o.status != Status.LOCKED)  revert InvalidState();
+        if (msg.sender != o.buyer)      revert Unauthorized();
 
         o.status = Status.PAID;
-        o.paidAt = block.timestamp;
-
+        o.paidAt = uint64(block.timestamp);
         emit PaymentMarked(id);
     }
 
     // ─── Dispute ───────────────────────────────────────────────────────────────
 
-    /// @notice Either party raises a dispute after buyer marks paid.
     function raiseDispute(uint256 id) external {
         Order storage o = orders[id];
-        require(o.status == Status.PAID, "Can only dispute after payment is marked");
-        require(msg.sender == o.seller || msg.sender == o.buyer, "Not a party to this order");
+        if (o.status != Status.PAID)                            revert InvalidState();
+        if (msg.sender != o.seller && msg.sender != o.buyer)   revert NotParty();
 
         o.status = Status.DISPUTED;
         emit DisputeRaised(id, msg.sender);
     }
 
-    /// @notice Admin (multisig on mainnet) resolves dispute — sends funds to winner.
-    function resolveDispute(uint256 id, address winner) external nonReentrant onlyRole(ADMIN_ROLE) {
+    function resolveDispute(uint256 id, address winner) external onlyAdmin {
         Order storage o = orders[id];
-        require(o.status == Status.DISPUTED, "Order not disputed");
-        require(winner == o.buyer || winner == o.seller, "Winner must be a party");
+        if (o.status != Status.DISPUTED)                revert InvalidState();
+        if (winner != o.buyer && winner != o.seller)    revert NotParty();
 
         o.status = Status.COMPLETED;
         IERC20(o.token).safeTransfer(winner, o.amount);
-
         emit DisputeResolved(id, winner);
     }
 }
