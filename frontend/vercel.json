@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "src/app/api/verification/submit-questionnaire/route.ts": { "maxDuration": 60 },
+    "src/app/api/verification/analyze-statement/route.ts":    { "maxDuration": 60 }
+  }
+}
