@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: "What happens during the 3-step verification?",
-    a: "Step 1 — Identity check: Aadhaar + PAN + a quick liveness selfie via Didit. Takes under 5 minutes. Step 2 — Bank statement review: Upload 6 months of statements. Our system checks for red flags. Step 3 — Short interview: 10 questions online, about 5 minutes, to understand your trading background. Once all three pass, you're a Verified Member.",
+    a: "Step 1 — Identity check: Aadhaar + PAN + a quick liveness selfie via Didit. Takes under 5 minutes. Step 2 — Bank statement review: Upload 6 months of statements. Our system checks for red flags. Step 3 — AI Questionnaire: 10 questions online, about 5 minutes, to understand your trading background. Once all three pass, you're a Verified Member.",
   },
   {
     q: "How does the escrow work?",
@@ -66,7 +66,7 @@ const HOW_IT_WORKS = [
   },
   {
     step: "04",
-    title: "Complete the interview",
+    title: "Complete the AI Questionnaire",
     desc: "Answer 10 short questions about your trading background. Scored by AI. Takes about 5 minutes.",
   },
   {

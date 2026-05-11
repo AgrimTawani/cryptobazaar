@@ -18,7 +18,7 @@ We reserve the right to update these Terms at any time. Continued use of the Pla
   {
     id: "definitions",
     title: "2. Definitions",
-    content: `"Verified Member" — A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored interview.
+    content: `"Verified Member" — A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored questionnaire.
 
 "Trade" — A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.
 
@@ -56,7 +56,7 @@ You must sign in via Google OAuth to create an account. You are responsible for 
 Before trading, you must complete:
 — Layer 1 (KYC): Identity verification via Didit using Aadhaar, PAN, and a liveness check.
 — Layer 2 (EDD): Upload of 6 months of bank statements, analysed by our ML system for red flags.
-— Layer 3 (Interview): A 10-question online interview scored by AI.
+— Layer 3 (AI Questionnaire): A 10-question online interview scored by AI.
 
 All three layers must pass for Verified Member status to be granted.
 

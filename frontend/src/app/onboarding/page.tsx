@@ -38,7 +38,7 @@ const STEPS = [
   },
   {
     number: "03",
-    title: "Interview",
+    title: "AI Questionnaire",
     desc: "10 questions scored by AI to assess trading intent and risk.",
     href: "/onboarding/questionnaire",
   },

@@ -181,7 +181,7 @@ export default function DashboardPage() {
             { label: "Google Login", done: true },
             { label: "KYC — Identity Verification", done: false },
             { label: "Bank Statement Review", done: false },
-            { label: "AI Interview", done: false },
+            { label: "AI Questionnaire", done: false },
             { label: "Wallet Connection", done: false },
           ].map((step) => (
             <div key={step.label} className="flex items-center gap-3 py-3 border-b border-[#f5f5f5]">
