@@ -22,6 +22,8 @@ export async function GET() {
         pricePerUnit: o.pricePerUnit.toString(),
         totalValueInr: o.totalValueInr.toString(),
         acceptedPaymentMethods: o.acceptedPaymentMethods,
+        escrowTxHash: o.escrowTxHash ?? null,
+        escrowContractAddress: o.escrowContractAddress ?? null,
       }))
     );
   } catch (err) {

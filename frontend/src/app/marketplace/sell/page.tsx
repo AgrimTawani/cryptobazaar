@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { thirdwebClient } from "@/lib/thirdweb";
+import { txUrl } from "@/lib/explorer";
 
 const amoyChain = defineChain(80002);
 const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ??
@@ -63,6 +64,7 @@ export default function SellPage() {
   const [ifsc, setIfsc] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/onboarding/status")
@@ -146,6 +148,7 @@ export default function SellPage() {
           params: [USDC_ADDR, amountRaw, priceRaw],
         })
       );
+      setTxHash(transactionHash);
 
       // Step 3: Save to DB
       setStep("saving");
@@ -296,11 +299,26 @@ export default function SellPage() {
         )}
 
         {step === "done" && (
-          <div className="bg-[#f0fdf4] border border-[#86efac] rounded-[14px] p-5 mb-6 text-center">
-            <p className="font-condensed text-2xl text-[#166534] mb-1">
+          <div className="bg-[#f0fdf4] border border-[#86efac] rounded-[14px] p-5 mb-6">
+            <p className="font-condensed text-2xl text-[#166534] mb-1 text-center">
               Order Created!
             </p>
-            <p className="font-sans text-sm text-[#15803d]">
+            {txHash && (
+              <div className="mt-3 pt-3 border-t border-[#86efac]">
+                <p className="font-sans text-[0.7rem] text-[#166534] uppercase tracking-[1px] mb-1">
+                  Transaction
+                </p>
+                <a
+                  href={txUrl(txHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[0.72rem] text-[#15803d] underline break-all"
+                >
+                  {txHash.slice(0, 18)}…{txHash.slice(-10)} ↗
+                </a>
+              </div>
+            )}
+            <p className="font-sans text-sm text-[#15803d] mt-3 text-center">
               Redirecting to marketplace…
             </p>
           </div>

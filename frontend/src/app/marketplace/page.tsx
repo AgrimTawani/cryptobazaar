@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
+import { txUrl } from "@/lib/explorer";
 
 const ASSET_FILTERS = ["All", "USDT", "USDC"];
 const CHAIN_FILTERS = ["All Chains", "Polygon", "Solana", "Tron", "BNB"];
@@ -26,6 +27,8 @@ interface OrderRow {
   pricePerUnit: string;
   totalValueInr: string;
   acceptedPaymentMethods: string[];
+  escrowTxHash: string | null;
+  escrowContractAddress: string | null;
 }
 
 export default function MarketplacePage() {
@@ -237,12 +240,25 @@ export default function MarketplacePage() {
             </div>
 
             {/* Action */}
-            <Link
-              href={`/marketplace/${order.orderId}`}
-              className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#333] transition-colors"
-            >
-              Buy
-            </Link>
+            <div className="flex flex-col items-start gap-[5px]">
+              <Link
+                href={`/marketplace/${order.orderId}`}
+                className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#333] transition-colors"
+              >
+                Buy
+              </Link>
+              {order.escrowTxHash && (
+                <a
+                  href={txUrl(order.escrowTxHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[0.62rem] text-[#999] underline hover:text-[#7b3fe4] transition-colors"
+                  title={order.escrowTxHash}
+                >
+                  ✓ on-chain ↗
+                </a>
+              )}
+            </div>
           </div>
         ))}
 
