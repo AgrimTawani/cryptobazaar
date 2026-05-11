@@ -4,30 +4,79 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useActiveAccount, useConnect, useDisconnect, useActiveWallet } from "thirdweb/react";
-import { createWallet, injectedProvider } from "thirdweb/wallets";
-import { polygon } from "thirdweb/chains";
+import { createWallet } from "thirdweb/wallets";
+import { polygon, bsc } from "thirdweb/chains";
 import { thirdwebClient } from "@/lib/thirdweb";
 
-const WALLETS = [
+type WalletOption = {
+  id: string;
+  name: string;
+  icon: string;
+  desc: string;
+  dbChain: string;
+  asset: string;
+  kind: "evm-metamask" | "evm-coinbase" | "evm-walletconnect" | "phantom" | "tronlink";
+  evmChain?: typeof polygon | typeof bsc;
+};
+
+const WALLETS: WalletOption[] = [
   {
-    id: "io.metamask",
+    id: "polygon-metamask",
     name: "MetaMask",
     icon: "🦊",
-    desc: "Browser extension wallet",
+    desc: "USDT on Polygon",
+    dbChain: "POLYGON",
+    asset: "USDT",
+    kind: "evm-metamask",
+    evmChain: polygon,
   },
   {
-    id: "com.coinbase.wallet",
-    name: "Coinbase Wallet",
-    icon: "🔵",
-    desc: "Coinbase self-custody wallet",
+    id: "phantom",
+    name: "Phantom",
+    icon: "👻",
+    desc: "USDC on Solana",
+    dbChain: "SOLANA",
+    asset: "USDC",
+    kind: "phantom",
   },
   {
-    id: "walletConnect",
+    id: "tronlink",
+    name: "TRON Wallet",
+    icon: "🔴",
+    desc: "USDT on TRON (TRC20) — TronLink, Coinbase Wallet, Trust Wallet",
+    dbChain: "TRON",
+    asset: "USDT",
+    kind: "tronlink",
+  },
+  {
+    id: "bsc-metamask",
+    name: "MetaMask (BSC)",
+    icon: "🟡",
+    desc: "USDT on Binance Smart Chain",
+    dbChain: "BSC",
+    asset: "USDT",
+    kind: "evm-metamask",
+    evmChain: bsc,
+  },
+  {
+    id: "bsc-walletconnect",
     name: "WalletConnect",
     icon: "🔗",
-    desc: "Connect any mobile wallet",
+    desc: "USDT on Polygon or BSC — any mobile wallet",
+    dbChain: "POLYGON",
+    asset: "USDT",
+    kind: "evm-walletconnect",
+    evmChain: polygon,
   },
-] as const;
+];
+
+declare global {
+  interface Window {
+    phantom?: { solana?: { isPhantom?: boolean; connect: () => Promise<{ publicKey: { toString: () => string } }> } };
+    tronWeb?: { defaultAddress?: { base58?: string }; ready?: boolean };
+    tronLink?: { request: (arg: { method: string }) => Promise<{ code: number; message: string }> };
+  }
+}
 
 export default function WalletPage() {
   const router = useRouter();
@@ -36,27 +85,77 @@ export default function WalletPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // For non-EVM wallets (Phantom, TronLink) ThirdWeb doesn't manage state
+  const [nativeAddress, setNativeAddress] = useState<string | null>(null);
+  const [nativeChain, setNativeChain] = useState<string | null>(null);
+
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const activeWallet = useActiveWallet();
   const account = useActiveAccount();
-  const address = account?.address ?? null;
 
-  const handleConnect = async (walletId: (typeof WALLETS)[number]["id"]) => {
+  // Use EVM address from ThirdWeb, or native address for Phantom/TronLink
+  const address = account?.address ?? nativeAddress ?? null;
+  const selectedDbChain = nativeChain ?? "POLYGON";
+
+  const handleConnect = async (w: WalletOption) => {
     if (!acknowledged) return;
-    setConnecting(walletId);
+    setConnecting(w.id);
     setError(null);
     try {
-      await connect(async () => {
-        const wallet = createWallet(walletId);
-        await wallet.connect({ client: thirdwebClient, chain: polygon });
-        return wallet;
-      });
+      if (w.kind === "phantom") {
+        const phantom = window.phantom?.solana;
+        if (!phantom?.isPhantom) {
+          setError("Phantom not detected. Install Phantom from phantom.app and try again.");
+          return;
+        }
+        const resp = await phantom.connect();
+        setNativeAddress(resp.publicKey.toString());
+        setNativeChain("SOLANA");
+
+      } else if (w.kind === "tronlink") {
+        if (!window.tronLink && !window.tronWeb) {
+          setError("No TRON wallet detected. Use TronLink, Coinbase Wallet, or Trust Wallet and try again.");
+          return;
+        }
+        // Request account access via TronLink
+        if (window.tronLink) {
+          const res = await window.tronLink.request({ method: "tron_requestAccounts" });
+          if (res.code !== 200) {
+            setError("TronLink connection rejected.");
+            return;
+          }
+        }
+        // tronWeb.defaultAddress.base58 is the TRON address
+        const tronAddress = window.tronWeb?.defaultAddress?.base58;
+        if (!tronAddress) {
+          setError("Could not retrieve TRON address. Unlock TronLink and try again.");
+          return;
+        }
+        setNativeAddress(tronAddress);
+        setNativeChain("TRON");
+
+      } else {
+        // EVM wallets via ThirdWeb
+        const walletId =
+          w.kind === "evm-metamask" ? "io.metamask" :
+          w.kind === "evm-coinbase" ? "com.coinbase.wallet" :
+          "walletConnect";
+
+        const chain = w.evmChain ?? polygon;
+        await connect(async () => {
+          const wallet = createWallet(walletId as "io.metamask" | "com.coinbase.wallet" | "walletConnect");
+          await wallet.connect({ client: thirdwebClient, chain });
+          return wallet;
+        });
+        // For EVM: chain is determined by the wallet option
+        // We store it after ThirdWeb connects — address comes from useActiveAccount
+        setNativeChain(w.dbChain);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Connection failed";
-      // MetaMask not installed — suggest it
-      if (msg.toLowerCase().includes("provider") || msg.toLowerCase().includes("not found")) {
-        setError(`${WALLETS.find(w => w.id === walletId)?.name} not detected. Please install it and try again.`);
+      if (msg.toLowerCase().includes("provider") || msg.toLowerCase().includes("not found") || msg.toLowerCase().includes("not installed")) {
+        setError(`${w.name} not detected. Please install it and try again.`);
       } else {
         setError(msg);
       }
@@ -65,15 +164,22 @@ export default function WalletPage() {
     }
   };
 
+  const handleDisconnect = () => {
+    if (activeWallet) disconnect(activeWallet);
+    setNativeAddress(null);
+    setNativeChain(null);
+  };
+
   const handleSave = async () => {
     if (!address || saving) return;
     setSaving(true);
     setError(null);
     try {
+      const chain = account?.address ? selectedDbChain : nativeChain;
       const res = await fetch("/api/verification/link-wallet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: address, walletChain: "POLYGON" }),
+        body: JSON.stringify({ walletAddress: address, walletChain: chain }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to save wallet"); return; }
@@ -88,6 +194,13 @@ export default function WalletPage() {
   const devSkip = async () => {
     await fetch("/api/verification/dev-approve-wallet", { method: "POST" });
     router.push("/dashboard");
+  };
+
+  const chainLabel: Record<string, string> = {
+    POLYGON: "Polygon",
+    SOLANA: "Solana",
+    TRON: "TRON (TRC20)",
+    BSC: "Binance Smart Chain",
   };
 
   return (
@@ -114,13 +227,13 @@ export default function WalletPage() {
         </h1>
         <p className="font-sans text-sm text-[#666] mb-7 leading-[1.6]">
           Your wallet address will be permanently bound to your account and
-          screened for on-chain history. Use a Polygon-compatible wallet holding USDT.
+          screened for on-chain history. Supported chains: Polygon, Solana, TRON (TRC20), and Binance Smart Chain.
         </p>
 
         {/* Warning */}
         <div className="bg-[#fffbeb] border-[1.5px] border-solid border-[#fde68a] rounded-xl py-4 px-5 mb-7">
           <p className="font-sans text-[0.8rem] text-[#92400e] leading-[1.6] m-0">
-            <strong>⚠️ Permanent bind:</strong> Once linked, changing your wallet invalidates all 3 verification credentials and requires full re-onboarding.
+            <strong>Permanent bind:</strong> Once linked, changing your wallet invalidates all 3 verification credentials and requires full re-onboarding.
           </p>
         </div>
 
@@ -147,14 +260,16 @@ export default function WalletPage() {
                   Wallet Connected
                 </span>
                 <button
-                  onClick={() => activeWallet && disconnect(activeWallet)}
+                  onClick={handleDisconnect}
                   className="font-sans text-[0.72rem] text-[#999] underline bg-transparent border-0 cursor-pointer"
                 >
                   Disconnect
                 </button>
               </div>
               <p className="font-mono text-[0.8rem] text-[#111] break-all">{address}</p>
-              <p className="font-sans text-[0.72rem] text-[#888] mt-1">Network: Polygon</p>
+              <p className="font-sans text-[0.72rem] text-[#888] mt-1">
+                Network: {chainLabel[account?.address ? selectedDbChain : (nativeChain ?? "POLYGON")] ?? selectedDbChain}
+              </p>
             </div>
 
             {error && <p className="font-sans text-[0.8rem] text-[#e53e3e] mb-4">{error}</p>}
@@ -181,7 +296,7 @@ export default function WalletPage() {
               {WALLETS.map((w) => (
                 <button
                   key={w.id}
-                  onClick={() => handleConnect(w.id)}
+                  onClick={() => handleConnect(w)}
                   disabled={!!connecting}
                   className="flex items-center gap-4 w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-left transition-all hover:border-black disabled:opacity-60"
                 >
@@ -190,6 +305,9 @@ export default function WalletPage() {
                     <div className="font-sans text-[0.9rem] font-semibold text-[#111]">{w.name}</div>
                     <div className="font-sans text-[0.75rem] text-[#999]">{w.desc}</div>
                   </div>
+                  <span className="font-sans text-[0.72rem] font-bold text-[#888] bg-[#f5f5f5] px-2 py-[3px] rounded-full shrink-0">
+                    {w.asset}
+                  </span>
                   {connecting === w.id && (
                     <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin-fast" />
                   )}

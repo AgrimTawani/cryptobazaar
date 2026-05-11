@@ -4,6 +4,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { WalletBalanceCard } from "@/components/WalletBalanceCard";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
   LOGIN_DONE: {
@@ -53,6 +54,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 interface OnboardingStatus {
   userStatus: string;
   walletAddress: string | null;
+  walletChain: string | null;
   kyc: string;
   edd: string;
   interview: string;
@@ -169,6 +171,16 @@ export default function DashboardPage() {
             {statusConfig.desc}
           </p>
         </div>
+
+        {/* Wallet balance widget */}
+        {dbStatus?.walletAddress && dbStatus?.walletChain && (
+          <div className="mb-6">
+            <WalletBalanceCard
+              walletAddress={dbStatus.walletAddress}
+              walletChain={dbStatus.walletChain}
+            />
+          </div>
+        )}
 
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-4 mb-6">

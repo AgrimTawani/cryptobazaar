@@ -30,6 +30,7 @@ export async function GET() {
       return NextResponse.json({
         userStatus: "LOGIN_DONE",
         walletAddress: null,
+        walletChain: null,
         kyc: "NOT_STARTED",
         edd: "NOT_STARTED",
         interview: "NOT_STARTED",
@@ -46,6 +47,7 @@ export async function GET() {
     return NextResponse.json({
       userStatus: user.status,
       walletAddress: user.walletAddress ?? null,
+      walletChain: user.walletChain ?? null,
       kyc: kyc?.status ?? "NOT_STARTED",
       edd: edd?.status ?? "NOT_STARTED",
       interview: interview?.status ?? "NOT_STARTED",

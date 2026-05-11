@@ -53,6 +53,7 @@ enum Chain {
   POLYGON
   SOLANA
   TRON
+  BSC
 }
 
 enum PaymentMethod {
