@@ -14,30 +14,41 @@ const EVM_CHAINS = [
   { key: "BSC",     label: "BNB Chain" },
 ];
 
+const EVM_TOKENS = ["USDT", "USDC"] as const;
+type TokenPref = typeof EVM_TOKENS[number];
+
+// Solana is USDC-only; TRON supports both but we surface the switcher
+const CHAIN_FIXED_TOKEN: Record<string, TokenPref | null> = {
+  SOLANA: "USDC",
+};
+
 interface Props {
   walletAddress: string;
   walletChain: string;
 }
 
 export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: Props) {
-  const [chain, setChain]       = useState(initialChain);
-  const [balance, setBalance]   = useState<string | null>(null);
-  const [symbol, setSymbol]     = useState<string | null>(null);
-  const [loading, setLoading]   = useState(true);
+  const [chain, setChain]         = useState(initialChain);
+  const [token, setToken]         = useState<TokenPref>("USDC");
+  const [balance, setBalance]     = useState<string | null>(null);
+  const [symbol, setSymbol]       = useState<string | null>(null);
+  const [loading, setLoading]     = useState(true);
   const [switching, setSwitching] = useState(false);
-  const [copied, setCopied]     = useState(false);
+  const [copied, setCopied]       = useState(false);
 
-  const meta = CHAIN_META[chain] ?? CHAIN_META.POLYGON;
-  const isEvm = chain === "POLYGON" || chain === "BSC";
+  const meta    = CHAIN_META[chain] ?? CHAIN_META.POLYGON;
+  const isEvm   = chain === "POLYGON" || chain === "BSC";
+  const fixedToken = CHAIN_FIXED_TOKEN[chain] ?? null;
 
   const fetchBalance = useCallback(() => {
     setLoading(true);
-    fetch("/api/wallet/balance")
+    const t = fixedToken ?? token;
+    fetch(`/api/wallet/balance?token=${t}`)
       .then((r) => r.json())
       .then((d) => { setBalance(d.balance ?? "—"); setSymbol(d.symbol ?? ""); })
       .catch(() => setBalance("—"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [token, fixedToken]);
 
   useEffect(() => { fetchBalance(); }, [fetchBalance]);
 
@@ -52,14 +63,19 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
       });
       if (res.ok) {
         setChain(newChain);
-        // Re-fetch balance for new chain — balance endpoint reads chain from DB
         setBalance(null);
         setLoading(true);
-        setTimeout(fetchBalance, 400); // small delay so DB write propagates
+        setTimeout(fetchBalance, 400);
       }
     } finally {
       setSwitching(false);
     }
+  };
+
+  const switchToken = (newToken: TokenPref) => {
+    if (newToken === token) return;
+    setToken(newToken);
+    // fetchBalance fires automatically via useEffect dep on token
   };
 
   const truncate = (addr: string) =>
@@ -77,7 +93,7 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
       style={{ background: meta.bg, borderColor: meta.border }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="text-lg leading-none" style={{ color: meta.color }}>{meta.icon}</span>
           <span
@@ -88,7 +104,7 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* EVM chain switcher */}
           {isEvm && (
             <div className="flex items-center gap-[2px] bg-white border border-[#e0e0e0] rounded-full p-[3px]">
@@ -105,6 +121,26 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
                   }
                 >
                   {c.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Token switcher — EVM and TRON; hidden for Solana (USDC-only) */}
+          {!fixedToken && (
+            <div className="flex items-center gap-[2px] bg-white border border-[#e0e0e0] rounded-full p-[3px]">
+              {EVM_TOKENS.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => switchToken(t)}
+                  className="font-sans text-[0.65rem] font-semibold px-[8px] py-[3px] rounded-full cursor-pointer transition-all"
+                  style={
+                    token === t
+                      ? { background: meta.color, color: "#fff" }
+                      : { background: "transparent", color: "#888" }
+                  }
+                >
+                  {t}
                 </button>
               ))}
             </div>

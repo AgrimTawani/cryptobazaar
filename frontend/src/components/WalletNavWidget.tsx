@@ -22,7 +22,8 @@ export function WalletNavWidget() {
     let mounted = true;
     Promise.all([
       fetch("/api/onboarding/status").then((r) => r.json()),
-      fetch("/api/wallet/balance").then((r) => r.json()),
+      // Default to USDC on Amoy testnet, USDT on mainnet
+      fetch(`/api/wallet/balance?token=${process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID === "80002" ? "USDC" : "USDT"}`).then((r) => r.json()),
     ])
       .then(([status, bal]) => {
         if (!mounted) return;
