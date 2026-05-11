@@ -6,6 +6,25 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
 
+interface ActivityRow {
+  id: string;
+  role: "seller" | "buyer";
+  action: string;
+  amount: string;
+  asset: string;
+  totalValueInr: string;
+  status: string;
+  statusLabel: string;
+  counterpartyName: string | null;
+  updatedAt: string;
+}
+
+interface DashboardStats {
+  totalTrades: number;
+  totalVolumeInr: number;
+  activity: ActivityRow[];
+}
+
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
   LOGIN_DONE: {
     label: "Onboarding Pending",
@@ -65,11 +84,16 @@ export default function DashboardPage() {
   const { signOut } = useClerk();
   const router = useRouter();
   const [dbStatus, setDbStatus] = useState<OnboardingStatus | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     fetch("/api/onboarding/status")
       .then((r) => r.json())
       .then((d: OnboardingStatus) => setDbStatus(d))
+      .catch(() => null);
+    fetch("/api/dashboard/stats")
+      .then((r) => r.json())
+      .then((d: DashboardStats) => setStats(d))
       .catch(() => null);
   }, []);
 
@@ -185,8 +209,16 @@ export default function DashboardPage() {
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[
-            { label: "Total Trades", value: "0" },
-            { label: "Trade Volume", value: "₹0" },
+            {
+              label: "Total Trades",
+              value: stats ? String(stats.totalTrades) : "—",
+            },
+            {
+              label: "Trade Volume",
+              value: stats
+                ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
+                : "—",
+            },
             { label: "Member Rating", value: "—" },
           ].map((stat) => (
             <div key={stat.label} className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[14px] py-5 px-6">
@@ -239,11 +271,51 @@ export default function DashboardPage() {
               View marketplace →
             </Link>
           </div>
-          <div className="text-center py-10">
-            <p className="font-sans text-sm text-[#bbb]">
-              No trades yet. Complete verification to start trading.
-            </p>
-          </div>
+          {!stats || stats.activity.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="font-sans text-sm text-[#bbb]">
+                No trades yet. Complete verification to start trading.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col divide-y divide-[#f5f5f5]">
+              {stats.activity.map((row) => (
+                <Link
+                  key={row.id}
+                  href={`/marketplace/${row.id}`}
+                  className="flex items-center justify-between py-4 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors"
+                >
+                  <div>
+                    <p className="font-sans text-[0.85rem] font-semibold text-[#111]">
+                      {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
+                    </p>
+                    <p className="font-sans text-[0.75rem] text-[#888] mt-[2px]">
+                      {row.counterpartyName
+                        ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · `
+                        : ""}
+                      ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`font-sans text-[0.7rem] font-semibold px-3 py-[4px] rounded-full ${
+                        row.status === "COMPLETED"
+                          ? "bg-[#f0fdf4] text-[#166534]"
+                          : row.status === "CANCELLED" || row.status === "EXPIRED"
+                          ? "bg-[#f5f5f5] text-[#888]"
+                          : row.status === "DISPUTED"
+                          ? "bg-[#fef2f2] text-[#991b1b]"
+                          : "bg-[#eff6ff] text-[#1e40af]"
+                      }`}
+                    >
+                      {row.statusLabel}
+                    </span>
+                    <span className="font-sans text-[0.75rem] text-[#ccc]">→</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
