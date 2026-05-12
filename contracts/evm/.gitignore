@@ -48,6 +48,7 @@ next-env.d.ts
 /src/generated/prisma
 
 # Foundry
+lib/
 out/
 cache/
 broadcast/
