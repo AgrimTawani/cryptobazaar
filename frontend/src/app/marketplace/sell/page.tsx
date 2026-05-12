@@ -128,6 +128,7 @@ export default function SellPage() {
           contract: usdcContract,
           method: "function approve(address spender, uint256 amount)",
           params: [ESCROW_ADDR, amountRaw],
+          gas: BigInt(100000),
         })
       );
 
@@ -146,6 +147,7 @@ export default function SellPage() {
           method:
             "function createOrder(address token, uint128 amount, uint96 priceInr)",
           params: [USDC_ADDR, amountRaw, priceRaw],
+          gas: BigInt(200000),
         })
       );
       setTxHash(transactionHash);
