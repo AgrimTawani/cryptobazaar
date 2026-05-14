@@ -53,7 +53,7 @@ export default function KYCPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="signup-step">Step 01</div>
+      <div className="signup-step">Step 02</div>
       <h1 className="signup-title">Identity Verification</h1>
       <p className="signup-desc">
         We use Didit to securely verify your identity. Your data is never stored on our servers.

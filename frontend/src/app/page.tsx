@@ -63,7 +63,7 @@ export default function Home() {
         </div>
         <div className="nav-right">
           <button className="btn-login">Login</button>
-          <Link href="/signup/kyc" className="btn-signup-nav">Create free account</Link>
+          <Link href="/signup/profile" className="btn-signup-nav">Create free account</Link>
         </div>
       </nav>
 
@@ -97,7 +97,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Link href="/signup/kyc" className="cta-primary">Start for Free</Link>
+            <Link href="/signup/profile" className="cta-primary">Start for Free</Link>
             <a href="#how" className="cta-secondary">How It Works</a>
           </motion.div>
 

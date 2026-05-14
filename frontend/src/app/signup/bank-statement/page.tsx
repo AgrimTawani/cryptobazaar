@@ -34,7 +34,7 @@ export default function BankStatementPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="signup-step">Step 02</div>
+      <div className="signup-step">Step 03</div>
       <h1 className="signup-title">Upload Bank Statement</h1>
       <p className="signup-desc">
         To complete your EDD, please upload your last 6 months' bank statement. 
