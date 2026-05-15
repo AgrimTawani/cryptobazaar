@@ -172,14 +172,18 @@ THE FUND IS NOT AN INSURANCE PRODUCT. IT IS NOT REGULATED AS ONE. IT DOES NOT CO
 8.2 Fund Construction
 0.75% of the value of every completed trade is automatically transferred from the escrow contract to the Fund contract at settlement. The Fund is held on-chain. CryptoBazaar cannot spend it without multisig approval from a minimum of 3 of 5 designated signatories.
 
-8.3 Eligibility to Request a Disbursement
-All four conditions must be satisfied:
+8.3 Nature of Disbursements
+Disbursements from the Fund are a contractual service remedy under the Indian Contract Act, 1872 (Sections 73–74) for CryptoBazaar's failure to deliver the service it promised — namely, that every counterparty on the Platform has been adequately screened. A disbursement is compensation for our screening failure, not a payment for an external risk event. The Fund does not operate as an insurance pool.
+
+8.4 Eligibility to Request a Disbursement
+All five conditions must be satisfied:
 (a) You had an active Membership Plan at the time of the trade that caused the freeze.
 (b) You had valid (unexpired) EDD and KYC credentials at the time of the trade.
 (c) The trade was executed through CryptoBazaar's escrow smart contract — on-chain verifiable.
 (d) The bank freeze is directly and demonstrably attributable to that specific CryptoBazaar trade, evidenced by a police notice or official bank freeze letter citing the transaction.
+(e) The freeze is attributable to a failure in CryptoBazaar's vetting process — specifically, that the counterparty to your trade was admitted to the Platform despite posing an identifiable risk that our screening should have caught. Freezes resulting from events unrelated to our screening failure are not eligible.
 
-8.4 Disbursement Tiers
+8.5 Disbursement Tiers
 Subject to fund availability and approval:
 — Emergency: Up to ₹10,000 within 24 hours. Requires: freeze notice + FIR/complaint number.
 — Standard: Up to ₹1,00,000 within 7 days. Requires: above + proof of legal representation.
@@ -187,21 +191,22 @@ Subject to fund availability and approval:
 
 Disbursement amounts are subject to the Fund's available balance at the time of approval. If the Fund cannot cover the full approved amount, a partial disbursement may be made.
 
-8.5 Anti-Abuse Rules
+8.6 Anti-Abuse Rules
 — Maximum 2 disbursement requests per member per 12-month period.
 — A 90-day waiting period applies from the date of becoming a Verified Member before a first request may be submitted. This prevents "join-and-claim" abuse.
 — All requests are cross-checked against on-chain trade records. No on-chain trade record means no disbursement.
 — Fraudulent disbursement requests (fabricated freeze notices, false information) result in permanent suspension and may result in criminal complaint.
 
-8.6 Scope Limitations
+8.7 Scope Limitations
 The Fund does not cover:
 — Losses from cryptocurrency price movements.
 — Bank freezes caused by transactions unrelated to CryptoBazaar.
+— Bank freezes where CryptoBazaar's vetting process functioned correctly and the risk was undetectable by reasonable screening methods.
 — Losses from your own negligence (e.g., sharing private keys, trading outside the Platform).
 — Tax liabilities arising from your trading activity.
 — Events of force majeure.
 
-8.7 No Fiduciary Duty
+8.8 No Fiduciary Duty
 CryptoBazaar's administration of the Fund does not create a fiduciary duty, trust relationship, or any other special duty of care beyond what is expressly set out in these Terms.`,
   },
   {
@@ -344,7 +349,7 @@ export default function TermsPage() {
           {/* Important notice */}
           <div className="bg-[#fffbeb] border-[1.5px] border-[#fde68a] rounded-xl py-5 px-6 mb-12">
             <p className="font-sans text-[0.85rem] text-[#92400e] leading-[1.7]">
-              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a voluntary member benefit. It is <strong>not an insurance product</strong> and is not regulated as such. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully before making any decisions based on the Fund.
+              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar's screening failures — it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
             </p>
           </div>
 

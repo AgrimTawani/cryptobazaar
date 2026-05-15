@@ -54,11 +54,11 @@ export default function LoginPage() {
           <h1 className="font-condensed text-[clamp(3.2rem,5.5vw,5.2rem)] leading-[0.95] tracking-[1px] text-white mb-5">
             TRADE USDT.
             <br />
-            <span className="text-lime">STAY INSURED.</span>
+            <span className="text-lime">STAY COVERED.</span>
           </h1>
           <p className="font-sans text-[0.9rem] text-white/[0.45] max-w-[300px] leading-[1.65]">
             The only gated P2P exchange in India. Every member verified. Every
-            trade insured.
+            trade backed by escrow.
           </p>
         </div>
 
@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div className="grid grid-cols-2 gap-[28px_40px] relative z-[1]">
           {[
             { value: "3-Layer", label: "Verification" },
-            { value: "0.75%", label: "Insurance Levy" },
+            { value: "0.75%", label: "Service Fund" },
             { value: "₹5L", label: "Max Payout" },
             { value: "0", label: "Custody Risk" },
           ].map((stat) => (

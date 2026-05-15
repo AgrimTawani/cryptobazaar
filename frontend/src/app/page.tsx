@@ -24,7 +24,7 @@ const FAQS = [
   },
   {
     q: "What is the Member Protection Fund?",
-    a: "Even with all verifications, there is a small chance that money entering your bank account was linked to a crime after it left our platform. If your bank account gets frozen because of a CryptoBazaar trade, the Member Protection Fund may reimburse you for the disruption. The fund is built from 0.75% of every completed trade and held in a separate on-chain contract — CryptoBazaar cannot spend it without multisig approval.",
+    a: "Our vetting is designed to keep tainted funds off the platform entirely. If our screening process fails to identify a counterparty risk and your bank account is frozen as a direct result of that failure, you may apply to the Member Protection Fund as a service remedy. The fund is built from 0.75% of every completed trade and held in a separate on-chain contract — CryptoBazaar cannot spend it without multisig approval.",
   },
   {
     q: "Is the Member Protection Fund guaranteed?",
@@ -256,8 +256,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            Trade USDT and USDC against INR without the risk of bank account freezes.
-            <br />Every user verified. Every member protected.
+            India's most rigorously vetted P2P exchange for USDT and USDC against INR.
+            <br />Every member verified. Every trade held in escrow.
           </motion.p>
 
           <motion.div
@@ -297,7 +297,7 @@ export default function Home() {
             <span className="text-lime">THE RIGHT WAY.</span>
           </h2>
           <p className="font-sans text-base text-white/50 max-w-[520px] leading-[1.7] mb-16">
-            CryptoBazaar is not just another P2P app. Every member is vetted, every trade is protected by a smart contract, and there is a Member Protection Fund for when things go wrong.
+            CryptoBazaar is not just another P2P app. Every member is vetted, every trade is protected by a smart contract, and there is a service remedy fund for when our vetting fails.
           </p>
 
           <div className="flex flex-col">
@@ -339,10 +339,10 @@ export default function Home() {
               Member Protection Fund
             </p>
             <h3 className="font-condensed text-[1.8rem] text-white tracking-[0.5px] mb-3">
-              What happens if your bank account gets frozen?
+              What happens if our vetting fails you?
             </h3>
             <p className="font-sans text-[0.9rem] text-white/[0.55] leading-[1.7] max-w-[600px] mb-6">
-              Sometimes, even after every precaution, a bank will freeze an account linked to a transaction it deems suspicious. If that happens because of a CryptoBazaar trade, you can apply for a disbursement from our Member Protection Fund — built from 0.75% of every completed trade on the platform.
+              CryptoBazaar's verification process is the product. If our screening fails to catch a bad actor and your bank account is frozen as a direct result of that failure on our platform, you can apply for a service remedy disbursement from the Member Protection Fund — built from 0.75% of every completed trade and held on-chain.
             </p>
             <div className="grid grid-cols-3 gap-5">
               {[
@@ -359,7 +359,7 @@ export default function Home() {
               ))}
             </div>
             <p className="font-sans text-[0.7rem] text-white/25 mt-5 leading-[1.6]">
-              * Disbursements are subject to fund availability and eligibility verification. The Member Protection Fund is a voluntary member benefit, not an insurance product. Payouts are not guaranteed.
+              * Disbursements are a service remedy for CryptoBazaar's vetting failure — not a payment for an external risk event. Subject to eligibility verification and fund availability. Not an insurance product. Payouts are not guaranteed.
             </p>
           </motion.div>
         </div>
@@ -561,7 +561,7 @@ export default function Home() {
                 CRYPTOBAZAAR
               </div>
               <p className="font-sans text-[0.78rem] text-white/30 leading-[1.7] mb-5">
-                The only gated P2P stablecoin exchange for India. Every member verified. Every trade protected.
+                The only gated P2P stablecoin exchange for India. Every member verified. Every trade held in escrow.
               </p>
               <div className="flex flex-col gap-[6px]">
                 {[
@@ -631,7 +631,7 @@ export default function Home() {
               © 2026 CryptoBazaar. All rights reserved.
             </p>
             <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] text-right">
-              The Member Protection Fund is a voluntary member benefit — not an insurance product and not regulated as such. Payouts are subject to fund availability and eligibility verification. No guarantee of any amount is made or implied.
+              The Member Protection Fund is a service remedy for CryptoBazaar's screening failures — not an insurance product and not regulated as such. Disbursements require documented proof that the freeze was caused by a failure in our vetting process. Subject to fund availability. No amount is guaranteed.
             </p>
           </div>
         </div>

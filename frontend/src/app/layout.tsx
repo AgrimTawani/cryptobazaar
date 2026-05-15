@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CryptoBazaar — Gated P2P Stablecoin Exchange for India",
   description:
-    "Trade USDT and USDC against INR without the risk of bank account freezes.",
+    "India's only gated P2P stablecoin exchange. Every member verified, every trade held in escrow.",
 };
 
 export default function RootLayout({
