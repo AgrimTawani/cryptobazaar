@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
@@ -135,7 +135,10 @@ export default function Home() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
+  const [navHidden, setNavHidden] = useState(false);
+  const [navHovered, setNavHovered] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const lastScrollY = useRef(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { isSignedIn, user } = useUser();
 
@@ -162,10 +165,32 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [currentWord, isDeleting, loopNum]);
 
+  // Navbar: hide on scroll-down, show on scroll-up or at top
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      if (y < 40) {
+        setNavHidden(false);
+      } else if (y > lastScrollY.current + 5) {
+        setNavHidden(true);
+      } else if (y < lastScrollY.current - 5) {
+        setNavHidden(false);
+      }
+      lastScrollY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Navbar: reveal when mouse is near the top of the viewport
+  useEffect(() => {
+    const onPointerMove = (e: PointerEvent) => {
+      const nearTop = e.clientY < 120;
+      setNavHovered(nearTop);
+    };
+    document.addEventListener("pointermove", onPointerMove);
+    return () => document.removeEventListener("pointermove", onPointerMove);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -183,12 +208,12 @@ export default function Home() {
     <div>
       {/* ── NAV ── */}
       <nav
-        className="nav"
+        className="fixed top-0 left-0 right-0 z-[101] flex items-center justify-between h-[64px] px-10 transition-transform duration-300 ease-out"
         style={{
+          transform: navHidden && !navHovered ? "translateY(-100%)" : "translateY(0)",
           background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
           borderBottom: scrolled ? "1px solid #f0f0f0" : "none",
-          transition: "all 0.3s ease",
         }}
       >
         <Link href="/" className="nav-logo no-underline text-black">
@@ -507,7 +532,6 @@ export default function Home() {
               { title: "Fraud has serious consequences", body: "Submitting forged bank statements or fabricated freeze notices results in permanent suspension and may be reported to law enforcement. All users are Aadhaar-linked." },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 items-start py-5 px-5 bg-[#fafafa] rounded-xl border border-[#f0f0f0]">
-                <span className="text-[1.4rem] shrink-0">{item.icon}</span>
                 <div>
                   <div className="font-condensed text-[1.1rem] tracking-[0.5px] mb-1">{item.title}</div>
                   <div className="font-sans text-[0.82rem] text-[#666] leading-[1.6]">{item.body}</div>
