@@ -138,6 +138,7 @@ export default function Home() {
   const [navHidden, setNavHidden] = useState(false);
   const [navHovered, setNavHovered] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { isSignedIn, user } = useUser();
@@ -208,18 +209,18 @@ export default function Home() {
     <div>
       {/* ── NAV ── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-[101] flex items-center justify-between h-[64px] px-10 transition-transform duration-300 ease-out"
+        className="fixed top-0 left-0 right-0 z-[101] flex items-center justify-between h-[64px] px-5 md:px-10 transition-transform duration-300 ease-out"
         style={{
-          transform: navHidden && !navHovered ? "translateY(-100%)" : "translateY(0)",
-          background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
+          transform: navHidden && !navHovered && !mobileMenuOpen ? "translateY(-100%)" : "translateY(0)",
+          background: scrolled || mobileMenuOpen ? "rgba(255,255,255,0.95)" : "transparent",
+          backdropFilter: scrolled || mobileMenuOpen ? "blur(12px)" : "none",
           borderBottom: scrolled ? "1px solid #f0f0f0" : "none",
         }}
       >
         <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
-        <div className="nav-links">
+        <div className="nav-links hidden md:flex">
           <Link href="/marketplace" className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200">
             Marketplace
           </Link>
@@ -233,7 +234,7 @@ export default function Home() {
             FAQ
           </button>
         </div>
-        <div className="nav-right">
+        <div className="nav-right hidden md:flex">
           {isSignedIn ? (
             <Link
               href="/dashboard"
@@ -256,7 +257,50 @@ export default function Home() {
             <Link href="/login" className="btn-login font-condensed">Login</Link>
           )}
         </div>
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex flex-col gap-[5px] p-2"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={`block w-6 h-[2px] bg-black transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+          <span className={`block w-6 h-[2px] bg-black transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+          <span className={`block w-6 h-[2px] bg-black transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+        </button>
       </nav>
+
+      {/* ── Mobile Menu Overlay ── */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 top-[64px] z-[100] bg-white flex flex-col items-center pt-10 gap-6 md:hidden"
+          >
+            <Link href="/marketplace" onClick={() => setMobileMenuOpen(false)} className="font-condensed text-[1.6rem] tracking-[2px] text-black">
+              Marketplace
+            </Link>
+            <button onClick={() => { scrollTo("how"); setMobileMenuOpen(false); }} className="font-condensed text-[1.6rem] tracking-[2px] text-black">
+              How It Works
+            </button>
+            <button onClick={() => { scrollTo("pricing"); setMobileMenuOpen(false); }} className="font-condensed text-[1.6rem] tracking-[2px] text-black">
+              Pricing
+            </button>
+            <button onClick={() => { scrollTo("faq"); setMobileMenuOpen(false); }} className="font-condensed text-[1.6rem] tracking-[2px] text-black">
+              FAQ
+            </button>
+            <div className="mt-4">
+              {isSignedIn ? (
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Dashboard</Link>
+              ) : (
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Login</Link>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── HERO ── */}
       <section className="shader-hero">
@@ -276,13 +320,13 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="shader-subtitle font-manrope !font-bold !text-[1.15rem] whitespace-nowrap tracking-wide !max-w-none w-full text-center"
+            className="shader-subtitle font-manrope !font-bold !text-[0.95rem] md:!text-[1.15rem] tracking-wide !max-w-none w-full text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             India's most rigorously vetted P2P exchange for USDT and USDC against INR.
-            <br />Every member verified. Every trade held in escrow.
+            <br className="hidden md:block" />Every member verified. Every trade held in escrow.
           </motion.p>
 
           <motion.div
@@ -312,7 +356,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" className="bg-black py-[100px] px-10">
+      <section id="how" className="bg-black py-16 md:py-[100px] px-5 md:px-10">
         <div className="max-w-[900px] mx-auto">
           <p className="font-sans text-[1.1rem] font-medium text-lime tracking-[4px] uppercase mb-4">
             How It Works
@@ -333,18 +377,18 @@ export default function Home() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className={`flex gap-5 py-5 items-center ${
+                className={`flex gap-4 md:gap-5 py-5 items-start md:items-center ${
                   i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.08]" : ""
                 }`}
               >
-                <div className="shrink-0 font-condensed text-5xl text-lime leading-none w-[72px]">
+                <div className="shrink-0 font-condensed text-3xl md:text-5xl text-lime leading-none w-[48px] md:w-[72px]">
                   {item.step}
                 </div>
                 <div>
-                  <div className="font-condensed text-[1.8rem] text-white tracking-[0.5px] mb-2">
+                  <div className="font-condensed text-[1.3rem] md:text-[1.8rem] text-white tracking-[0.5px] mb-1 md:mb-2">
                     {item.title}
                   </div>
-                  <div className="font-sans text-[1.1rem] text-white/70 leading-[1.6] max-w-[600px]">
+                  <div className="font-sans text-[0.9rem] md:text-[1.1rem] text-white/70 leading-[1.6] max-w-[600px]">
                     {item.desc}
                   </div>
                 </div>
@@ -358,7 +402,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mt-16 bg-lime/[0.06] border border-lime/20 rounded-2xl py-9 px-10"
+            className="mt-12 md:mt-16 bg-lime/[0.06] border border-lime/20 rounded-2xl py-7 px-5 md:py-9 md:px-10"
           >
             <p className="font-sans text-[0.7rem] text-lime tracking-[2px] uppercase mb-3">
               Member Protection Fund
@@ -369,7 +413,7 @@ export default function Home() {
             <p className="font-sans text-[0.9rem] text-white/[0.55] leading-[1.7] max-w-[600px] mb-6">
               CryptoBazaar's verification process is the product. If our screening fails to catch a bad actor and your bank account is frozen as a direct result of that failure on our platform, you can apply for a service remedy disbursement from the Member Protection Fund — built from 0.75% of every completed trade and held on-chain.
             </p>
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
               {[
                 { tier: "Emergency", amount: "Up to ₹10,000", time: "Within 24 hours", desc: "Bank freeze notice + complaint number" },
                 { tier: "Standard", amount: "Up to ₹1,00,000", time: "Within 7 days", desc: "Above + proof of legal representation" },
@@ -391,7 +435,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="bg-white py-[100px] px-10">
+      <section id="pricing" className="bg-white py-16 md:py-[100px] px-5 md:px-10">
         <div className="max-w-[960px] mx-auto">
           <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Membership Plans
@@ -403,7 +447,7 @@ export default function Home() {
             Pick a plan based on how much you trade per month. Every plan includes full escrow protection and Member Protection Fund contribution on every trade.
           </p>
 
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-5">
             {TIERS.map((tier) => (
               <motion.div
                 key={tier.name}
@@ -459,7 +503,7 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="bg-[#fafafa] py-[100px] px-10">
+      <section id="faq" className="bg-[#fafafa] py-16 md:py-[100px] px-5 md:px-10">
         <div className="max-w-[720px] mx-auto">
           <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Frequently Asked Questions
@@ -511,7 +555,7 @@ export default function Home() {
       </section>
 
       {/* ── TERMS SUMMARY ── */}
-      <section id="terms" className="bg-white py-20 px-10">
+      <section id="terms" className="bg-white py-16 md:py-20 px-5 md:px-10">
         <div className="max-w-[720px] mx-auto">
           <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
             Terms of Use
@@ -552,8 +596,8 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="bg-black">
         {/* Contact bar */}
-        <div className="border-b border-white/[0.06] py-12 px-10">
-          <div className="max-w-[960px] mx-auto flex justify-between items-center flex-wrap gap-6">
+        <div className="border-b border-white/[0.06] py-8 md:py-12 px-5 md:px-10">
+          <div className="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
               <p className="font-condensed text-[2rem] text-white tracking-[1px] mb-[6px]">
                 HAVE A QUESTION?
@@ -572,8 +616,8 @@ export default function Home() {
         </div>
 
         {/* Main footer grid */}
-        <div className="pt-14 px-10 pb-10 max-w-[960px] mx-auto">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-12">
+        <div className="pt-10 md:pt-14 px-5 md:px-10 pb-10 max-w-[960px] mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-8 md:gap-10 mb-12">
             {/* Brand */}
             <div>
               <div className="font-condensed text-[1.4rem] tracking-[3px] text-white mb-3">
@@ -645,11 +689,11 @@ export default function Home() {
           </div>
 
           {/* Bottom bar */}
-          <div className="pt-6 border-t border-white/[0.06] flex justify-between flex-wrap gap-4">
+          <div className="pt-6 border-t border-white/[0.06] flex flex-col md:flex-row justify-between gap-4">
             <p className="font-sans text-[0.7rem] text-white/[0.18]">
               © 2026 CryptoBazaar. All rights reserved.
             </p>
-            <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] text-right">
+            <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] md:text-right">
               The Member Protection Fund is a service remedy for CryptoBazaar's screening failures — not an insurance product and not regulated as such. Disbursements require documented proof that the freeze was caused by a failure in our vetting process. Subject to fund availability. No amount is guaranteed.
             </p>
           </div>

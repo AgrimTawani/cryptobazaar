@@ -334,10 +334,16 @@
 
 @media (max-width: 768px) {
   .nav { padding: 0 20px; }
-  .nav-links { display: none; }
+  .nav-links { display: none !important; }
   .shader-hero-content { padding: 80px 20px 40px; }
   .hero-spotlight { max-width: 340px; }
-  .shader-stats { gap: 28px; }
+  .shader-stats { gap: 20px; }
+  .shader-stat-value { font-size: 2.2rem; }
+  .shader-stat-label { font-size: 1rem; letter-spacing: 1px; }
+  .shader-subtitle { font-size: 0.95rem !important; white-space: normal !important; }
+  .cta-primary, .cta-secondary { padding: 14px 32px; font-size: 1.05rem; }
+  .shader-cta { gap: 10px; }
+  .nav-logo { font-size: 1.5rem; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
