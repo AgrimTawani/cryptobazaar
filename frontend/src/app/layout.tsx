@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CryptoBazaar | Gated P2P Stablecoin Exchange for India",
+  title: "CryptoBazaar",
   description:
     "India's only gated P2P stablecoin exchange. Trade USDT and USDC securely with INR. Every member is verified, and every trade is protected by smart contract escrow.",
   keywords: ["P2P crypto exchange India", "buy USDT INR", "sell USDC INR", "secure crypto trading India", "CryptoBazaar", "crypto escrow", "verified P2P trading"],
