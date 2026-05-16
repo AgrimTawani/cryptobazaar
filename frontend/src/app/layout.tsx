@@ -28,6 +28,32 @@ export default function RootLayout({
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                document.addEventListener('contextmenu', (e) => e.preventDefault());
+                document.addEventListener('keydown', (e) => {
+                  if (
+                    e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                    (e.ctrlKey && e.key === 'U') || 
+                    (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                    (e.metaKey && e.shiftKey && (e.key === 'C' || e.key === 'I' || e.key === 'J')) || 
+                    (e.metaKey && e.key === 'U') ||
+                    (e.ctrlKey && e.key === 'c') ||
+                    (e.metaKey && e.key === 'c') ||
+                    (e.ctrlKey && e.key === 'C') ||
+                    (e.metaKey && e.key === 'C')
+                  ) {
+                    e.preventDefault();
+                  }
+                });
+                document.addEventListener('copy', (e) => e.preventDefault());
+                document.addEventListener('cut', (e) => e.preventDefault());
+                document.addEventListener('dragstart', (e) => e.preventDefault());
+              `
+            }}
+          />
         </head>
         <body className={`${inter.variable}`}>
           <ThirdwebProvider>
