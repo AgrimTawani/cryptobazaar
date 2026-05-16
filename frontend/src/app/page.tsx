@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: "What happens during the 3-step verification?",
-    a: "Step 1 — Identity check: Aadhaar + PAN + a quick liveness selfie via Didit. Takes under 5 minutes. Step 2 — Bank statement review: Upload 6 months of statements. Our system checks for red flags. Step 3 — AI Questionnaire: 10 questions online, about 5 minutes, to understand your trading background. Once all three pass, you're a Verified Member.",
+    a: "Step 1 — Identity check: Aadhaar + PAN + a quick liveness selfie. Takes under 5 minutes. Step 2 — Bank statement review: Upload 6 months of statements. Our system checks for red flags. Step 3 — AI Questionnaire: 10 questions online, about 5 minutes, to understand your trading background. Once all three pass, you're a Verified Member.",
   },
   {
     q: "How does the escrow work?",
@@ -57,7 +57,7 @@ const HOW_IT_WORKS = [
   {
     step: "02",
     title: "Verify your identity",
-    desc: "Complete a quick Aadhaar + PAN + liveness check via Didit. This is mandatory — it's how we keep bad actors out.",
+    desc: "Complete a quick Aadhaar + PAN + liveness check. This is mandatory — it's how we keep bad actors out.",
   },
   {
     step: "03",
@@ -195,16 +195,16 @@ export default function Home() {
           CRYPTOBAZAAR
         </Link>
         <div className="nav-links">
-          <Link href="/marketplace" className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
+          <Link href="/marketplace" className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200">
             Marketplace
           </Link>
-          <button onClick={() => scrollTo("how")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
+          <button onClick={() => scrollTo("how")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200">
             How It Works
           </button>
-          <button onClick={() => scrollTo("pricing")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
+          <button onClick={() => scrollTo("pricing")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200">
             Pricing
           </button>
-          <button onClick={() => scrollTo("faq")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555]">
+          <button onClick={() => scrollTo("faq")} className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200">
             FAQ
           </button>
         </div>
@@ -228,7 +228,7 @@ export default function Home() {
               </span>
             </Link>
           ) : (
-            <Link href="/login" className="btn-login">Login</Link>
+            <Link href="/login" className="btn-login font-condensed">Login</Link>
           )}
         </div>
       </nav>
@@ -251,7 +251,7 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="shader-subtitle"
+            className="shader-subtitle font-manrope !font-bold !text-[1.15rem] whitespace-nowrap tracking-wide !max-w-none w-full text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
@@ -289,14 +289,14 @@ export default function Home() {
       {/* ── HOW IT WORKS ── */}
       <section id="how" className="bg-black py-[100px] px-10">
         <div className="max-w-[900px] mx-auto">
-          <p className="font-sans text-[0.75rem] text-lime tracking-[3px] uppercase mb-4">
+          <p className="font-sans text-[1.1rem] font-medium text-lime tracking-[4px] uppercase mb-4">
             How It Works
           </p>
           <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px] mb-5">
             TRADE P2P.<br />
             <span className="text-lime">THE RIGHT WAY.</span>
           </h2>
-          <p className="font-sans text-base text-white/50 max-w-[520px] leading-[1.7] mb-16">
+          <p className="font-sans text-base text-white/50 max-w-[520px] leading-[1.7] mb-12">
             CryptoBazaar is not just another P2P app. Every member is vetted, every trade is protected by a smart contract, and there is a service remedy fund for when our vetting fails.
           </p>
 
@@ -308,7 +308,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className={`flex gap-8 py-8 items-start ${
+                className={`flex gap-5 py-5 items-center ${
                   i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.08]" : ""
                 }`}
               >
@@ -316,10 +316,10 @@ export default function Home() {
                   {item.step}
                 </div>
                 <div>
-                  <div className="font-condensed text-[1.6rem] text-white tracking-[0.5px] mb-2">
+                  <div className="font-condensed text-[1.8rem] text-white tracking-[0.5px] mb-2">
                     {item.title}
                   </div>
-                  <div className="font-sans text-[0.925rem] text-white/50 leading-[1.7] max-w-[560px]">
+                  <div className="font-sans text-[1.1rem] text-white/70 leading-[1.6] max-w-[600px]">
                     {item.desc}
                   </div>
                 </div>
@@ -386,46 +386,41 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
-                className={`rounded-2xl py-8 px-7 relative ${
-                  tier.highlight
-                    ? "border-2 border-solid border-black bg-black"
-                    : "border-[1.5px] border-solid border-[#e5e5e5] bg-white"
-                }`}
               >
-                {tier.highlight && (
-                  <div className="absolute -top-[13px] left-1/2 -translate-x-1/2 bg-lime rounded-full py-[3px] px-4 font-sans text-[0.68rem] font-bold tracking-[1px] uppercase whitespace-nowrap">
-                    Most Popular
+                <div className="group rounded-2xl py-8 px-7 h-full relative border-[1.5px] border-solid border-[#e5e5e5] bg-white hover:bg-black hover:border-black hover:scale-[1.03] transition-all duration-300">
+                  {tier.highlight && (
+                    <div className="absolute -top-[13px] left-1/2 -translate-x-1/2 bg-lime rounded-full py-[3px] px-4 font-sans text-[0.68rem] font-bold tracking-[1px] uppercase whitespace-nowrap">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="font-condensed text-[1.1rem] tracking-[2px] mb-3 text-[#999] group-hover:text-lime transition-colors duration-300">
+                    {tier.name.toUpperCase()}
                   </div>
-                )}
-                <div className={`font-condensed text-[1.1rem] tracking-[2px] mb-3 ${tier.highlight ? "text-lime" : "text-[#999]"}`}>
-                  {tier.name.toUpperCase()}
+                  <div className="font-condensed text-5xl leading-none mb-1 text-black group-hover:text-white transition-colors duration-300">
+                    {tier.price}
+                  </div>
+                  <div className="font-sans text-[0.8rem] mb-2 text-[#999] group-hover:text-white/40 transition-colors duration-300">
+                    per month
+                  </div>
+                  <div className="rounded-lg py-[10px] px-[14px] mb-6 bg-[#f5f5f5] group-hover:bg-lime/10 transition-colors duration-300">
+                    <span className="font-condensed text-[1.3rem] text-black group-hover:text-lime transition-colors duration-300">{tier.cap}</span>
+                    <span className="font-sans text-[0.75rem] ml-[6px] text-[#888] group-hover:text-white/40 transition-colors duration-300">{tier.capLabel}</span>
+                  </div>
+                  <ul className="list-none flex flex-col gap-[10px] mb-7">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 font-sans text-[0.82rem] leading-[1.5] text-[#555] group-hover:text-white/[0.65] transition-colors duration-300">
+                        <span className="text-lime shrink-0 mt-[1px]">✓</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/login"
+                    className="block text-center py-3 rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline bg-black text-white group-hover:bg-lime group-hover:text-black transition-colors duration-300"
+                  >
+                    Get Started →
+                  </Link>
                 </div>
-                <div className={`font-condensed text-5xl leading-none mb-1 ${tier.highlight ? "text-white" : "text-black"}`}>
-                  {tier.price}
-                </div>
-                <div className={`font-sans text-[0.8rem] mb-2 ${tier.highlight ? "text-white/40" : "text-[#999]"}`}>
-                  per month
-                </div>
-                <div className={`rounded-lg py-[10px] px-[14px] mb-6 ${tier.highlight ? "bg-lime/10" : "bg-[#f5f5f5]"}`}>
-                  <span className={`font-condensed text-[1.3rem] ${tier.highlight ? "text-lime" : "text-black"}`}>{tier.cap}</span>
-                  <span className={`font-sans text-[0.75rem] ml-[6px] ${tier.highlight ? "text-white/40" : "text-[#888]"}`}>{tier.capLabel}</span>
-                </div>
-                <ul className="list-none flex flex-col gap-[10px] mb-7">
-                  {tier.features.map((f) => (
-                    <li key={f} className={`flex items-start gap-2 font-sans text-[0.82rem] leading-[1.5] ${tier.highlight ? "text-white/[0.65]" : "text-[#555]"}`}>
-                      <span className="text-lime shrink-0 mt-[1px]">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/login"
-                  className={`block text-center py-3 rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline ${
-                    tier.highlight ? "bg-lime text-black" : "bg-black text-white"
-                  }`}
-                >
-                  Get Started →
-                </Link>
               </motion.div>
             ))}
           </div>
@@ -505,11 +500,11 @@ export default function Home() {
 
           <div className="flex flex-col gap-4 mb-10">
             {[
-              { icon: "🇮🇳", title: "Indian residents only", body: "You must be 18+ and a resident of India. You must trade on your own behalf, not as an agent for someone else." },
-              { icon: "🔒", title: "Verification is mandatory and recurring", body: "All 3 layers must be completed and renewed every 6 months. Providing false information during verification may result in a criminal complaint." },
-              { icon: "⛓️", title: "We never hold your crypto", body: "Your crypto is locked in a smart contract — not our wallets. CryptoBazaar cannot access it. The code controls release, not us." },
-              { icon: "🛡️", title: "The Member Protection Fund is NOT insurance", body: "It is a voluntary member benefit. Payouts are discretionary and subject to fund availability. No amount is guaranteed. It is not a regulated financial product." },
-              { icon: "⚖️", title: "Fraud has serious consequences", body: "Submitting forged bank statements or fabricated freeze notices results in permanent suspension and may be reported to law enforcement. All users are Aadhaar-linked." },
+              { title: "Indian residents only", body: "You must be 18+ and a resident of India. You must trade on your own behalf, not as an agent for someone else." },
+              { title: "Verification is mandatory and recurring", body: "All 3 layers must be completed and renewed every 6 months. Providing false information during verification may result in a criminal complaint." },
+              { title: "We never hold your crypto", body: "Your crypto is locked in a smart contract — not our wallets. CryptoBazaar cannot access it. The code controls release, not us." },
+              { title: "The Member Protection Fund is NOT insurance", body: "It is a voluntary member benefit. Payouts are discretionary and subject to fund availability. No amount is guaranteed. It is not a regulated financial product." },
+              { title: "Fraud has serious consequences", body: "Submitting forged bank statements or fabricated freeze notices results in permanent suspension and may be reported to law enforcement. All users are Aadhaar-linked." },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 items-start py-5 px-5 bg-[#fafafa] rounded-xl border border-[#f0f0f0]">
                 <span className="text-[1.4rem] shrink-0">{item.icon}</span>
