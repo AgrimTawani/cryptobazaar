@@ -77,7 +77,7 @@ export default function MarketplacePage() {
   return (
     <div className="min-h-screen bg-[#fafafa]">
       {/* Top bar */}
-      <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between sticky top-0 z-50">
+      <header className="bg-white border-b border-[#f0f0f0] px-5 md:px-10 h-16 flex items-center justify-between sticky top-0 z-50">
         <Link
           href="/"
           className="font-condensed text-base tracking-[3px] text-black no-underline"
@@ -87,13 +87,13 @@ export default function MarketplacePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="font-sans text-[0.82rem] text-[#888] no-underline"
+            className="hidden md:inline font-sans text-[0.82rem] text-[#888] no-underline"
           >
             Home
           </Link>
-          <span className="text-[#ddd]">·</span>
+          <span className="text-[#ddd] hidden md:inline">·</span>
           <WalletNavWidget />
-          <span className="text-[#ddd]">·</span>
+          <span className="text-[#ddd] hidden md:inline">·</span>
           <Link
             href="/dashboard"
             className="flex items-center gap-2 no-underline pt-[5px] pr-[14px] pb-[5px] pl-[5px] border-[1.5px] border-solid border-[#e0e0e0] rounded-full bg-white"
@@ -107,7 +107,7 @@ export default function MarketplacePage() {
                 className="rounded-full"
               />
             )}
-            <span className="font-sans text-[0.8rem] font-medium text-[#111]">
+            <span className="font-sans text-[0.8rem] font-medium text-[#111] hidden sm:inline">
               {user?.firstName ?? "Dashboard"}
             </span>
           </Link>
@@ -116,7 +116,7 @@ export default function MarketplacePage() {
 
       {/* Verification banner */}
       {!isVerified && (
-        <div className="bg-black py-3 px-10 flex items-center justify-between flex-wrap gap-3">
+        <div className="bg-black py-3 px-5 md:px-10 flex items-center justify-between flex-wrap gap-3">
           <p className="font-sans text-[0.82rem] text-white/70">
             👀 <strong className="text-white">View only.</strong> Complete your
             verification to buy or sell.
@@ -130,7 +130,7 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      <div className="max-w-[1100px] mx-auto py-10 px-6">
+      <div className="max-w-[1100px] mx-auto py-8 md:py-10 px-4 md:px-6">
 
         {/* Your active orders */}
         {myOrders.length > 0 && (
@@ -225,8 +225,8 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Table header */}
-        <div className="grid grid-cols-[1fr_100px_130px_130px_140px_120px] gap-3 py-[10px] px-5 bg-[#f5f5f5] rounded-[10px] mb-2">
+        {/* Table header — hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[1fr_100px_130px_130px_140px_120px] gap-3 py-[10px] px-5 bg-[#f5f5f5] rounded-[10px] mb-2">
           {["Seller", "Asset", "Price / unit", "Available", "Payment", ""].map(
             (h) => (
               <span
@@ -239,7 +239,8 @@ export default function MarketplacePage() {
           )}
         </div>
 
-        {/* Order rows */}
+        {/* Order rows — desktop table */}
+        <div className="hidden md:block">
         {filtered.map((order) => (
           <div
             key={order.id}
@@ -315,6 +316,40 @@ export default function MarketplacePage() {
             </div>
           </div>
         ))}
+        </div>
+
+        {/* Order cards — mobile */}
+        <div className="md:hidden flex flex-col gap-3">
+          {filtered.map((order) => (
+            <Link
+              key={order.id}
+              href={`/marketplace/${order.id}`}
+              className="bg-white border border-[#e5e5e5] rounded-xl p-4 no-underline block"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                {order.sellerAvatar ? (
+                  <img src={order.sellerAvatar} alt="" width={24} height={24} className="rounded-full" />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-[#e5e5e5]" />
+                )}
+                <span className="font-sans text-[0.85rem] text-[#111] font-medium">{order.sellerName}</span>
+              </div>
+              <div className="flex justify-between items-end">
+                <div>
+                  <p className="font-sans text-[0.95rem] font-semibold text-[#111] mb-[2px]">
+                    {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
+                  </p>
+                  <p className="font-mono text-[0.8rem] text-[#888]">
+                    ₹{parseFloat(order.pricePerUnit).toFixed(2)} / unit
+                  </p>
+                </div>
+                <span className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full">
+                  Buy
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
 
         {/* Empty state */}
         {filtered.length === 0 && (

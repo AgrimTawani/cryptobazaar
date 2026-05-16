@@ -8,7 +8,7 @@ export default function OnboardingLayout({
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {/* Top bar */}
-      <header className="flex items-center justify-between py-5 px-10 bg-white border-b border-[#f0f0f0]">
+      <header className="flex items-center justify-between py-4 px-5 md:py-5 md:px-10 bg-white border-b border-[#f0f0f0]">
         <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
           CRYPTOBAZAAR
         </Link>

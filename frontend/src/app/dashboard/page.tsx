@@ -116,7 +116,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#fafafa]">
       {/* Top bar */}
-      <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between">
+      <header className="bg-white border-b border-[#f0f0f0] px-5 md:px-10 h-16 flex items-center justify-between">
         <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
           CRYPTOBAZAAR
         </Link>
@@ -133,9 +133,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="max-w-[900px] mx-auto py-12 px-6">
+      <div className="max-w-[900px] mx-auto py-8 md:py-12 px-4 md:px-6">
         {/* Profile card */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-8 flex items-center gap-6 mb-6 flex-wrap">
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6 mb-6">
           {user?.imageUrl && (
             <img
               src={user.imageUrl}
@@ -207,7 +207,7 @@ export default function DashboardPage() {
         )}
 
         {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
             {
               label: "Total Trades",
@@ -233,7 +233,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Verification checklist */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-7 px-8 mb-6">
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-6 px-5 md:py-7 md:px-8 mb-6">
           <h2 className="font-condensed text-[1.4rem] tracking-[0.5px] mb-5">
             Verification Status
           </h2>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent activity */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-7 px-8">
+        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-6 px-5 md:py-7 md:px-8">
           <div className="flex justify-between items-center mb-5">
             <h2 className="font-condensed text-[1.4rem] tracking-[0.5px]">
               Recent Activity

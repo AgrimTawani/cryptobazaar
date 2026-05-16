@@ -311,7 +311,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-black px-10 py-10 border-b border-[#222]">
+      <header className="bg-black px-5 md:px-10 py-8 md:py-10 border-b border-[#222]">
         <div className="max-w-225 mx-auto">
           <Link href="/" className="font-condensed text-base tracking-[3px] text-lime no-underline inline-block mb-8">
             ← CRYPTOBAZAAR
@@ -325,9 +325,9 @@ export default function TermsPage() {
         </div>
       </header>
 
-      <div className="max-w-225 mx-auto py-15 px-10 flex gap-15 items-start">
-        {/* Sidebar TOC */}
-        <aside className="shrink-0 w-50 sticky top-8">
+      <div className="max-w-225 mx-auto py-8 md:py-15 px-5 md:px-10 flex gap-15 items-start">
+        {/* Sidebar TOC — hidden on mobile */}
+        <aside className="hidden md:block shrink-0 w-50 sticky top-8">
           <p className="font-sans text-[0.65rem] text-[#bbb] tracking-[2px] uppercase mb-4">
             Contents
           </p>

@@ -33,9 +33,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       {/* ── Left panel ── */}
-      <div className="basis-[55%] shrink-0 bg-black relative flex flex-col justify-between py-12 px-14 overflow-hidden">
+      <div className="hidden md:flex basis-[55%] shrink-0 bg-black relative flex-col justify-between py-12 px-14 overflow-hidden">
         {/* Dot grid */}
         <div className="absolute inset-0 pointer-events-none [background-image:radial-gradient(circle,rgba(212,255,0,0.13)_1.5px,transparent_1.5px)] [background-size:28px_28px]" />
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel ── */}
-      <div className="flex-1 bg-white flex flex-col justify-center items-start py-16 px-14">
+      <div className="flex-1 bg-white flex flex-col justify-center items-center md:items-start py-10 px-6 md:py-16 md:px-14">
         <div className="w-full max-w-[340px]">
           <h2 className="font-condensed text-[2.6rem] tracking-[1px] text-black mb-2 leading-none">
             GET STARTED
