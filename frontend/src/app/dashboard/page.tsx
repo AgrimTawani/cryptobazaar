@@ -66,7 +66,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
     label: "Account Suspended",
     color: "#1f2937",
     bg: "#f9fafb",
-    desc: "Your account has been suspended. Contact support@cryptobazaar.in.",
+    desc: "Your account has been suspended. Contact support@cryptobazaar.co.in.",
   },
 };
 

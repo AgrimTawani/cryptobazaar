@@ -44,7 +44,7 @@ We reserve the right to update these Terms at any time. Continued use of the Pla
 (e) You are trading on your own behalf and not as an agent, nominee, or representative of any other person or entity.
 (f) Your use of the Platform does not violate any law or regulation applicable to you.
 
-Verification of eligibility is ongoing. If your circumstances change such that you no longer meet these criteria, you must immediately cease trading and notify us at support@cryptobazaar.in.`,
+Verification of eligibility is ongoing. If your circumstances change such that you no longer meet these criteria, you must immediately cease trading and notify us at support@cryptobazaar.co.in.`,
   },
   {
     id: "account",
@@ -85,7 +85,7 @@ Membership fees are currently collected via UPI transfer to our registered busin
 Your cumulative INR trade volume within a billing month is tracked. When you approach your cap, you will be notified. If you reach it, new trades are blocked until the next billing cycle or you upgrade your plan.
 
 5.4 Refunds
-Membership fees are non-refundable once a billing period has begun, unless we are unable to provide access to the Platform for more than 72 consecutive hours due to a fault on our side. Any refund requests must be submitted to support@cryptobazaar.in within 7 days of the fee being paid.
+Membership fees are non-refundable once a billing period has begun, unless we are unable to provide access to the Platform for more than 72 consecutive hours due to a fault on our side. Any refund requests must be submitted to support@cryptobazaar.co.in within 7 days of the fee being paid.
 
 5.5 Member Protection Fund Eligibility
 An active Membership Plan at the time of a trade is a prerequisite for eligibility to request a disbursement from the Member Protection Fund. A lapsed subscription at the time of the relevant trade disqualifies a claim.`,
@@ -159,7 +159,7 @@ The compliance team issues a ruling:
 The losing party's account is flagged. A second dispute loss within 12 months results in permanent suspension.
 
 7.6 Finality
-Dispute rulings are final. If you believe a ruling was made in error, you may appeal in writing to disputes@cryptobazaar.in within 7 days. Appeals are reviewed by a senior compliance officer. The appeal decision is final.`,
+Dispute rulings are final. If you believe a ruling was made in error, you may appeal in writing to disputes@cryptobazaar.co.in within 7 days. Appeals are reviewed by a senior compliance officer. The appeal decision is final.`,
   },
   {
     id: "fund",
@@ -243,7 +243,7 @@ You retain ownership of any data you provide (e.g., bank statements, trade histo
 — We store: your Google account identifier, wallet address, DID, onboarding status, trade history (on-chain), and subscription status.
 — We do not sell your data to third parties.
 
-A full Privacy Policy is available at cryptobazaar.in/privacy. By using the Platform you consent to the data practices described therein.`,
+A full Privacy Policy is available at cryptobazaar.co.in/privacy. By using the Platform you consent to the data practices described therein.`,
   },
   {
     id: "liability",
@@ -267,7 +267,7 @@ We are not liable for any indirect, incidental, special, or consequential losses
     id: "termination",
     title: "13. Termination",
     content: `13.1 By You
-You may close your account at any time by contacting support@cryptobazaar.in. Outstanding active trades must be completed or resolved before closure. Membership fees for the current period are non-refundable.
+You may close your account at any time by contacting support@cryptobazaar.co.in. Outstanding active trades must be completed or resolved before closure. Membership fees for the current period are non-refundable.
 
 13.2 By Us
 We may suspend or permanently terminate your access if:
@@ -293,9 +293,9 @@ Nothing in this clause prevents either party from seeking urgent injunctive reli
   {
     id: "contact",
     title: "15. Contact and Notices",
-    content: `For general support: support@cryptobazaar.in
-For dispute appeals: disputes@cryptobazaar.in
-For legal notices: legal@cryptobazaar.in
+    content: `For general support: support@cryptobazaar.co.in
+For dispute appeals: disputes@cryptobazaar.co.in
+For legal notices: legal@cryptobazaar.co.in
 
 CryptoBazaar
 [Registered Address]
@@ -374,8 +374,8 @@ export default function TermsPage() {
           <div className="bg-[#fafafa] border border-[#e5e5e5] rounded-xl p-6 mt-4">
             <p className="font-sans text-[0.8rem] text-[#888] leading-[1.7]">
               These Terms were last reviewed by the CryptoBazaar compliance team in May 2026. If you have any questions about these Terms, please contact us at{" "}
-              <a href="mailto:legal@cryptobazaar.in" className="text-black underline">
-                legal@cryptobazaar.in
+              <a href="mailto:legal@cryptobazaar.co.in" className="text-black underline">
+                legal@cryptobazaar.co.in
               </a>{" "}
               before using the Platform.
             </p>

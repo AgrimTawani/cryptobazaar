@@ -207,6 +207,34 @@ export default function Home() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "name": "CryptoBazaar",
+                "url": "https://cryptobazaar.co.in",
+                "logo": "https://cryptobazaar.co.in/icon.png",
+                "description": "India's only gated P2P stablecoin exchange. Every member verified, every trade held in escrow."
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": FAQS.map(faq => ({
+                  "@type": "Question",
+                  "name": faq.q,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq.a
+                  }
+                }))
+              }
+            ]
+          }),
+        }}
+      />
       {/* ── NAV ── */}
       <nav
         className="fixed top-0 left-0 right-0 z-[101] flex items-center justify-between h-[64px] px-5 md:px-10 transition-transform duration-300 ease-out"
@@ -607,10 +635,10 @@ export default function Home() {
               </p>
             </div>
             <a
-              href="mailto:support@cryptobazaar.in"
+              href="mailto:support@cryptobazaar.co.in"
               className="inline-flex items-center gap-[10px] py-[14px] px-7 bg-lime text-black rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline"
             >
-              ✉ support@cryptobazaar.in
+              ✉ support@cryptobazaar.co.in
             </a>
           </div>
         </div>
@@ -628,9 +656,9 @@ export default function Home() {
               </p>
               <div className="flex flex-col gap-[6px]">
                 {[
-                  { label: "General", email: "support@cryptobazaar.in" },
-                  { label: "Disputes", email: "disputes@cryptobazaar.in" },
-                  { label: "Legal", email: "legal@cryptobazaar.in" },
+                  { label: "General", email: "support@cryptobazaar.co.in" },
+                  { label: "Disputes", email: "disputes@cryptobazaar.co.in" },
+                  { label: "Legal", email: "legal@cryptobazaar.co.in" },
                 ].map((c) => (
                   <div key={c.label} className="flex gap-2 items-center">
                     <span className="font-sans text-[0.68rem] text-white/25 tracking-[1px] uppercase w-[50px]">{c.label}</span>
@@ -673,8 +701,8 @@ export default function Home() {
             <div>
               <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Contact Us</p>
               <div className="flex flex-col gap-3">
-                <a href="mailto:support@cryptobazaar.in" className="font-sans text-[0.78rem] text-white/[0.45] no-underline">
-                  ✉ support@cryptobazaar.in
+                <a href="mailto:support@cryptobazaar.co.in" className="font-sans text-[0.78rem] text-white/[0.45] no-underline">
+                  ✉ support@cryptobazaar.co.in
                 </a>
                 <p className="font-sans text-[0.75rem] text-white/25 leading-[1.5]">
                   Response time:<br />within 24 hours
