@@ -117,7 +117,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#fafafa]">
       {/* Top bar */}
       <header className="bg-white border-b border-[#f0f0f0] px-5 md:px-10 h-16 flex items-center justify-between">
-        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
+        <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
         <div className="flex items-center gap-3">

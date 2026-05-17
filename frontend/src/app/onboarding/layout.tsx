@@ -9,7 +9,7 @@ export default function OnboardingLayout({
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {/* Top bar */}
       <header className="flex items-center justify-between py-4 px-5 md:py-5 md:px-10 bg-white border-b border-[#f0f0f0]">
-        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
+        <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
         <span className="font-sans text-[0.78rem] text-[#999] tracking-[0.5px]">

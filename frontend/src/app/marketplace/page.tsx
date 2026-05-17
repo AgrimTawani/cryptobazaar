@@ -80,7 +80,7 @@ export default function MarketplacePage() {
       <header className="bg-white border-b border-[#f0f0f0] px-5 md:px-10 h-16 flex items-center justify-between sticky top-0 z-50">
         <Link
           href="/"
-          className="font-condensed text-base tracking-[3px] text-black no-underline"
+          className="nav-logo no-underline text-black"
         >
           CRYPTOBAZAAR
         </Link>
