@@ -45,6 +45,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { ScrollbarThemer } from "@/components/ScrollbarThemer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,6 +61,7 @@ export default function RootLayout({
           <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital@1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
         </head>
         <body className={`${inter.variable}`}>
+          <ScrollbarThemer />
           <ThirdwebProvider>
             {children}
           </ThirdwebProvider>

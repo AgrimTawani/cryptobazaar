@@ -32,6 +32,40 @@
   h1, h2, h3, h4, h5, h6 { font-family: var(--condensed); font-weight: normal; }
   a { color: inherit; text-decoration: none; }
   button { cursor: pointer; border: none; background: none; font-family: var(--condensed); color: inherit; }
+
+  /* Custom Scrollbar - default (light theme) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fafafa;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 0px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #333333;
+  }
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #000000 #fafafa;
+  }
+
+  /* Custom Scrollbar - dark theme override (applied via JS) */
+  html.dark-scrollbar ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+  html.dark-scrollbar ::-webkit-scrollbar-thumb {
+    background: #D4FF00;
+  }
+  html.dark-scrollbar ::-webkit-scrollbar-thumb:hover {
+    background: #c2eb00;
+  }
+  html.dark-scrollbar {
+    scrollbar-color: #D4FF00 #000000;
+  }
 }
 
 @layer utilities {
