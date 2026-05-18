@@ -107,6 +107,7 @@
   z-index: 1;
   text-align: center;
   padding: 120px 24px 60px;
+  width: 100%;
   max-width: 860px;
 }
 
@@ -122,6 +123,7 @@
   overflow: visible;
   padding-top: 0.15em;
   -webkit-text-stroke: 1.5px var(--black);
+  white-space: nowrap;
 }
 
 .shader-title-accent {

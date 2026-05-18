@@ -15,8 +15,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
       {/* Page Content Fade In */}
       <motion.div
-        initial={{ opacity: 0, filter: "blur(4px)" }}
-        animate={{ opacity: 1, filter: "blur(0px)" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
         {children}

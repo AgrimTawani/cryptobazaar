@@ -135,11 +135,8 @@ export default function Home() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
-  const [navHidden, setNavHidden] = useState(false);
-  const [navHovered, setNavHovered] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { isSignedIn, user } = useUser();
 
@@ -166,32 +163,14 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [currentWord, isDeleting, loopNum]);
 
-  // Navbar: hide on scroll-down, show on scroll-up or at top
+  // Navbar: convert to glassmorphism on scroll
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setScrolled(y > 40);
-      if (y < 40) {
-        setNavHidden(false);
-      } else if (y > lastScrollY.current + 5) {
-        setNavHidden(true);
-      } else if (y < lastScrollY.current - 5) {
-        setNavHidden(false);
-      }
-      lastScrollY.current = y;
+      setScrolled(y > 20);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Navbar: reveal when mouse is near the top of the viewport
-  useEffect(() => {
-    const onPointerMove = (e: PointerEvent) => {
-      const nearTop = e.clientY < 120;
-      setNavHovered(nearTop);
-    };
-    document.addEventListener("pointermove", onPointerMove);
-    return () => document.removeEventListener("pointermove", onPointerMove);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -237,12 +216,15 @@ export default function Home() {
       />
       {/* ── NAV ── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-[101] flex items-center justify-between h-[64px] px-5 md:px-10 transition-transform duration-300 ease-out"
+        className={`fixed z-[101] inset-x-0 mx-auto flex items-center justify-between h-[64px] transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          scrolled || mobileMenuOpen
+            ? "top-4 w-[calc(100%-32px)] max-w-[960px] rounded-full px-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10"
+            : "top-0 w-full max-w-[100vw] rounded-[0px] px-5 md:px-10 border-transparent shadow-none"
+        }`}
         style={{
-          transform: navHidden && !navHovered && !mobileMenuOpen ? "translateY(-100%)" : "translateY(0)",
-          background: scrolled || mobileMenuOpen ? "rgba(255,255,255,0.95)" : "transparent",
-          backdropFilter: scrolled || mobileMenuOpen ? "blur(12px)" : "none",
-          borderBottom: scrolled ? "1px solid #f0f0f0" : "none",
+          background: scrolled || mobileMenuOpen ? "rgba(255, 255, 255, 0.75)" : "rgba(255, 255, 255, 0)",
+          backdropFilter: scrolled || mobileMenuOpen ? "saturate(180%) blur(20px)" : "saturate(100%) blur(0px)",
+          WebkitBackdropFilter: scrolled || mobileMenuOpen ? "saturate(180%) blur(20px)" : "saturate(100%) blur(0px)",
         }}
       >
         <Link href="/" className="nav-logo no-underline text-black">
@@ -305,7 +287,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 top-[64px] z-[100] bg-white flex flex-col items-center pt-10 gap-6 md:hidden"
+            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex flex-col items-center pt-[100px] gap-6 md:hidden"
           >
             <Link href="/marketplace" onClick={() => setMobileMenuOpen(false)} className="font-condensed text-[1.6rem] tracking-[2px] text-black">
               Marketplace
