@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 type StepStatus = "done" | "active" | "locked";
 
@@ -80,11 +81,7 @@ export default function OnboardingPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="w-full h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-lime border-t-transparent rounded-full animate-spin-fast" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

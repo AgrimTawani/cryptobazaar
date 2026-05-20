@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface ActivityRow {
   id: string;
@@ -107,11 +108,7 @@ export default function DashboardPage() {
   };
 
   if (!isLoaded || isLoadingDb) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
-        <div className="w-8 h-8 border-[3px] border-lime border-t-transparent rounded-full animate-spin-fast" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
