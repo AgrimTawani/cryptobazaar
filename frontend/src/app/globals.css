@@ -170,6 +170,7 @@
   background: transparent;
   color: var(--black);
   transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 .cta-secondary {
@@ -189,6 +190,7 @@
   background: var(--black);
   color: var(--white);
   transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 /* Stats in hero */
@@ -278,6 +280,7 @@
 .btn-login:hover {
   background: var(--black);
   color: var(--white);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 .btn-signup-nav {
   font-family: var(--condensed);
@@ -295,6 +298,7 @@
 .btn-signup-nav:hover {
   background: transparent;
   color: var(--black);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 /* ═══════════ SIGNUP ═══════════ */
 .signup-bg {
@@ -352,7 +356,7 @@
   border-radius: 6px;
   transition: background 0.15s, transform 0.2s;
 }
-.btn-kyc:hover { background: var(--lime-dark); transform: translateY(-1px); }
+.btn-kyc:hover { background: var(--lime-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); }
 .spinner {
   width: 32px; height: 32px;
   border: 3px solid var(--border);

@@ -620,7 +620,7 @@ export default function Home() {
               href="mailto:support@cryptobazaar.co.in"
               className="inline-flex items-center gap-[10px] py-[14px] px-7 bg-lime text-black rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline"
             >
-              ✉ support@cryptobazaar.co.in
+              support@cryptobazaar.co.in
             </a>
           </div>
         </div>
@@ -684,7 +684,7 @@ export default function Home() {
               <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Contact Us</p>
               <div className="flex flex-col gap-3">
                 <a href="mailto:support@cryptobazaar.co.in" className="font-sans text-[0.78rem] text-white/[0.45] no-underline">
-                  ✉ support@cryptobazaar.co.in
+                  support@cryptobazaar.co.in
                 </a>
                 <p className="font-sans text-[0.75rem] text-white/25 leading-[1.5]">
                   Response time:<br />within 24 hours
