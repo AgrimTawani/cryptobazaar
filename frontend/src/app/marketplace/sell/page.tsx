@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { thirdwebClient } from "@/lib/thirdweb";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
 
 const amoyChain = defineChain(80002);
@@ -65,16 +66,18 @@ export default function SellPage() {
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
 
   useEffect(() => {
-    fetch("/api/onboarding/status")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.walletAddress && d.walletChain) {
-          setWalletInfo({ address: d.walletAddress, chain: d.walletChain });
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ]).then(([d]) => {
+      if (d.walletAddress && d.walletChain) {
+        setWalletInfo({ address: d.walletAddress, chain: d.walletChain });
+      }
+      setIsLoadingDb(false);
+    });
   }, []);
 
   const totalInr =
@@ -188,6 +191,10 @@ export default function SellPage() {
     step === "approving" || step === "creating" || step === "saving";
   const needsBank =
     paymentMethods.includes("IMPS") || paymentMethods.includes("NEFT");
+
+  if (isLoadingDb) {
+    return <LoadingSpinner />;
+  }
 
   if (walletInfo && walletInfo.chain !== "POLYGON") {
     return (

@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
 
 const ASSET_FILTERS = ["All", "USDT", "USDC"];
@@ -47,23 +48,20 @@ export default function MarketplacePage() {
   const [isVerified, setIsVerified] = useState(false);
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [myOrders, setMyOrders] = useState<OrderRow[]>([]);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
 
   useEffect(() => {
-    fetch("/api/onboarding/status")
-      .then((r) => r.json())
-      .then((d) => setIsVerified(d.userStatus === "VERIFIED"))
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/orders")
-      .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data)) setOrders(data); })
-      .catch(() => {});
-    fetch("/api/orders?mine=true")
-      .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data)) setMyOrders(data); })
-      .catch(() => {});
+    Promise.all([
+      fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
+      fetch("/api/orders").then((r) => r.json()).catch(() => []),
+      fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ]).then(([statusData, ordersData, myOrdersData]) => {
+      setIsVerified(statusData?.userStatus === "VERIFIED");
+      if (Array.isArray(ordersData)) setOrders(ordersData);
+      if (Array.isArray(myOrdersData)) setMyOrders(myOrdersData);
+      setIsLoadingDb(false);
+    });
   }, []);
 
   const filtered = orders.filter((o) => {
@@ -73,6 +71,10 @@ export default function MarketplacePage() {
       o.chain === CHAIN_MAP[chainFilter];
     return assetMatch && chainMatch;
   });
+
+  if (isLoadingDb) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa]">

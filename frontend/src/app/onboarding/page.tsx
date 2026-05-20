@@ -60,9 +60,11 @@ export default function OnboardingPage() {
   useEffect(() => {
     fetch("/api/users/sync", { method: "POST" }).catch(() => null);
 
-    fetch("/api/onboarding/status")
-      .then((r) => r.json())
-      .then((data: OnboardingStatus) => {
+    Promise.all([
+      fetch("/api/onboarding/status").then((r) => r.json()),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ])
+      .then(([data]) => {
         if (data.userStatus === "VERIFIED") {
           router.replace("/marketplace");
           return;

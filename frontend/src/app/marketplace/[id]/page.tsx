@@ -5,6 +5,7 @@ import { useActiveAccount, useSendTransaction, ConnectButton } from "thirdweb/re
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
 import { thirdwebClient } from "@/lib/thirdweb";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
 
 const amoyChain = defineChain(80002);
@@ -80,10 +81,18 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     return () => clearInterval(t);
   }, []);
 
-  const fetchOrder = useCallback(async () => {
+  const fetchOrder = useCallback(async (isInitial = false) => {
     if (!id) return;
     try {
-      const res = await fetch(`/api/orders/${id}`);
+      let res;
+      if (isInitial) {
+        [res] = await Promise.all([
+          fetch(`/api/orders/${id}`),
+          new Promise((resolve) => setTimeout(resolve, 1500))
+        ]);
+      } else {
+        res = await fetch(`/api/orders/${id}`);
+      }
       const data = await res.json();
       if (res.ok) setOrder(data);
     } catch {
@@ -94,8 +103,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   }, [id]);
 
   useEffect(() => {
-    fetchOrder();
-    const interval = setInterval(fetchOrder, 5000);
+    fetchOrder(true);
+    const interval = setInterval(() => fetchOrder(false), 5000);
     return () => clearInterval(interval);
   }, [fetchOrder]);
 
@@ -125,11 +134,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-black border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!order) {

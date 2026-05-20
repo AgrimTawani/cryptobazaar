@@ -91,7 +91,8 @@ export default function DashboardPage() {
   useEffect(() => {
     Promise.all([
       fetch("/api/onboarding/status").then((r) => r.json()).catch(() => null),
-      fetch("/api/dashboard/stats").then((r) => r.json()).catch(() => null)
+      fetch("/api/dashboard/stats").then((r) => r.json()).catch(() => null),
+      new Promise((resolve) => setTimeout(resolve, 1500))
     ]).then(([statusData, statsData]) => {
       if (statusData) setDbStatus(statusData);
       if (statsData) setStats(statsData);
