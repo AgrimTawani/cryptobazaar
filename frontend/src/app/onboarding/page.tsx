@@ -62,7 +62,18 @@ export default function OnboardingPage() {
     fetch("/api/onboarding/status")
       .then((r) => r.json())
       .then((data: OnboardingStatus) => {
-        setStatuses(deriveSteps(data));
+        if (data.userStatus === "VERIFIED") {
+          router.replace("/marketplace");
+          return;
+        }
+        
+        const newStatuses = deriveSteps(data);
+        if (newStatuses.every((s) => s === "done")) {
+          router.replace("/dashboard");
+          return;
+        }
+        
+        setStatuses(newStatuses);
       })
       .catch(() => null)
       .finally(() => setLoading(false));
