@@ -79,6 +79,14 @@ export default function OnboardingPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) {
+    return (
+      <div className="w-full h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-[3px] border-lime border-t-transparent rounded-full animate-spin-fast" />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-[600px]">
       <motion.div
