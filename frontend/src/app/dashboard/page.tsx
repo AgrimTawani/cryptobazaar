@@ -85,16 +85,17 @@ export default function DashboardPage() {
   const router = useRouter();
   const [dbStatus, setDbStatus] = useState<OnboardingStatus | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
 
   useEffect(() => {
-    fetch("/api/onboarding/status")
-      .then((r) => r.json())
-      .then((d: OnboardingStatus) => setDbStatus(d))
-      .catch(() => null);
-    fetch("/api/dashboard/stats")
-      .then((r) => r.json())
-      .then((d: DashboardStats) => setStats(d))
-      .catch(() => null);
+    Promise.all([
+      fetch("/api/onboarding/status").then((r) => r.json()).catch(() => null),
+      fetch("/api/dashboard/stats").then((r) => r.json()).catch(() => null)
+    ]).then(([statusData, statsData]) => {
+      if (statusData) setDbStatus(statusData);
+      if (statsData) setStats(statsData);
+      setIsLoadingDb(false);
+    });
   }, []);
 
   const userStatus = (dbStatus?.userStatus ?? "LOGIN_DONE") as keyof typeof STATUS_CONFIG;
@@ -105,7 +106,7 @@ export default function DashboardPage() {
     router.push("/");
   };
 
-  if (!isLoaded) {
+  if (!isLoaded || isLoadingDb) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
         <div className="w-8 h-8 border-[3px] border-lime border-t-transparent rounded-full animate-spin-fast" />
