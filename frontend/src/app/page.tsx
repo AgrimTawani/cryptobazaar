@@ -292,16 +292,16 @@ export default function Home() {
                 <div className="hero-marquee-depth-left" />
                 <div className="hero-marquee-depth-right" />
                 <div className="hero-marquee-track">
-                  {[...Array(2)].map((_, i) => (
-                    <div key={i} className="flex gap-8">
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
-                      <span className="hero-marquee-text">LOREM IPSUM</span>
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className="flex gap-8 items-center">
+                      <span className="hero-marquee-text">USDT</span>
+                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
+                      <span className="hero-marquee-text">USDC</span>
+                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
+                      <span className="hero-marquee-text">DAI</span>
+                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
+                      <span className="hero-marquee-text">USDe</span>
+                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
                     </div>
                   ))}
                 </div>

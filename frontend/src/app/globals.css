@@ -248,7 +248,8 @@
 .hero-marquee-wrapper {
   perspective: 600px;
   perspective-origin: center center;
-  width: 100%;
+  width: 120%;
+  margin-left: -10%;
   display: flex;
   justify-content: center;
 }
