@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const QUOTES = [
-  "Not your keys, not your coins. — Andreas Antonopoulos",
-  "If you don't believe me or don't get it, I don't have time to try to convince you, sorry. — Satoshi Nakamoto",
-  "Bitcoin is a swarm of cyber hornets serving the goddess of wisdom. — Michael Saylor",
-  "Stay humble, stack sats. — Matt Odell",
+  "Not your keys, not your coins. - Andreas Antonopoulos",
+  "If you don't believe me or don't get it, I don't have time to try to convince you, sorry. - Satoshi Nakamoto",
+  "Bitcoin is a swarm of cyber hornets serving the goddess of wisdom. - Michael Saylor",
+  "Stay humble, stack sats. - Matt Odell",
   "Vires in numeris. (Strength in numbers)",
-  "We have elected to put our money and faith in a mathematical framework that is free of politics and human error. — Tyler Winklevoss",
+  "We have elected to put our money and faith in a mathematical framework that is free of politics and human error. - Tyler Winklevoss",
 ];
 
 export function LoadingSpinner() {

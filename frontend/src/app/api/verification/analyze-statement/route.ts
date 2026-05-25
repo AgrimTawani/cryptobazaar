@@ -71,7 +71,7 @@ function extractPdfMeta(buffer: Buffer) {
     rawProducer: str(/\/Producer\s*\(([^)]*)\)/) ?? str(/\/Producer\s*<([^>]*)>/) ?? null,
     creationDate: str(/\/CreationDate\s*\(([^)]*)\)/) ?? null,
     modDate: str(/\/ModDate\s*\(([^)]*)\)/) ?? null,
-    // Most real PDFs use FlateDecode compression — BT markers won't appear in raw bytes
+    // Most real PDFs use FlateDecode compression - BT markers won't appear in raw bytes
     hasText: true,
     pages: (raw.match(/\/Type\s*\/Page[^s]/g) ?? []).length || 1,
   };
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
       analysis = JSON.parse(raw);
     } catch {
       console.error("[analyze-statement] Gemini returned non-JSON:", raw);
-      return NextResponse.json({ error: "Analysis failed — unexpected AI response" }, { status: 502 });
+      return NextResponse.json({ error: "Analysis failed - unexpected AI response" }, { status: 502 });
     }
 
     const score = Math.max(0, Math.min(100, analysis.score ?? 0));

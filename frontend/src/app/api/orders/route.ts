@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       return NextResponse.json(orders.map(mapOrder));
     }
 
-    // Public marketplace — LISTED only, exclude user's own orders
+    // Public marketplace - LISTED only, exclude user's own orders
     const orders = await db.order.findMany({
       where: { status: "LISTED", sellerId: { not: user.id } },
       include: { seller: { select: { name: true, avatarUrl: true } } },

@@ -210,15 +210,15 @@ export default function DashboardPage() {
           {[
             {
               label: "Total Trades",
-              value: stats ? String(stats.totalTrades) : "—",
+              value: stats ? String(stats.totalTrades) : "-",
             },
             {
               label: "Trade Volume",
               value: stats
                 ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
-                : "—",
+                : "-",
             },
-            { label: "Member Rating", value: "—" },
+            { label: "Member Rating", value: "-" },
           ].map((stat) => (
             <div key={stat.label} className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[14px] py-5 px-6">
               <div className="font-condensed text-[2rem] tracking-[0.5px] mb-1">
@@ -238,7 +238,7 @@ export default function DashboardPage() {
           </h2>
           {[
             { label: "Google Login", done: true },
-            { label: "KYC — Identity Verification", done: dbStatus?.kyc === "PASSED" },
+            { label: "KYC - Identity Verification", done: dbStatus?.kyc === "PASSED" },
             { label: "Bank Statement Review", done: dbStatus?.edd === "PASSED" },
             { label: "AI Questionnaire", done: dbStatus?.interview === "PASSED" },
             { label: "Wallet Connection", done: !!dbStatus?.walletAddress },

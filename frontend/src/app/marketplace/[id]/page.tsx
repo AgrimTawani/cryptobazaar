@@ -44,8 +44,8 @@ const STATUS: Record<string, { label: string; color: string; bg: string; border:
   BUYER_PAID:              { label: "Awaiting Confirmation", color: "#92400e", bg: "#fffbeb", border: "#fde68a" },
   COMPLETED:               { label: "Completed ✓",           color: "#166534", bg: "#f0fdf4", border: "#86efac" },
   DISPUTED:                { label: "Disputed",              color: "#991b1b", bg: "#fef2f2", border: "#fca5a5" },
-  DISPUTE_RESOLVED_BUYER:  { label: "Resolved — Buyer Won",  color: "#166534", bg: "#f0fdf4", border: "#86efac" },
-  DISPUTE_RESOLVED_SELLER: { label: "Resolved — Seller Won", color: "#166534", bg: "#f0fdf4", border: "#86efac" },
+  DISPUTE_RESOLVED_BUYER:  { label: "Resolved - Buyer Won",  color: "#166534", bg: "#f0fdf4", border: "#86efac" },
+  DISPUTE_RESOLVED_SELLER: { label: "Resolved - Seller Won", color: "#166534", bg: "#f0fdf4", border: "#86efac" },
   CANCELLED:               { label: "Cancelled",             color: "#555",    bg: "#f5f5f5", border: "#e5e5e5" },
   EXPIRED:                 { label: "Expired",               color: "#555",    bg: "#f5f5f5", border: "#e5e5e5" },
 };
@@ -96,7 +96,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
       const data = await res.json();
       if (res.ok) setOrder(data);
     } catch {
-      // transient — keep trying
+      // transient - keep trying
     } finally {
       setLoading(false);
     }

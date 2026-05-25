@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const isDevSkip = !secret || secret === "your_webhook_secret_here";
 
     if (!isDevSkip) {
-      // 1. Freshness check — reject stale replays
+      // 1. Freshness check - reject stale replays
       const ts = parseInt(timestamp, 10);
       if (isNaN(ts) || Math.abs(Date.now() / 1000 - ts) > MAX_AGE_SECS) {
         console.warn("[webhook/didit] stale timestamp:", timestamp);
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     const failed = status === "Declined";
 
     if (!passed && !failed) {
-      // Intermediate status (In Progress, In Review) — acknowledge but don't act
+      // Intermediate status (In Progress, In Review) - acknowledge but don't act
       return NextResponse.json({ received: true });
     }
 

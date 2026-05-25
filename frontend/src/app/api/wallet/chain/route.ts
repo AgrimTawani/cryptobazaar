@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-// EVM chains share the same address — users can switch between them freely
+// EVM chains share the same address - users can switch between them freely
 const EVM_CHAINS = new Set(["POLYGON", "BSC"]);
 
 export async function PATCH(req: NextRequest) {

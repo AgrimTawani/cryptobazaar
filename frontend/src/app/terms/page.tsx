@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms of Use — CryptoBazaar",
+  title: "Terms of Use - CryptoBazaar",
   description: "Full Terms of Use for CryptoBazaar, the gated P2P stablecoin exchange for India.",
 };
 
@@ -18,19 +18,19 @@ We reserve the right to update these Terms at any time. Continued use of the Pla
   {
     id: "definitions",
     title: "2. Definitions",
-    content: `"Verified Member" — A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored questionnaire.
+    content: `"Verified Member" - A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored questionnaire.
 
-"Trade" — A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.
+"Trade" - A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.
 
-"Escrow Contract" — A self-executing smart contract deployed on a public blockchain that holds the seller's crypto until the trade is confirmed or resolved.
+"Escrow Contract" - A self-executing smart contract deployed on a public blockchain that holds the seller's crypto until the trade is confirmed or resolved.
 
-"Member Protection Fund" ("the Fund") — A voluntary, discretionary benefit pool funded by 0.75% of every completed trade, held in a separate on-chain contract. Not an insurance product.
+"Member Protection Fund" ("the Fund") - A voluntary, discretionary benefit pool funded by 0.75% of every completed trade, held in a separate on-chain contract. Not an insurance product.
 
-"Membership Plan" — A monthly subscription (Starter, Trader, or Pro) that grants trading access and defines monthly volume limits.
+"Membership Plan" - A monthly subscription (Starter, Trader, or Pro) that grants trading access and defines monthly volume limits.
 
-"UTR" — Unique Transaction Reference number issued by NPCI for every UPI, IMPS, or NEFT payment.
+"UTR" - Unique Transaction Reference number issued by NPCI for every UPI, IMPS, or NEFT payment.
 
-"DID" — Decentralised Identifier created via Hyperledger Identus on behalf of each Verified Member to hold their verifiable credentials.`,
+"DID" - Decentralised Identifier created via Hyperledger Identus on behalf of each Verified Member to hold their verifiable credentials.`,
   },
   {
     id: "eligibility",
@@ -54,9 +54,9 @@ You must sign in via Google OAuth to create an account. You are responsible for 
 
 4.2 Three-Layer Verification
 Before trading, you must complete:
-— Layer 1 (KYC): Identity verification via Didit using Aadhaar, PAN, and a liveness check.
-— Layer 2 (EDD): Upload of 6 months of bank statements, analysed by our ML system for red flags.
-— Layer 3 (AI Questionnaire): A 10-question online interview scored by AI.
+- Layer 1 (KYC): Identity verification via Didit using Aadhaar, PAN, and a liveness check.
+- Layer 2 (EDD): Upload of 6 months of bank statements, analysed by our ML system for red flags.
+- Layer 3 (AI Questionnaire): A 10-question online interview scored by AI.
 
 All three layers must pass for Verified Member status to be granted.
 
@@ -74,9 +74,9 @@ You represent that all information provided during registration and verification
     title: "5. Membership Plans",
     content: `5.1 Plan Tiers
 Access to trading requires an active Membership Plan:
-— Starter: ₹200/month, ₹5,00,000 monthly trade cap
-— Trader: ₹500/month, ₹20,00,000 monthly trade cap
-— Pro: ₹1,000/month, no trade cap
+- Starter: ₹200/month, ₹5,00,000 monthly trade cap
+- Trader: ₹500/month, ₹20,00,000 monthly trade cap
+- Pro: ₹1,000/month, no trade cap
 
 5.2 Payment
 Membership fees are currently collected via UPI transfer to our registered business account. Payment instructions are provided after verification is complete. Plans are month-to-month. No automatic renewals occur without your explicit confirmation and payment.
@@ -113,13 +113,13 @@ The buyer has 30 minutes from trade initiation to submit payment and enter the U
 
 6.4 Confirmation Window
 Once the buyer marks "I have paid", the seller has 15 minutes to:
-(a) Confirm receipt — the smart contract releases crypto to the buyer, and 0.75% is sent to the Member Protection Fund contract; or
-(b) Raise a dispute — the trade enters dispute resolution.
+(a) Confirm receipt - the smart contract releases crypto to the buyer, and 0.75% is sent to the Member Protection Fund contract; or
+(b) Raise a dispute - the trade enters dispute resolution.
 
 If the seller does not respond within 15 minutes, the trade automatically escalates to dispute resolution.
 
 6.5 Irreversibility
-Once the buyer has marked payment, the seller cannot cancel the trade. This is a deliberate design choice to protect buyers against the most common P2P fraud — a seller cancelling after receiving funds.
+Once the buyer has marked payment, the seller cannot cancel the trade. This is a deliberate design choice to protect buyers against the most common P2P fraud - a seller cancelling after receiving funds.
 
 6.6 Platform Role
 CryptoBazaar is a technology facilitator. We do not process, hold, or control INR payments between parties. We do not hold custody of crypto at any point during a trade. The smart contract operates independently on the public blockchain.`,
@@ -135,16 +135,16 @@ A dispute is triggered when:
 
 7.2 Evidence Submission
 Both parties are given 24 hours to submit evidence:
-— Bank statements covering the date of the trade (PDF).
-— Any additional context.
+- Bank statements covering the date of the trade (PDF).
+- Any additional context.
 
 Screenshots are accepted as supplementary context only. Bank statements are the primary evidence.
 
 7.3 Tampering Detection
 All submitted PDFs are run through Perfios/Authbridge for:
-— PDF metadata validation.
-— Digital signature verification.
-— Anomaly detection (font inconsistencies, image layers over text, known manipulation patterns).
+- PDF metadata validation.
+- Digital signature verification.
+- Anomaly detection (font inconsistencies, image layers over text, known manipulation patterns).
 
 Submitting a tampered or forged document results in immediate ruling against that party, permanent suspension, and may result in a criminal complaint being filed. All users are Aadhaar-linked and fully identified.
 
@@ -153,8 +153,8 @@ A genuine payment appears on both parties' bank statements. The Platform's compl
 
 7.5 Ruling and Execution
 The compliance team issues a ruling:
-— Payment confirmed: crypto released to buyer via smart contract.
-— Payment not confirmed: crypto returned to seller via smart contract.
+- Payment confirmed: crypto released to buyer via smart contract.
+- Payment not confirmed: crypto returned to seller via smart contract.
 
 The losing party's account is flagged. A second dispute loss within 12 months results in permanent suspension.
 
@@ -173,38 +173,38 @@ THE FUND IS NOT AN INSURANCE PRODUCT. IT IS NOT REGULATED AS ONE. IT DOES NOT CO
 0.75% of the value of every completed trade is automatically transferred from the escrow contract to the Fund contract at settlement. The Fund is held on-chain. CryptoBazaar cannot spend it without multisig approval from a minimum of 3 of 5 designated signatories.
 
 8.3 Nature of Disbursements
-Disbursements from the Fund are a contractual service remedy under the Indian Contract Act, 1872 (Sections 73–74) for CryptoBazaar's failure to deliver the service it promised — namely, that every counterparty on the Platform has been adequately screened. A disbursement is compensation for our screening failure, not a payment for an external risk event. The Fund does not operate as an insurance pool.
+Disbursements from the Fund are a contractual service remedy under the Indian Contract Act, 1872 (Sections 73–74) for CryptoBazaar's failure to deliver the service it promised - namely, that every counterparty on the Platform has been adequately screened. A disbursement is compensation for our screening failure, not a payment for an external risk event. The Fund does not operate as an insurance pool.
 
 8.4 Eligibility to Request a Disbursement
 All five conditions must be satisfied:
 (a) You had an active Membership Plan at the time of the trade that caused the freeze.
 (b) You had valid (unexpired) EDD and KYC credentials at the time of the trade.
-(c) The trade was executed through CryptoBazaar's escrow smart contract — on-chain verifiable.
+(c) The trade was executed through CryptoBazaar's escrow smart contract - on-chain verifiable.
 (d) The bank freeze is directly and demonstrably attributable to that specific CryptoBazaar trade, evidenced by a police notice or official bank freeze letter citing the transaction.
-(e) The freeze is attributable to a failure in CryptoBazaar's vetting process — specifically, that the counterparty to your trade was admitted to the Platform despite posing an identifiable risk that our screening should have caught. Freezes resulting from events unrelated to our screening failure are not eligible.
+(e) The freeze is attributable to a failure in CryptoBazaar's vetting process - specifically, that the counterparty to your trade was admitted to the Platform despite posing an identifiable risk that our screening should have caught. Freezes resulting from events unrelated to our screening failure are not eligible.
 
 8.5 Disbursement Tiers
 Subject to fund availability and approval:
-— Emergency: Up to ₹10,000 within 24 hours. Requires: freeze notice + FIR/complaint number.
-— Standard: Up to ₹1,00,000 within 7 days. Requires: above + proof of legal representation.
-— Full: Up to ₹5,00,000 within 30 days. Requires: above + account unfrozen or NOC issued.
+- Emergency: Up to ₹10,000 within 24 hours. Requires: freeze notice + FIR/complaint number.
+- Standard: Up to ₹1,00,000 within 7 days. Requires: above + proof of legal representation.
+- Full: Up to ₹5,00,000 within 30 days. Requires: above + account unfrozen or NOC issued.
 
 Disbursement amounts are subject to the Fund's available balance at the time of approval. If the Fund cannot cover the full approved amount, a partial disbursement may be made.
 
 8.6 Anti-Abuse Rules
-— Maximum 2 disbursement requests per member per 12-month period.
-— A 90-day waiting period applies from the date of becoming a Verified Member before a first request may be submitted. This prevents "join-and-claim" abuse.
-— All requests are cross-checked against on-chain trade records. No on-chain trade record means no disbursement.
-— Fraudulent disbursement requests (fabricated freeze notices, false information) result in permanent suspension and may result in criminal complaint.
+- Maximum 2 disbursement requests per member per 12-month period.
+- A 90-day waiting period applies from the date of becoming a Verified Member before a first request may be submitted. This prevents "join-and-claim" abuse.
+- All requests are cross-checked against on-chain trade records. No on-chain trade record means no disbursement.
+- Fraudulent disbursement requests (fabricated freeze notices, false information) result in permanent suspension and may result in criminal complaint.
 
 8.7 Scope Limitations
 The Fund does not cover:
-— Losses from cryptocurrency price movements.
-— Bank freezes caused by transactions unrelated to CryptoBazaar.
-— Bank freezes where CryptoBazaar's vetting process functioned correctly and the risk was undetectable by reasonable screening methods.
-— Losses from your own negligence (e.g., sharing private keys, trading outside the Platform).
-— Tax liabilities arising from your trading activity.
-— Events of force majeure.
+- Losses from cryptocurrency price movements.
+- Bank freezes caused by transactions unrelated to CryptoBazaar.
+- Bank freezes where CryptoBazaar's vetting process functioned correctly and the risk was undetectable by reasonable screening methods.
+- Losses from your own negligence (e.g., sharing private keys, trading outside the Platform).
+- Tax liabilities arising from your trading activity.
+- Events of force majeure.
 
 8.8 No Fiduciary Duty
 CryptoBazaar's administration of the Fund does not create a fiduciary duty, trust relationship, or any other special duty of care beyond what is expressly set out in these Terms.`,
@@ -219,7 +219,7 @@ CryptoBazaar's administration of the Fund does not create a fiduciary duty, trus
 (c) Financing of terrorism or any activities prohibited under the Unlawful Activities (Prevention) Act.
 (d) Trading on behalf of sanctioned individuals, entities, or jurisdictions.
 (e) Using another person's identity, bank account, or wallet without their knowledge and consent.
-(f) Manipulating trade outcomes — including submitting false UTRs, fabricating bank statements, or coordinating with a counterparty to deceive the Platform.
+(f) Manipulating trade outcomes - including submitting false UTRs, fabricating bank statements, or coordinating with a counterparty to deceive the Platform.
 (g) Circumventing verification checks through technical means or third-party services.
 (h) Posting listings for assets other than those supported by the Platform.
 (i) Any other activity that is illegal under Indian law or any law applicable to you.
@@ -238,10 +238,10 @@ You retain ownership of any data you provide (e.g., bank statements, trade histo
     title: "11. Privacy and Data",
     content: `We collect and process only the data necessary to operate the Platform. Key principles:
 
-— KYC data (Aadhaar, PAN, biometric liveness) is processed via Didit and is never stored on CryptoBazaar servers. Only the resulting cryptographic credential is stored, on your DID.
-— Bank statement PDFs are processed in-flight for ML scoring and discarded. We do not retain your statement.
-— We store: your Google account identifier, wallet address, DID, onboarding status, trade history (on-chain), and subscription status.
-— We do not sell your data to third parties.
+- KYC data (Aadhaar, PAN, biometric liveness) is processed via Didit and is never stored on CryptoBazaar servers. Only the resulting cryptographic credential is stored, on your DID.
+- Bank statement PDFs are processed in-flight for ML scoring and discarded. We do not retain your statement.
+- We store: your Google account identifier, wallet address, DID, onboarding status, trade history (on-chain), and subscription status.
+- We do not sell your data to third parties.
 
 A full Privacy Policy is available at cryptobazaar.co.in/privacy. By using the Platform you consent to the data practices described therein.`,
   },
@@ -326,7 +326,7 @@ export default function TermsPage() {
       </header>
 
       <div className="max-w-225 mx-auto py-8 md:py-15 px-5 md:px-10 flex gap-15 items-start">
-        {/* Sidebar TOC — hidden on mobile */}
+        {/* Sidebar TOC - hidden on mobile */}
         <aside className="hidden md:block shrink-0 w-50 sticky top-8">
           <p className="font-sans text-[0.65rem] text-[#bbb] tracking-[2px] uppercase mb-4">
             Contents
@@ -349,7 +349,7 @@ export default function TermsPage() {
           {/* Important notice */}
           <div className="bg-[#fffbeb] border-[1.5px] border-[#fde68a] rounded-xl py-5 px-6 mb-12">
             <p className="font-sans text-[0.85rem] text-[#92400e] leading-[1.7]">
-              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar's screening failures — it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
+              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar's screening failures - it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
             </p>
           </div>
 

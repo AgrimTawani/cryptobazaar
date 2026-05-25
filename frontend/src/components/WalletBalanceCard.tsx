@@ -45,8 +45,8 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
     const t = fixedToken ?? token;
     fetch(`/api/wallet/balance?token=${t}`)
       .then((r) => r.json())
-      .then((d) => { setBalance(d.balance ?? "—"); setSymbol(d.symbol ?? ""); })
-      .catch(() => setBalance("—"))
+      .then((d) => { setBalance(d.balance ?? "-"); setSymbol(d.symbol ?? ""); })
+      .catch(() => setBalance("-"))
       .finally(() => setLoading(false));
   }, [token, fixedToken]);
 
@@ -126,7 +126,7 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
             </div>
           )}
 
-          {/* Token switcher — EVM and TRON; hidden for Solana (USDC-only) */}
+          {/* Token switcher - EVM and TRON; hidden for Solana (USDC-only) */}
           {!fixedToken && (
             <div className="flex items-center gap-[2px] bg-white border border-[#e0e0e0] rounded-full p-[3px]">
               {EVM_TOKENS.map((t) => (

@@ -43,7 +43,7 @@ const WALLETS: WalletOption[] = [
     id: "tronlink",
     name: "TRON Wallet",
     icon: "🔴",
-    desc: "USDT on TRON (TRC20) — TronLink, Coinbase Wallet, Trust Wallet",
+    desc: "USDT on TRON (TRC20) - TronLink, Coinbase Wallet, Trust Wallet",
     dbChain: "TRON",
     asset: "USDT",
     kind: "tronlink",
@@ -62,7 +62,7 @@ const WALLETS: WalletOption[] = [
     id: "bsc-walletconnect",
     name: "WalletConnect",
     icon: "🔗",
-    desc: "USDT on Polygon or BSC — any mobile wallet",
+    desc: "USDT on Polygon or BSC - any mobile wallet",
     dbChain: "POLYGON",
     asset: "USDT",
     kind: "evm-walletconnect",
@@ -149,7 +149,7 @@ export default function WalletPage() {
           return wallet;
         });
         // For EVM: chain is determined by the wallet option
-        // We store it after ThirdWeb connects — address comes from useActiveAccount
+        // We store it after ThirdWeb connects - address comes from useActiveAccount
         setNativeChain(w.dbChain);
       }
     } catch (err: unknown) {

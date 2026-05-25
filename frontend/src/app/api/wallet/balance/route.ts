@@ -120,12 +120,12 @@ export async function GET(request: Request) {
     } else if (walletChain === "TRON") {
       result = await tronBalance(walletAddress, tokenPref);
     } else {
-      result = { balance: "—", symbol: "" };
+      result = { balance: "-", symbol: "" };
     }
 
     return NextResponse.json(result);
   } catch (err) {
     console.error("[wallet/balance]", err);
-    return NextResponse.json({ error: String(err), balance: "—", symbol: "" }, { status: 500 });
+    return NextResponse.json({ error: String(err), balance: "-", symbol: "" }, { status: 500 });
   }
 }

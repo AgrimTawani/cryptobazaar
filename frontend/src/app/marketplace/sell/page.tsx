@@ -135,7 +135,7 @@ export default function SellPage() {
         })
       );
 
-      // Read nextOrderId right after approve confirms — minimises race window
+      // Read nextOrderId right after approve confirms - minimises race window
       const nextId = await readContract({
         contract: escrowContract,
         method: "function nextOrderId() view returns (uint256)",

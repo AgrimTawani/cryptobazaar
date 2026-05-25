@@ -227,7 +227,7 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Table header — hidden on mobile */}
+        {/* Table header - hidden on mobile */}
         <div className="hidden md:grid grid-cols-[1fr_100px_130px_130px_140px_120px] gap-3 py-[10px] px-5 bg-[#f5f5f5] rounded-[10px] mb-2">
           {["Seller", "Asset", "Price / unit", "Available", "Payment", ""].map(
             (h) => (
@@ -241,7 +241,7 @@ export default function MarketplacePage() {
           )}
         </div>
 
-        {/* Order rows — desktop table */}
+        {/* Order rows - desktop table */}
         <div className="hidden md:block">
         {filtered.map((order) => (
           <div
@@ -320,7 +320,7 @@ export default function MarketplacePage() {
         ))}
         </div>
 
-        {/* Order cards — mobile */}
+        {/* Order cards - mobile */}
         <div className="md:hidden flex flex-col gap-3">
           {filtered.map((order) => (
             <Link

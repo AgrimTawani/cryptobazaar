@@ -52,7 +52,7 @@ export default function KYCPage() {
           setError("Verification was declined. Please try again.");
         }
       } catch {
-        // transient error — keep polling
+        // transient error - keep polling
       }
     }, 3000);
   };

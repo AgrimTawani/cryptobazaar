@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       analysis = JSON.parse(raw);
     } catch {
       console.error("[submit-questionnaire] Gemini non-JSON:", raw);
-      return NextResponse.json({ error: "Scoring failed — unexpected AI response" }, { status: 502 });
+      return NextResponse.json({ error: "Scoring failed - unexpected AI response" }, { status: 502 });
     }
 
     const score = Math.max(0, Math.min(100, analysis.score ?? 0));

@@ -150,7 +150,7 @@ export default function BankStatementPage() {
           </div>
         )}
 
-        {/* Drop zone — hide after successful result */}
+        {/* Drop zone - hide after successful result */}
         {!result && (
           <>
             <div
