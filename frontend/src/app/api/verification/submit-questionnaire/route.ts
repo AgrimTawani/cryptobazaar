@@ -86,17 +86,21 @@ export async function POST(req: NextRequest) {
       f.toLowerCase().includes("lien") || f.toLowerCase().includes("freeze") || f.toLowerCase().includes("fraud")
     );
 
-    const existing = await db.onboardingRecord.findFirst({
-      where: { userId: user.id, layer: "INTERVIEW" },
-      orderBy: { attemptNumber: "desc" },
-    });
-
-    await db.onboardingRecord.create({
-      data: {
+    await db.onboardingRecord.upsert({
+      where: { userId_layer: { userId: user.id, layer: "INTERVIEW" } },
+      create: {
         userId: user.id,
         layer: "INTERVIEW",
         status: passed ? "PASSED" : "FAILED",
-        attemptNumber: existing ? existing.attemptNumber + 1 : 1,
+        attemptNumber: 1,
+        score,
+        result: { ...analysis, answers } as object,
+        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        completedAt: new Date(),
+      },
+      update: {
+        status: passed ? "PASSED" : "FAILED",
+        attemptNumber: { increment: 1 },
         score,
         result: { ...analysis, answers } as object,
         rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),

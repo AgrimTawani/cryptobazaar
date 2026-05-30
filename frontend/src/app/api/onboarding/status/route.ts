@@ -46,6 +46,7 @@ export async function GET() {
 
     return NextResponse.json({
       userStatus: user.status,
+      memberNumber: user.memberNumber,
       walletAddress: user.walletAddress ?? null,
       walletChain: user.walletChain ?? null,
       kyc: kyc?.status ?? "NOT_STARTED",

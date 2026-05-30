@@ -178,16 +178,21 @@ export async function POST(req: NextRequest) {
     const forensic = await runForgeryCheck(buffer);
 
     if (!forensic.passed) {
-      const existing = await db.onboardingRecord.findFirst({
-        where: { userId: user.id, layer: "EDD" },
-        orderBy: { attemptNumber: "desc" },
-      });
-      await db.onboardingRecord.create({
-        data: {
+      await db.onboardingRecord.upsert({
+        where: { userId_layer: { userId: user.id, layer: "EDD" } },
+        create: {
           userId: user.id,
           layer: "EDD",
           status: "FAILED",
-          attemptNumber: existing ? existing.attemptNumber + 1 : 1,
+          attemptNumber: 1,
+          score: 0,
+          result: { forensic } as object,
+          rejectionReason: forensic.flags.join("; "),
+          completedAt: new Date(),
+        },
+        update: {
+          status: "FAILED",
+          attemptNumber: { increment: 1 },
           score: 0,
           result: { forensic } as object,
           rejectionReason: forensic.flags.join("; "),
@@ -205,11 +210,10 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Step 2: Upload to R2 ─────────────────────────────────────────────────
-    const existing = await db.onboardingRecord.findFirst({
-      where: { userId: user.id, layer: "EDD" },
-      orderBy: { attemptNumber: "desc" },
+    const existingRecord = await db.onboardingRecord.findUnique({
+      where: { userId_layer: { userId: user.id, layer: "EDD" } },
     });
-    const attemptNumber = existing ? existing.attemptNumber + 1 : 1;
+    const attemptNumber = existingRecord ? existingRecord.attemptNumber + 1 : 1;
     const r2Key = await uploadToR2(buffer, user.id, user.name, attemptNumber);
 
     // ── Step 3: AI income analysis with Gemini ────────────────────────────────
@@ -245,12 +249,21 @@ export async function POST(req: NextRequest) {
     const passed = score >= 60 && !analysis.flagged;
 
     // ── Step 4: Write result to DB ────────────────────────────────────────────
-    await db.onboardingRecord.create({
-      data: {
+    await db.onboardingRecord.upsert({
+      where: { userId_layer: { userId: user.id, layer: "EDD" } },
+      create: {
         userId: user.id,
         layer: "EDD",
         status: passed ? "PASSED" : "FAILED",
         attemptNumber,
+        score,
+        result: { ...analysis, forensic, r2Key } as object,
+        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        completedAt: new Date(),
+      },
+      update: {
+        status: passed ? "PASSED" : "FAILED",
+        attemptNumber: { increment: 1 },
         score,
         result: { ...analysis, forensic, r2Key } as object,
         rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),

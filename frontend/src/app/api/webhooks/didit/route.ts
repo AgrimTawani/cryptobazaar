@@ -64,24 +64,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    const record = await db.onboardingRecord.findFirst({
-      where: { userId, layer: "KYC", status: "IN_PROGRESS" },
-      orderBy: { attemptNumber: "desc" },
+    await db.onboardingRecord.upsert({
+      where: { userId_layer: { userId, layer: "KYC" } },
+      create: {
+        userId,
+        layer: "KYC",
+        status: passed ? "PASSED" : "FAILED",
+        attemptNumber: 1,
+        result: decision ?? {},
+        completedAt: new Date(),
+        rejectionReason: failed ? (decision?.id_verifications?.[0]?.status ?? "Declined") : null,
+      },
+      update: {
+        status: passed ? "PASSED" : "FAILED",
+        attemptNumber: { increment: 1 },
+        result: decision ?? {},
+        completedAt: new Date(),
+        rejectionReason: failed ? (decision?.id_verifications?.[0]?.status ?? "Declined") : null,
+      },
     });
-
-    if (record) {
-      await db.onboardingRecord.update({
-        where: { id: record.id },
-        data: {
-          status: passed ? "PASSED" : "FAILED",
-          result: decision ?? {},
-          completedAt: new Date(),
-          rejectionReason: failed
-            ? (decision?.id_verifications?.[0]?.status ?? "Declined")
-            : null,
-        },
-      });
-    }
 
     if (passed) {
       await db.user.update({

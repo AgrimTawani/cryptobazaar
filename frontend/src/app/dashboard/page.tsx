@@ -73,6 +73,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 
 interface OnboardingStatus {
   userStatus: string;
+  memberNumber: number | null;
   walletAddress: string | null;
   walletChain: string | null;
   kyc: string;
@@ -145,9 +146,16 @@ export default function DashboardPage() {
             />
           )}
           <div className="flex-1">
-            <h1 className="font-condensed text-[2rem] tracking-[0.5px] leading-none mb-1">
-              {user?.fullName ?? "Welcome"}
-            </h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="font-condensed text-[2rem] tracking-[0.5px] leading-none">
+                {user?.fullName ?? "Welcome"}
+              </h1>
+              {dbStatus?.memberNumber && (
+                <span className="font-sans text-[0.7rem] font-semibold tracking-[1.5px] uppercase px-2 py-1 bg-black text-lime rounded-md">
+                  #{dbStatus.memberNumber}
+                </span>
+              )}
+            </div>
             <p className="font-sans text-sm text-[#888] mb-3">
               {user?.primaryEmailAddress?.emailAddress}
             </p>
