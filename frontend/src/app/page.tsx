@@ -302,50 +302,44 @@ export default function Home() {
           {/* ── Stat cards ── */}
           <motion.div
             className="flex flex-wrap justify-center gap-3 mt-10 w-full"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.6 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
           >
             {[
-              {
-                value: platformStats ? formatVolume(platformStats.totalVolumeInr) : "—",
-                label: "Total Traded",
-              },
-              {
-                value: platformStats ? platformStats.verifiedMembers.toString() : "—",
-                label: "Verified Members",
-              },
-              {
-                value: platformStats ? platformStats.totalTrades.toString() : "—",
-                label: "Trades Completed",
-              },
+              { value: platformStats ? formatVolume(platformStats.totalVolumeInr) : "—", label: "Total Traded" },
+              { value: platformStats ? platformStats.verifiedMembers.toString() : "—", label: "Verified Members" },
+              { value: platformStats ? platformStats.totalTrades.toString() : "—", label: "Trades Done" },
               { value: "0", label: "Custody Risk" },
-            ].map((stat) => (
-              <div
+            ].map((stat, i) => (
+              <motion.div
                 key={stat.label}
-                className="flex flex-col items-center px-6 py-4 rounded-2xl bg-white/60 backdrop-blur-md border border-black/[0.07] shadow-sm min-w-[110px]"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.65 + i * 0.07 }}
+                className="flex flex-col items-center px-7 py-5 rounded-2xl bg-black border border-white/10 min-w-[120px]"
               >
-                <span className="font-condensed text-[1.6rem] text-black leading-none tracking-wide">
+                <span className="font-condensed text-[2rem] text-lime leading-none tracking-wide">
                   {stat.value}
                 </span>
-                <span className="font-sans text-[0.62rem] text-black/40 tracking-[1.5px] uppercase mt-[6px] text-center">
+                <span className="font-sans text-[0.6rem] text-white/40 tracking-[1.8px] uppercase mt-2 text-center">
                   {stat.label}
                 </span>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
 
           {/* ── Trust badges ── */}
           <motion.div
-            className="flex flex-wrap justify-center gap-2 mt-4"
+            className="flex flex-wrap justify-center gap-2 mt-5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.75 }}
+            transition={{ duration: 0.4, delay: 0.95 }}
           >
             {["Aadhaar KYC", "Smart Contract Escrow", "Non-Custodial"].map((badge) => (
               <span
                 key={badge}
-                className="font-sans text-[0.65rem] tracking-[1.2px] uppercase px-3 py-[5px] rounded-full border border-black/10 text-black/45 bg-white/50 backdrop-blur-sm"
+                className="font-sans text-[0.63rem] tracking-[1.5px] uppercase px-4 py-2 rounded-full bg-black text-white/50 border border-white/10"
               >
                 {badge}
               </span>
