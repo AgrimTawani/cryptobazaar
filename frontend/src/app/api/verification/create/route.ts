@@ -45,18 +45,10 @@ export async function POST() {
       data: { kycSessionId: sessionId },
     });
 
-    const existing = await db.onboardingRecord.findFirst({
-      where: { userId: user.id, layer: "KYC" },
-      orderBy: { attemptNumber: "desc" },
-    });
-
-    await db.onboardingRecord.create({
-      data: {
-        userId: user.id,
-        layer: "KYC",
-        status: "IN_PROGRESS",
-        attemptNumber: existing ? existing.attemptNumber + 1 : 1,
-      },
+    await db.onboardingRecord.upsert({
+      where: { userId_layer: { userId: user.id, layer: "KYC" } },
+      create: { userId: user.id, layer: "KYC", status: "IN_PROGRESS", attemptNumber: 1 },
+      update: { status: "IN_PROGRESS", attemptNumber: { increment: 1 } },
     });
 
     return NextResponse.json({ sessionUrl });
