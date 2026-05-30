@@ -197,7 +197,6 @@ model User {
 }
 
 model OnboardingRecord {
-  id              Int                   @id @default(autoincrement())
   userId          Int                   @map("user_id")
   layer           OnboardingLayer
   status          OnboardingLayerStatus @default(PENDING)
@@ -214,8 +213,7 @@ model OnboardingRecord {
 
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([userId, layer])
-  @@index([userId])
+  @@id([userId, layer])
   @@map("onboarding_records")
 }
 

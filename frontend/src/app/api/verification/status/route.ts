@@ -10,9 +10,8 @@ export async function GET() {
     const user = await db.user.findUnique({ where: { clerkId } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const record = await db.onboardingRecord.findFirst({
-      where: { userId: user.id, layer: "KYC" },
-      orderBy: { attemptNumber: "desc" },
+    const record = await db.onboardingRecord.findUnique({
+      where: { userId_layer: { userId: user.id, layer: "KYC" } },
     });
 
     // Already resolved in DB (webhook fired in production)
@@ -41,7 +40,7 @@ export async function GET() {
 
     if ((passed || failed) && record) {
       await db.onboardingRecord.update({
-        where: { id: record.id },
+        where: { userId_layer: { userId: user.id, layer: "KYC" } },
         data: {
           status: passed ? "PASSED" : "FAILED",
           result: decision,

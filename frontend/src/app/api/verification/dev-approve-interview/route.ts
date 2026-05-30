@@ -13,28 +13,11 @@ export async function POST() {
   const user = await db.user.findUnique({ where: { clerkId } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const existing = await db.onboardingRecord.findFirst({
-    where: { userId: user.id, layer: "INTERVIEW" },
-    orderBy: { attemptNumber: "desc" },
+  await db.onboardingRecord.upsert({
+    where: { userId_layer: { userId: user.id, layer: "INTERVIEW" } },
+    create: { userId: user.id, layer: "INTERVIEW", status: "PASSED", attemptNumber: 1, completedAt: new Date(), result: { dev: true } },
+    update: { status: "PASSED", completedAt: new Date(), result: { dev: true } },
   });
-
-  if (existing) {
-    await db.onboardingRecord.update({
-      where: { id: existing.id },
-      data: { status: "PASSED", completedAt: new Date(), result: { dev: true } },
-    });
-  } else {
-    await db.onboardingRecord.create({
-      data: {
-        userId: user.id,
-        layer: "INTERVIEW",
-        status: "PASSED",
-        attemptNumber: 1,
-        completedAt: new Date(),
-        result: { dev: true },
-      },
-    });
-  }
 
   return NextResponse.json({ ok: true });
 }
