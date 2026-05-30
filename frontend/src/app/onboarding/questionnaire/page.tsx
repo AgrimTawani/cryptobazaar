@@ -9,81 +9,100 @@ const QUESTIONS = [
     id: "volume",
     question: "How much USDT do you expect to trade monthly?",
     options: ["Under ₹50,000", "₹50,000 – ₹2,00,000", "₹2,00,000 – ₹10,00,000", "Over ₹10,00,000"],
+    freeText: false,
     hasOther: false,
     detailFor: null as string | null,
     detailPrompt: null as string | null,
   },
   {
     id: "experience",
-    question: "Are you new to P2P trading?",
-    options: ["Yes, completely new", "Some experience (under 6 months)", "Experienced (6 months – 2 years)", "Very experienced (2+ years)"],
+    question: "Describe your P2P trading experience.",
+    options: [] as string[],
+    freeText: true,
     hasOther: false,
-    detailFor: null,
-    detailPrompt: null,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "binance",
     question: "Do you have a verified Binance P2P account?",
     options: ["Yes", "No"],
+    freeText: false,
     hasOther: false,
-    detailFor: "Yes",
-    detailPrompt: "Enter your Binance UID (optional)",
+    detailFor: "Yes" as string | null,
+    detailPrompt: "Enter your Binance UID (optional)" as string | null,
   },
   {
     id: "duration",
-    question: "Since how long have you been trading cryptocurrency?",
-    options: ["Never traded before", "Less than 6 months", "6 months – 2 years", "Over 2 years"],
+    question: "How long have you been trading cryptocurrency, and on which platforms?",
+    options: [] as string[],
+    freeText: true,
     hasOther: false,
-    detailFor: null,
-    detailPrompt: null,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "active",
-    question: "Are you currently actively trading on any P2P platform?",
-    options: ["Yes, daily", "Yes, a few times a week", "Occasionally", "No, just starting out"],
+    question: "Are you currently active on any P2P platform? If yes, which ones and how often?",
+    options: [] as string[],
+    freeText: true,
     hasOther: false,
-    detailFor: null,
-    detailPrompt: null,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "txn_time",
     question: "What is your expected average transaction completion time?",
     options: ["Under 15 minutes", "15 – 30 minutes", "30 – 60 minutes", "Over 1 hour"],
+    freeText: false,
     hasOther: false,
-    detailFor: null,
-    detailPrompt: null,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "source_of_funds",
-    question: "What is your primary source of funds for trading?",
-    options: ["Salary / Employment income", "Business income", "Investment returns", "Savings", "Other"],
-    hasOther: true,
-    detailFor: null,
-    detailPrompt: null,
+    question: "What is your primary source of funds for trading? Please describe.",
+    options: [] as string[],
+    freeText: true,
+    hasOther: false,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "lien",
     question: "Has your bank account ever been frozen or had a lien placed on it?",
     options: ["Yes", "No"],
+    freeText: false,
     hasOther: false,
-    detailFor: "Yes",
-    detailPrompt: "Please briefly explain the reason",
+    detailFor: "Yes" as string | null,
+    detailPrompt: "Please briefly explain the reason" as string | null,
   },
   {
     id: "purpose",
-    question: "What is your primary purpose for using CryptoBazaar?",
-    options: ["International remittances", "Business payments", "Portfolio diversification / savings", "Converting crypto earnings", "Other"],
-    hasOther: true,
-    detailFor: null,
-    detailPrompt: null,
+    question: "What is your primary purpose for using CryptoBazaar? Please describe.",
+    options: [] as string[],
+    freeText: true,
+    hasOther: false,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
   {
     id: "max_txn",
     question: "What is the maximum single transaction size you expect to make?",
     options: ["Under ₹25,000", "₹25,000 – ₹1,00,000", "₹1,00,000 – ₹5,00,000", "Over ₹5,00,000"],
+    freeText: false,
     hasOther: false,
-    detailFor: null,
-    detailPrompt: null,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
+  },
+  {
+    id: "itr",
+    question: "Do you file Income Tax Returns (ITR) with crypto income declared?",
+    options: ["Yes", "No"],
+    freeText: false,
+    hasOther: false,
+    detailFor: null as string | null,
+    detailPrompt: null as string | null,
   },
 ];
 
@@ -93,16 +112,39 @@ export default function QuestionnairePage() {
   const router = useRouter();
   const [answers, setAnswers] = useState<Answers>({});
   const [submitting, setSubmitting] = useState(false);
+  const [itrUploading, setItrUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ passed: boolean; score: number; summary: string } | null>(null);
 
   const answeredCount = QUESTIONS.filter((q) => {
     const val = answers[q.id];
+    if (q.freeText) return (val?.trim().length ?? 0) > 0;
     if (!val) return false;
     if (val === "Other") return !!answers[`${q.id}_detail`]?.trim();
     return true;
   }).length;
   const allAnswered = answeredCount === QUESTIONS.length;
+
+  const handleItrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") { setError("ITR must be a PDF."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError("ITR PDF must be under 10MB."); return; }
+    setItrUploading(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/verification/upload-itr", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setAnswers((a) => ({ ...a, itr_r2Key: data.r2Key }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setItrUploading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!allAnswered || submitting) return;
@@ -153,7 +195,7 @@ export default function QuestionnairePage() {
           AI Questionnaire
         </h1>
         <p className="font-sans text-base text-[#666] mb-10 leading-relaxed">
-          10 questions about your trading background. Scored by AI to assess intent and risk. Takes under 3 minutes.
+          11 questions about your trading background. Scored by AI to assess intent and risk. Takes under 3 minutes.
         </p>
 
         {result ? (
@@ -183,45 +225,76 @@ export default function QuestionnairePage() {
                     </span>
                     {q.question}
                   </p>
-                  <div className="flex flex-col gap-2">
-                    {q.options.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => setAnswers((a) => ({ ...a, [q.id]: opt }))}
-                        className={`text-left py-4 px-5 rounded-xl font-sans text-[0.95rem] border-[1.5px] transition-all duration-150 ${
-                          answers[q.id] === opt
-                            ? "border-black bg-black text-white"
-                            : "border-[#e5e5e5] bg-white text-[#333] hover:border-[#999]"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
 
-                    {/* "Other" free-text input */}
-                    {q.hasOther && answers[q.id] === "Other" && (
-                      <input
-                        type="text"
-                        autoFocus
-                        placeholder="Please specify…"
-                        value={answers[`${q.id}_detail`] ?? ""}
-                        onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
-                        className="mt-1 w-full py-4 px-5 border-[1.5px] border-black rounded-xl font-sans text-[0.95rem] text-[#111] outline-none placeholder:text-[#bbb]"
-                      />
-                    )}
+                  {q.freeText ? (
+                    <textarea
+                      rows={3}
+                      placeholder="Type your answer…"
+                      value={answers[q.id] ?? ""}
+                      onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                      className="w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-[0.95rem] text-[#111] outline-none focus:border-black resize-none placeholder:text-[#bbb]"
+                    />
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {q.options.map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => setAnswers((a) => ({ ...a, [q.id]: opt }))}
+                          className={`text-left py-4 px-5 rounded-xl font-sans text-[0.95rem] border-[1.5px] transition-all duration-150 ${
+                            answers[q.id] === opt
+                              ? "border-black bg-black text-white"
+                              : "border-[#e5e5e5] bg-white text-[#333] hover:border-[#999]"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
 
-                    {/* Conditional detail field (e.g. Binance UID, lien reason) */}
-                    {q.detailFor && answers[q.id] === q.detailFor && (
-                      <input
-                        type="text"
-                        autoFocus
-                        placeholder={q.detailPrompt ?? ""}
-                        value={answers[`${q.id}_detail`] ?? ""}
-                        onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
-                        className="mt-1 w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-[0.95rem] text-[#111] outline-none focus:border-black placeholder:text-[#bbb]"
-                      />
-                    )}
-                  </div>
+                      {q.hasOther && answers[q.id] === "Other" && (
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="Please specify…"
+                          value={answers[`${q.id}_detail`] ?? ""}
+                          onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
+                          className="mt-1 w-full py-4 px-5 border-[1.5px] border-black rounded-xl font-sans text-[0.95rem] text-[#111] outline-none placeholder:text-[#bbb]"
+                        />
+                      )}
+
+                      {q.detailFor && answers[q.id] === q.detailFor && (
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder={q.detailPrompt ?? ""}
+                          value={answers[`${q.id}_detail`] ?? ""}
+                          onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
+                          className="mt-1 w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-[0.95rem] text-[#111] outline-none focus:border-black placeholder:text-[#bbb]"
+                        />
+                      )}
+
+                      {q.id === "itr" && answers["itr"] === "Yes" && (
+                        <div className="mt-3 space-y-2">
+                          <p className="font-sans text-[0.82rem] text-[#555]">
+                            Upload your latest ITR acknowledgement PDF (max 10MB).
+                          </p>
+                          {itrUploading && (
+                            <p className="font-sans text-[0.78rem] text-[#7b3fe4]">Uploading…</p>
+                          )}
+                          {answers["itr_r2Key"] && !itrUploading && (
+                            <p className="font-sans text-[0.78rem] text-[#166534]">✓ ITR uploaded</p>
+                          )}
+                          {!answers["itr_r2Key"] && !itrUploading && (
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={handleItrUpload}
+                              className="font-sans text-[0.82rem] text-[#555]"
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -256,7 +329,7 @@ export default function QuestionnairePage() {
               ) : allAnswered ? (
                 "Submit Answers →"
               ) : (
-                `Answer all questions (${answeredCount} / 10 done)`
+                `Answer all questions (${answeredCount} / ${QUESTIONS.length} done)`
               )}
             </button>
           </>

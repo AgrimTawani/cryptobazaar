@@ -26,11 +26,18 @@ Risk factors to consider:
 - Bank account lien/freeze history = major red flag (−30 points)
 - No trading experience + very high volume expectation = moderate risk (−15 points)
 - Unclear or suspicious source of funds = major red flag (−25 points)
+- Vague or very short answers to open-ended questions = minor risk (−5 points)
+- Source of funds unclear or evasive in free-text answer = major red flag (−20 points)
+- Purpose answer inconsistent with volume expectations = moderate risk (−10 points)
 - Expects very slow transaction times (1 hour+) = minor risk (−5 points)
-- New to P2P but realistic volume expectations = acceptable
+
+Positive signals:
+- Files ITR with crypto income declared AND uploaded ITR document = very strong positive signal (+20 points)
+- Files ITR with crypto income declared but no document uploaded = moderate positive signal (+8 points)
 - Verified Binance P2P account = positive signal (+10 points)
 - Active P2P trader with consistent source of funds = positive signal (+10 points)
 - Long crypto trading history = positive signal (+5 points)
+- Detailed, genuine answers to open-ended questions showing real trading knowledge = positive signal (+5 points)
 
 Start from a base score of 70. Apply adjustments based on the answers.
 Return ONLY the JSON object. No markdown, no explanation.`;
@@ -44,8 +51,8 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const { answers } = await req.json() as { answers: Record<string, string> };
-    if (!answers || Object.keys(answers).filter(k => !k.endsWith("_detail")).length < 10) {
-      return NextResponse.json({ error: "All 10 questions must be answered" }, { status: 400 });
+    if (!answers || Object.keys(answers).filter(k => !k.endsWith("_detail") && k !== "itr_r2Key").length < 11) {
+      return NextResponse.json({ error: "All 11 questions must be answered" }, { status: 400 });
     }
 
     const apiKey = process.env.GOOGLE_AI_API_KEY;
@@ -56,15 +63,16 @@ export async function POST(req: NextRequest) {
     // Format answers for the prompt
     const formatted = [
       `Expected monthly trading volume: ${answers.volume}`,
-      `P2P experience level: ${answers.experience}`,
+      `P2P trading experience: ${answers.experience}`,
       `Binance P2P verified account: ${answers.binance}${answers.binance_detail ? ` (UID: ${answers.binance_detail})` : ""}`,
-      `Crypto trading duration: ${answers.duration}`,
-      `Currently active in P2P: ${answers.active}`,
+      `Duration trading crypto and platforms used: ${answers.duration}`,
+      `Currently active on P2P: ${answers.active}`,
       `Expected transaction time: ${answers.txn_time}`,
       `Source of funds: ${answers.source_of_funds}`,
       `Bank account lien history: ${answers.lien}${answers.lien_detail ? ` (Details: ${answers.lien_detail})` : ""}`,
       `Purpose of trading: ${answers.purpose}`,
       `Max single transaction size: ${answers.max_txn}`,
+      `Files ITR with crypto returns: ${answers.itr}${answers.itr_r2Key ? " (ITR document uploaded and verified)" : answers.itr === "Yes" ? " (stated yes but no document uploaded)" : ""}`,
     ].join("\n");
 
     const genai = new GoogleGenerativeAI(apiKey);
