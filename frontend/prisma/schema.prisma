@@ -197,7 +197,7 @@ model User {
 }
 
 model OnboardingRecord {
-  id              String                @id @default(uuid())
+  id              Int                   @id @default(autoincrement())
   userId          Int                   @map("user_id")
   layer           OnboardingLayer
   status          OnboardingLayerStatus @default(PENDING)
