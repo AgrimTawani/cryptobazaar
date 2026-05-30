@@ -16,7 +16,7 @@ export async function POST() {
   await db.user.update({
     where: { id: user.id },
     data: {
-      walletAddress: `dev-wallet-${user.id.slice(0, 8)}`,
+      walletAddress: `dev-wallet-${user.id}`,
       walletChain: "POLYGON",
       walletVerifiedAt: new Date(),
       status: "VERIFIED",

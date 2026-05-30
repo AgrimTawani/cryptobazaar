@@ -118,10 +118,9 @@ enum MessageType {
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id           String     @id @default(uuid())
-  memberNumber Int        @unique @default(autoincrement()) @map("member_number")
-  clerkId      String     @unique @map("clerk_id")
-  status       UserStatus @default(LOGIN_DONE)
+  id      Int        @id @default(autoincrement())
+  clerkId String     @unique @map("clerk_id")
+  status  UserStatus @default(LOGIN_DONE)
 
   // Identity — from Google / Clerk
   email     String? @unique
@@ -141,15 +140,7 @@ model User {
 
   // Didit session reference
   kycSessionId  String?   @map("kyc_session_id")
-  kycProvider   String?   @default("didit") @map("kyc_provider")
   kycVerifiedAt DateTime? @map("kyc_verified_at")
-  kycExpiresAt  DateTime? @map("kyc_expires_at")
-
-  // Hyperledger Identus
-  did             String? @unique
-  kycCredentialId String? @map("kyc_credential_id")
-  eddCredentialId String? @map("edd_credential_id")
-  interviewCredId String? @map("interview_cred_id")
 
   // Wallet
   walletAddress    String?   @unique @map("wallet_address")
@@ -207,7 +198,7 @@ model User {
 
 model OnboardingRecord {
   id              String                @id @default(uuid())
-  userId          String                @map("user_id")
+  userId          Int                   @map("user_id")
   layer           OnboardingLayer
   status          OnboardingLayerStatus @default(PENDING)
   attemptNumber   Int                   @default(1) @map("attempt_number")
@@ -230,7 +221,7 @@ model OnboardingRecord {
 
 model WalletScreen {
   id            String    @id @default(uuid())
-  userId        String    @map("user_id")
+  userId        Int       @map("user_id")
   walletAddress String    @map("wallet_address")
   provider      String    @default("nominis")
   riskScore     Float?    @map("risk_score")
@@ -248,7 +239,7 @@ model WalletScreen {
 
 model Subscription {
   id         String             @id @default(uuid())
-  userId     String             @map("user_id")
+  userId     Int                @map("user_id")
   tier       SubscriptionTier
   status     SubscriptionStatus @default(ACTIVE)
   amountPaid Decimal            @map("amount_paid") @db.Decimal(10, 2)
@@ -270,8 +261,8 @@ model Order {
   orderId String @unique @map("order_id")
 
   // Parties
-  sellerId String  @map("seller_id")
-  buyerId  String? @map("buyer_id")
+  sellerId Int  @map("seller_id")
+  buyerId  Int? @map("buyer_id")
 
   // Asset
   asset         Asset
@@ -352,7 +343,7 @@ model ChatRoom {
 model ChatMessage {
   id         String      @id @default(uuid())
   chatRoomId String      @map("chat_room_id")
-  senderId   String?     @map("sender_id")
+  senderId   Int?        @map("sender_id")
   type       MessageType @default(TEXT)
   content    String
   isRead     Boolean     @default(false) @map("is_read")
@@ -369,8 +360,8 @@ model ChatMessage {
 model TradeRating {
   id          String @id @default(uuid())
   orderId     String @map("order_id")
-  raterId     String @map("rater_id")
-  ratedUserId String @map("rated_user_id")
+  raterId     Int    @map("rater_id")
+  ratedUserId Int    @map("rated_user_id")
   raterRole   String @map("rater_role")
 
   // Scores 1–5
@@ -393,7 +384,7 @@ model TradeRating {
 model Dispute {
   id           String @id @default(uuid())
   orderId      String @unique @map("order_id")
-  raisedById   String @map("raised_by_id")
+  raisedById   Int    @map("raised_by_id")
   raisedByRole String @map("raised_by_role")
 
   status           DisputeStatus @default(OPEN)
@@ -424,7 +415,7 @@ model Dispute {
 
 model ProtectionFundClaim {
   id      String @id @default(uuid())
-  userId  String @map("user_id")
+  userId  Int    @map("user_id")
   orderId String @map("order_id")
 
   tier   ClaimTier

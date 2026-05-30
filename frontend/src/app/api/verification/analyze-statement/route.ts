@@ -13,12 +13,12 @@ const r2 = new S3Client({
   },
 });
 
-async function uploadToR2(buffer: Buffer, userId: string, name: string | null, attemptNumber: number): Promise<string> {
+async function uploadToR2(buffer: Buffer, userId: number, name: string | null, attemptNumber: number): Promise<string> {
   const safeName = (name ?? "unknown")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-  const key = `statements/${safeName}-${userId.slice(0, 8)}/${Date.now()}-attempt${attemptNumber}.pdf`;
+  const key = `statements/${safeName}-${userId}/${Date.now()}-attempt${attemptNumber}.pdf`;
   await r2.send(new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
     Key: key,
