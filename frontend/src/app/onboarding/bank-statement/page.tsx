@@ -56,9 +56,7 @@ export default function BankStatementPage() {
 
       setResult(data);
 
-      if (data.passed) {
-        setTimeout(() => router.push("/onboarding/questionnaire"), 2000);
-      }
+      setTimeout(() => router.push("/onboarding/questionnaire"), 3000);
     } catch {
       setError("Network error. Please check your connection and try again.");
     } finally {
@@ -100,53 +98,22 @@ export default function BankStatementPage() {
 
         {/* Result panel */}
         {result && (
-          <div
-            className={`rounded-[14px] p-5 mb-6 border ${
-              result.passed
-                ? "bg-[#f0fff4] border-[#68d391]"
-                : "bg-[#fff5f5] border-[#fc8181]"
-            }`}
-          >
+          <div className="rounded-[14px] p-5 mb-6 border bg-[#f0fff4] border-[#68d391]">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-xl">{result.passed ? "✓" : "✗"}</span>
+              <span className="text-xl">✓</span>
               <span className="font-condensed text-[1.3rem] tracking-[1px]">
-                {result.passed ? "Statement Approved" : "Statement Declined"}
+                Statement Received
               </span>
-              <span
-                className={`ml-auto font-sans text-[0.8rem] font-bold px-2 py-[2px] rounded-full ${
-                  result.passed
-                    ? "bg-[#68d391] text-[#1a4731]"
-                    : "bg-[#fc8181] text-[#742a2a]"
-                }`}
-              >
-                Score {result.score}/100
+              <span className="ml-auto font-sans text-[0.8rem] font-bold px-2 py-0.5 rounded-full bg-[#e2e8f0] text-[#4a5568]">
+                AI Score {result.score}/100
               </span>
             </div>
-            <p className="font-sans text-[0.82rem] text-[#555] leading-[1.6] mb-2">
-              {result.summary}
+            <p className="font-sans text-[0.82rem] text-[#555] leading-[1.6] mb-3">
+              Your statement has been submitted for manual review. Our compliance team will verify your account within 24–48 hours. You can continue the onboarding process below.
             </p>
-            {result.flags.length > 0 && (
-              <ul className="mt-2 space-y-1">
-                {result.flags.map((f, i) => (
-                  <li key={i} className="font-sans text-[0.78rem] text-[#e53e3e] flex items-start gap-1">
-                    <span>•</span> {f}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {result.passed && (
-              <p className="font-sans text-[0.78rem] text-[#38a169] mt-3">
-                Redirecting to next step…
-              </p>
-            )}
-            {!result.passed && (
-              <button
-                onClick={() => { setResult(null); setFile(null); }}
-                className="mt-3 font-sans text-[0.8rem] text-[#e53e3e] underline bg-transparent border-0 cursor-pointer"
-              >
-                Upload a different statement
-              </button>
-            )}
+            <p className="font-sans text-[0.78rem] text-[#38a169]">
+              Redirecting to next step…
+            </p>
           </div>
         )}
 

@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     const score = Math.max(0, Math.min(100, analysis.score ?? 0));
-    const passed = score >= 70 && !analysis.flags?.some(f =>
+    const aiPassed = score >= 70 && !analysis.flags?.some(f =>
       f.toLowerCase().includes("lien") || f.toLowerCase().includes("freeze") || f.toLowerCase().includes("fraud")
     );
 
@@ -99,31 +99,30 @@ export async function POST(req: NextRequest) {
       create: {
         userId: user.id,
         layer: "INTERVIEW",
-        status: passed ? "PASSED" : "FAILED",
+        status: aiPassed ? "PASSED" : "FAILED",
         attemptNumber: 1,
         score,
         result: { ...analysis, answers } as object,
-        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        rejectionReason: aiPassed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
         completedAt: new Date(),
       },
       update: {
-        status: passed ? "PASSED" : "FAILED",
+        status: aiPassed ? "PASSED" : "FAILED",
         attemptNumber: { increment: 1 },
         score,
         result: { ...analysis, answers } as object,
-        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        rejectionReason: aiPassed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
         completedAt: new Date(),
       },
     });
 
-    if (passed) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { status: "ONBOARDING_PENDING" },
-      });
-    }
+    // Always advance — compliance team reviews manually
+    await db.user.update({
+      where: { id: user.id },
+      data: { status: "ONBOARDING_PENDING" },
+    });
 
-    return NextResponse.json({ passed, score, flags: analysis.flags, summary: analysis.summary });
+    return NextResponse.json({ passed: true, score, flags: analysis.flags, summary: analysis.summary });
   } catch (err) {
     console.error("[submit-questionnaire]", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });

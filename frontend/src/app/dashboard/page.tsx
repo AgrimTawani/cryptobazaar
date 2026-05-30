@@ -49,7 +49,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
     label: "Screening In Progress",
     color: "#0f766e",
     bg: "#f0fdfa",
-    desc: "Your wallet is being screened. This usually takes a few minutes.",
+    desc: "Your application is under manual review by our compliance team. This typically takes 24–48 hours. You'll be notified once verified.",
   },
   VERIFIED: {
     label: "Verified Member",

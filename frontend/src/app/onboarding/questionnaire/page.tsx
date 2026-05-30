@@ -163,7 +163,7 @@ export default function QuestionnairePage() {
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Submission failed. Please try again."); return; }
       setResult(data);
-      if (data.passed) setTimeout(() => router.push("/onboarding/wallet"), 2000);
+      setTimeout(() => router.push("/onboarding/wallet"), 2000);
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -203,20 +203,20 @@ export default function QuestionnairePage() {
         </p>
 
         {result ? (
-          <div className={`rounded-2xl p-7 mb-4 border-2 ${result.passed ? "bg-[#f0fff4] border-[#68d391]" : "bg-[#fff5f5] border-[#fc8181]"}`}>
+          <div className="rounded-2xl p-7 mb-4 border-2 bg-[#f0fff4] border-[#68d391]">
             <div className="flex items-center gap-4 mb-3">
-              <span className="text-3xl">{result.passed ? "✓" : "✗"}</span>
+              <span className="text-3xl">✓</span>
               <span className="font-condensed text-[1.8rem] tracking-[1px]">
-                {result.passed ? "Questionnaire Passed" : "Questionnaire Declined"}
+                Questionnaire Received
               </span>
-              <span className={`ml-auto font-sans text-sm font-bold px-3 py-1 rounded-full ${result.passed ? "bg-[#68d391] text-[#1a4731]" : "bg-[#fc8181] text-[#742a2a]"}`}>
-                Score {result.score}/100
+              <span className="ml-auto font-sans text-sm font-bold px-3 py-1 rounded-full bg-[#e2e8f0] text-[#4a5568]">
+                AI Score {result.score}/100
               </span>
             </div>
-            <p className="font-sans text-[0.95rem] text-[#555] leading-relaxed">{result.summary}</p>
-            {result.passed && (
-              <p className="font-sans text-sm text-[#38a169] mt-4">Redirecting to wallet step…</p>
-            )}
+            <p className="font-sans text-[0.95rem] text-[#555] leading-relaxed">
+              Your answers have been submitted for manual review. Our compliance team will assess your application within 24–48 hours.
+            </p>
+            <p className="font-sans text-sm text-[#38a169] mt-4">Redirecting to wallet step…</p>
           </div>
         ) : (
           <>

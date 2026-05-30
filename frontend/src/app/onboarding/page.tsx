@@ -17,9 +17,11 @@ interface OnboardingStatus {
 }
 
 function deriveSteps(s: OnboardingStatus): StepStatus[] {
+  // KYC requires PASSED (Didit's binary decision — real failure means redo)
   const kyc: StepStatus = s.kyc === "PASSED" ? "done" : "active";
-  const edd: StepStatus = kyc === "done" ? (s.edd === "PASSED" ? "done" : "active") : "locked";
-  const interview: StepStatus = edd === "done" ? (s.interview === "PASSED" ? "done" : "active") : "locked";
+  // EDD + INTERVIEW: any submitted status (PASSED or FAILED) means done — compliance reviews manually
+  const edd: StepStatus = kyc === "done" ? (s.edd !== "NOT_STARTED" ? "done" : "active") : "locked";
+  const interview: StepStatus = edd === "done" ? (s.interview !== "NOT_STARTED" ? "done" : "active") : "locked";
   const wallet: StepStatus = interview === "done" ? (s.walletAddress ? "done" : "active") : "locked";
   return [kyc, edd, interview, wallet];
 }
@@ -34,13 +36,13 @@ const STEPS = [
   {
     number: "02",
     title: "Bank Statement Review",
-    desc: "Upload 6 months of statements for ML-based EDD scoring.",
+    desc: "Upload 6 months of statements. Score is advisory — our team reviews all submissions.",
     href: "/onboarding/bank-statement",
   },
   {
     number: "03",
     title: "AI Questionnaire",
-    desc: "10 questions scored by AI to assess trading intent and risk.",
+    desc: "11 questions assessed for trading intent. All answers are reviewed manually by our team.",
     href: "/onboarding/questionnaire",
   },
   {

@@ -238,40 +238,39 @@ export async function POST(req: NextRequest) {
     }
 
     const score = Math.max(0, Math.min(100, analysis.score ?? 0));
-    const passed = score >= 60 && !analysis.flagged;
+    const aiPassed = score >= 60 && !analysis.flagged;
 
-    // ── Step 4: Write result to DB ────────────────────────────────────────────
+    // ── Step 4: Write result to DB (honest score, always advance user) ────────
     await db.onboardingRecord.upsert({
       where: { userId_layer: { userId: user.id, layer: "EDD" } },
       create: {
         userId: user.id,
         layer: "EDD",
-        status: passed ? "PASSED" : "FAILED",
+        status: aiPassed ? "PASSED" : "FAILED",
         attemptNumber,
         score,
         result: { ...analysis, forensic, r2Key } as object,
-        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        rejectionReason: aiPassed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
         completedAt: new Date(),
       },
       update: {
-        status: passed ? "PASSED" : "FAILED",
+        status: aiPassed ? "PASSED" : "FAILED",
         attemptNumber: { increment: 1 },
         score,
         result: { ...analysis, forensic, r2Key } as object,
-        rejectionReason: passed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
+        rejectionReason: aiPassed ? null : (analysis.flags?.join("; ") || "Score below threshold"),
         completedAt: new Date(),
       },
     });
 
-    if (passed) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { status: "ONBOARDING_PENDING" },
-      });
-    }
+    // Always advance — compliance team reviews manually
+    await db.user.update({
+      where: { id: user.id },
+      data: { status: "ONBOARDING_PENDING" },
+    });
 
     return NextResponse.json({
-      passed,
+      passed: true,
       score,
       flags: analysis.flags,
       summary: analysis.summary,
