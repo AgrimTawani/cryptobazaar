@@ -1,0 +1,79 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: identus
+      POSTGRES_USER: identus
+      POSTGRES_PASSWORD: identus
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./identus-postgres-init:/docker-entrypoint-initdb.d
+      - identus_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  prism-node:
+    image: ghcr.io/input-output-hk/prism-node:2.3.0
+    environment:
+      NODE_PSQL_HOST: db
+      NODE_PSQL_DATABASE: node_db
+      NODE_PSQL_USERNAME: identus
+      NODE_PSQL_PASSWORD: identus
+    depends_on:
+      db:
+        condition: service_healthy
+
+  cloud-agent:
+    image: ghcr.io/hyperledger/identus-cloud-agent:1.38.0
+    environment:
+      # Pollux (credentials) DB
+      POLLUX_DB_HOST: db
+      POLLUX_DB_PORT: 5432
+      POLLUX_DB_NAME: pollux
+      POLLUX_DB_USER: identus
+      POLLUX_DB_PASSWORD: identus
+      # Connect (connections) DB
+      CONNECT_DB_HOST: db
+      CONNECT_DB_PORT: 5432
+      CONNECT_DB_NAME: connect
+      CONNECT_DB_USER: identus
+      CONNECT_DB_PASSWORD: identus
+      # Agent (wallet/keys) DB
+      AGENT_DB_HOST: db
+      AGENT_DB_PORT: 5432
+      AGENT_DB_NAME: agent
+      AGENT_DB_USER: identus
+      AGENT_DB_PASSWORD: identus
+      # PRISM Node
+      PRISM_NODE_HOST: prism-node
+      PRISM_NODE_PORT: 50053
+      # Auth
+      API_KEY_ENABLED: "true"
+      DEFAULT_WALLET_ENABLED: "true"
+      DEFAULT_WALLET_AUTH_API_KEY: "my-local-api-key"
+      # Store secrets in Postgres (not Vault)
+      SECRET_STORAGE_BACKEND: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: agent
+      POSTGRES_USER: identus
+      POSTGRES_PASSWORD: identus
+      # Endpoints
+      REST_SERVICE_URL: http://localhost:8085
+      DIDCOMM_SERVICE_URL: http://localhost:8090
+    ports:
+      - "8085:8085"
+      - "8090:8090"
+    depends_on:
+      db:
+        condition: service_healthy
+      prism-node:
+        condition: service_started
+
+volumes:
+  identus_pgdata:

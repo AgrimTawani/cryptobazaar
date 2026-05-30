@@ -277,37 +277,14 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Link href="/login" className="cta-primary">Login</Link>
+            {isSignedIn ? (
+              <Link href="/dashboard" className="cta-primary">Dashboard</Link>
+            ) : (
+              <Link href="/login" className="cta-primary">Login</Link>
+            )}
             <button onClick={() => scrollTo("how")} className="cta-secondary">How It Works</button>
           </motion.div>
 
-          <motion.div
-            className="w-full mt-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <div className="hero-marquee-wrapper">
-              <div className="hero-marquee-container">
-                <div className="hero-marquee-depth-left" />
-                <div className="hero-marquee-depth-right" />
-                <div className="hero-marquee-track">
-                  {[...Array(12)].map((_, i) => (
-                    <div key={i} className="flex gap-8 items-center">
-                      <span className="hero-marquee-text">USDT</span>
-                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
-                      <span className="hero-marquee-text">USDC</span>
-                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
-                      <span className="hero-marquee-text">DAI</span>
-                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
-                      <span className="hero-marquee-text">USDe</span>
-                      <span className="hero-marquee-text opacity-50 !text-[0.8rem]">♦</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
