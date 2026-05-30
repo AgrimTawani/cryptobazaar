@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -113,6 +113,8 @@ export default function QuestionnairePage() {
   const [answers, setAnswers] = useState<Answers>({});
   const [submitting, setSubmitting] = useState(false);
   const [itrUploading, setItrUploading] = useState(false);
+  const [itrFileName, setItrFileName] = useState<string | null>(null);
+  const itrInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ passed: boolean; score: number; summary: string } | null>(null);
 
@@ -130,6 +132,7 @@ export default function QuestionnairePage() {
     if (!file) return;
     if (file.type !== "application/pdf") { setError("ITR must be a PDF."); return; }
     if (file.size > 10 * 1024 * 1024) { setError("ITR PDF must be under 10MB."); return; }
+    setItrFileName(file.name);
     setItrUploading(true);
     setError(null);
     try {
@@ -141,6 +144,7 @@ export default function QuestionnairePage() {
       setAnswers((a) => ({ ...a, itr_r2Key: data.r2Key }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
+      setItrFileName(null);
     } finally {
       setItrUploading(false);
     }
@@ -273,24 +277,58 @@ export default function QuestionnairePage() {
                       )}
 
                       {q.id === "itr" && answers["itr"] === "Yes" && (
-                        <div className="mt-3 space-y-2">
-                          <p className="font-sans text-[0.82rem] text-[#555]">
-                            Upload your latest ITR acknowledgement PDF (max 10MB).
-                          </p>
-                          {itrUploading && (
-                            <p className="font-sans text-[0.78rem] text-[#7b3fe4]">Uploading…</p>
-                          )}
-                          {answers["itr_r2Key"] && !itrUploading && (
-                            <p className="font-sans text-[0.78rem] text-[#166534]">✓ ITR uploaded</p>
-                          )}
-                          {!answers["itr_r2Key"] && !itrUploading && (
-                            <input
-                              type="file"
-                              accept="application/pdf"
-                              onChange={handleItrUpload}
-                              className="font-sans text-[0.82rem] text-[#555]"
-                            />
-                          )}
+                        <div className="mt-3">
+                          <div
+                            onClick={() => !answers["itr_r2Key"] && !itrUploading && itrInputRef.current?.click()}
+                            className={`border-[1.5px] border-dashed rounded-xl py-5 px-5 text-center transition-colors duration-150 ${
+                              answers["itr_r2Key"]
+                                ? "border-lime bg-lime/4 cursor-default"
+                                : itrUploading
+                                ? "border-[#ddd] bg-[#fafafa] cursor-wait"
+                                : "border-[#ddd] bg-[#fafafa] cursor-pointer hover:border-[#999]"
+                            }`}
+                          >
+                            {itrUploading ? (
+                              <div className="flex items-center justify-center gap-2">
+                                <span className="w-4 h-4 border-2 border-[#7b3fe4] border-t-transparent rounded-full animate-spin" />
+                                <span className="font-sans text-[0.8rem] text-[#7b3fe4]">Uploading…</span>
+                              </div>
+                            ) : answers["itr_r2Key"] ? (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base">📄</span>
+                                  <span className="font-sans text-[0.82rem] font-semibold text-[#111]">{itrFileName}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="font-sans text-[0.75rem] text-[#166534] font-semibold">✓ Uploaded</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setAnswers((a) => { const n = { ...a }; delete n["itr_r2Key"]; return n; });
+                                      setItrFileName(null);
+                                      if (itrInputRef.current) itrInputRef.current.value = "";
+                                    }}
+                                    className="font-sans text-[0.72rem] text-[#999] underline bg-transparent border-0 cursor-pointer"
+                                  >
+                                    Replace
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="text-xl mb-1">📁</div>
+                                <p className="font-sans text-[0.82rem] font-semibold text-[#333] mb-0.5">Upload ITR acknowledgement PDF</p>
+                                <p className="font-sans text-[0.72rem] text-[#aaa]">Click to browse · max 10MB · optional</p>
+                              </>
+                            )}
+                          </div>
+                          <input
+                            ref={itrInputRef}
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={handleItrUpload}
+                          />
                         </div>
                       )}
                     </div>
