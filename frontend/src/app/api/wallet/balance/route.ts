@@ -21,7 +21,7 @@ const EVM_TOKENS = {
     USDT: { address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", chain: polygonChain, decimals: 6 },
     USDC: {
       address: isAmoy
-        ? (process.env.NEXT_PUBLIC_AMOY_USDC_ADDRESS ?? "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582")
+        ? (process.env.NEXT_PUBLIC_AMOY_USDC_ADDRESS ?? "0x8B0180f2101c8260d49339abfEe87927412494B4")
         : "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
       chain: polygonChain,
       decimals: 6,
