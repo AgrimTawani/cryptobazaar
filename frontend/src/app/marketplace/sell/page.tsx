@@ -10,6 +10,7 @@ import {
   getContract,
   prepareContractCall,
   readContract,
+  waitForReceipt,
   defineChain,
 } from "thirdweb";
 import Link from "next/link";
@@ -153,6 +154,12 @@ export default function SellPage() {
           gas: BigInt(200000),
         })
       );
+      // Verify the createOrder tx didn't revert before touching the DB
+      const receipt = await waitForReceipt({ client: thirdwebClient, chain: amoyChain, transactionHash });
+      if (receipt.status === "reverted") {
+        throw new Error("createOrder transaction reverted on-chain. Your USDC was not moved. Please try again.");
+      }
+
       setTxHash(transactionHash);
 
       // Step 3: Save to DB
