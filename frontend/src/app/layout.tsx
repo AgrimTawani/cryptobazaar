@@ -1,17 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThirdwebProvider, AutoConnect } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
-import { thirdwebClient } from "@/lib/thirdweb";
-
-const wallets = [
-  createWallet("io.metamask"),
-  createWallet("com.coinbase.wallet"),
-  createWallet("walletConnect"),
-  createWallet("io.rabby"),
-  createWallet("io.zerion.wallet"),
-];
+import { ThirdwebProvider } from "thirdweb/react";
+import { ThirdwebAutoConnect } from "@/components/ThirdwebAutoConnect";
 import "./globals.css";
 
 const inter = Inter({
@@ -73,7 +64,7 @@ export default function RootLayout({
         <body className={`${inter.variable}`}>
           <ScrollbarThemer />
           <ThirdwebProvider>
-            <AutoConnect client={thirdwebClient} wallets={wallets} />
+            <ThirdwebAutoConnect />
             {children}
           </ThirdwebProvider>
         </body>
