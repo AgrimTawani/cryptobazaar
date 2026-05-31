@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 const CHAIN_META: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   POLYGON: { label: "Polygon",      color: "#7b3fe4", bg: "#f5f0ff", border: "#c4b5fd", icon: "⬡" },
@@ -28,13 +29,16 @@ interface Props {
 }
 
 export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: Props) {
-  const [chain, setChain]         = useState(initialChain);
-  const [token, setToken]         = useState<TokenPref>("USDC");
-  const [balance, setBalance]     = useState<string | null>(null);
-  const [symbol, setSymbol]       = useState<string | null>(null);
-  const [loading, setLoading]     = useState(true);
-  const [switching, setSwitching] = useState(false);
-  const [copied, setCopied]       = useState(false);
+  const router = useRouter();
+  const [chain, setChain]           = useState(initialChain);
+  const [token, setToken]           = useState<TokenPref>("USDC");
+  const [balance, setBalance]       = useState<string | null>(null);
+  const [symbol, setSymbol]         = useState<string | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [switching, setSwitching]   = useState(false);
+  const [copied, setCopied]         = useState(false);
+  const [unlinking, setUnlinking]   = useState(false);
+  const [confirmUnlink, setConfirmUnlink] = useState(false);
 
   const meta    = CHAIN_META[chain] ?? CHAIN_META.POLYGON;
   const isEvm   = chain === "POLYGON" || chain === "BSC";
@@ -85,6 +89,17 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
     navigator.clipboard.writeText(walletAddress);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleUnlink = async () => {
+    if (!confirmUnlink) { setConfirmUnlink(true); return; }
+    setUnlinking(true);
+    try {
+      await fetch("/api/verification/unlink-wallet", { method: "POST" });
+      router.push("/onboarding/wallet");
+    } finally {
+      setUnlinking(false);
+    }
   };
 
   return (
@@ -156,15 +171,27 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
       </div>
 
       {/* Address */}
-      <div className="flex items-center gap-2 mb-5">
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
         <span className="font-mono text-[0.88rem] text-[#111] tracking-tight">
           {truncate(walletAddress)}
         </span>
         <button
           onClick={handleCopy}
-          className="font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-[8px] py-[2px] rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
+          className="font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
         >
           {copied ? "✓ Copied" : "Copy"}
+        </button>
+        <button
+          onClick={handleUnlink}
+          disabled={unlinking}
+          className="ml-auto font-sans text-[0.68rem] shrink-0 cursor-pointer border rounded-full px-2 py-0.5 transition-colors disabled:opacity-50"
+          style={
+            confirmUnlink
+              ? { color: "#991b1b", borderColor: "#fca5a5", background: "#fff1f2" }
+              : { color: "#999", borderColor: "#e0e0e0", background: "white" }
+          }
+        >
+          {unlinking ? "Unlinking…" : confirmUnlink ? "Tap again to confirm" : "Disconnect"}
         </button>
       </div>
 
