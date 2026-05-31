@@ -5,7 +5,6 @@ import {
   useActiveAccount,
   useSendTransaction,
   useActiveWalletConnectionStatus,
-  ConnectButton,
 } from "thirdweb/react";
 import {
   getContract,
@@ -261,11 +260,11 @@ export default function SellPage() {
           </div>
         )}
         {!walletOk && connectionStatus !== "connecting" && (
-          <div className="bg-[#f5f0ff] border border-[#c4b5fd] rounded-[14px] p-5 mb-6">
-            <p className="font-sans text-sm text-[#5b21b6] mb-3">
-              Connect your wallet to sign the transaction.
+          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[14px] p-5 mb-6 flex items-center gap-3">
+            <span className="text-base shrink-0">🦊</span>
+            <p className="font-sans text-sm text-[#92400e]">
+              Open MetaMask and unlock your registered wallet to continue.
             </p>
-            <ConnectButton client={thirdwebClient} />
           </div>
         )}
 
