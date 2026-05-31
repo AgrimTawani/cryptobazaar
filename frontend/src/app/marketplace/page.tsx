@@ -52,17 +52,32 @@ export default function MarketplacePage() {
   const [isLoadingDb, setIsLoadingDb] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
-      fetch("/api/orders").then((r) => r.json()).catch(() => []),
-      fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
-      new Promise((resolve) => setTimeout(resolve, 1500))
-    ]).then(([statusData, ordersData, myOrdersData]) => {
-      setIsVerified(statusData?.userStatus === "VERIFIED");
-      if (Array.isArray(ordersData)) setOrders(ordersData);
-      if (Array.isArray(myOrdersData)) setMyOrders(myOrdersData);
-      setIsLoadingDb(false);
-    });
+    const fetchData = (initial = false) => {
+      const requests = initial
+        ? [
+            fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
+            fetch("/api/orders").then((r) => r.json()).catch(() => []),
+            fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+            new Promise((resolve) => setTimeout(resolve, 1500)),
+          ]
+        : [
+            Promise.resolve(null),
+            fetch("/api/orders").then((r) => r.json()).catch(() => []),
+            fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+            Promise.resolve(null),
+          ];
+
+      Promise.all(requests).then(([statusData, ordersData, myOrdersData]) => {
+        if (statusData) setIsVerified(statusData?.userStatus === "VERIFIED");
+        if (Array.isArray(ordersData)) setOrders(ordersData);
+        if (Array.isArray(myOrdersData)) setMyOrders(myOrdersData);
+        if (initial) setIsLoadingDb(false);
+      });
+    };
+
+    fetchData(true);
+    const interval = setInterval(() => fetchData(false), 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const filtered = orders.filter((o) => {
