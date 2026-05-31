@@ -18,9 +18,9 @@ function mapOrder(o: {
   amount: { toString(): string }; pricePerUnit: { toString(): string };
   totalValueInr: { toString(): string }; acceptedPaymentMethods: string[];
   escrowTxHash: string | null; escrowContractAddress: string | null;
-  status: string;
+  status: string; sellerId: number;
   seller: { name: string | null; avatarUrl: string | null };
-}) {
+}, currentUserId: number) {
   return {
     id: o.id,
     orderId: o.orderId,
@@ -36,6 +36,7 @@ function mapOrder(o: {
     escrowContractAddress: o.escrowContractAddress ?? null,
     status: o.status,
     statusLabel: STATUS_LABEL[o.status] ?? o.status,
+    isMine: o.sellerId === currentUserId,
   };
 }
 
@@ -62,16 +63,16 @@ export async function GET(request: Request) {
         include: { seller: { select: { name: true, avatarUrl: true } } },
         orderBy: { createdAt: "desc" },
       });
-      return NextResponse.json(orders.map(mapOrder));
+      return NextResponse.json(orders.map((o) => mapOrder(o, user.id)));
     }
 
-    // Public marketplace - LISTED only, exclude user's own orders
+    // Public marketplace - LISTED only, include own orders (marked isMine)
     const orders = await db.order.findMany({
-      where: { status: "LISTED", sellerId: { not: user.id } },
+      where: { status: "LISTED" },
       include: { seller: { select: { name: true, avatarUrl: true } } },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(orders.map(mapOrder));
+    return NextResponse.json(orders.map((o) => mapOrder(o, user.id)));
   } catch (err) {
     console.error("[orders GET]", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });

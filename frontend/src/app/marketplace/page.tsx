@@ -32,6 +32,7 @@ interface OrderRow {
   escrowContractAddress: string | null;
   status: string;
   statusLabel: string;
+  isMine: boolean;
 }
 
 const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
@@ -298,12 +299,21 @@ export default function MarketplacePage() {
 
             {/* Action */}
             <div className="flex flex-col items-start gap-[5px]">
-              <Link
-                href={`/marketplace/${order.id}`}
-                className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#333] transition-colors"
-              >
-                Buy
-              </Link>
+              {order.isMine ? (
+                <Link
+                  href={`/marketplace/${order.id}`}
+                  className="font-sans text-[0.78rem] font-semibold text-[#7b3fe4] border border-[#c4b5fd] bg-[#f5f0ff] py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#ede9fe] transition-colors"
+                >
+                  Your listing →
+                </Link>
+              ) : (
+                <Link
+                  href={`/marketplace/${order.id}`}
+                  className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full text-center no-underline hover:bg-[#333] transition-colors"
+                >
+                  Buy
+                </Link>
+              )}
               {order.escrowTxHash && (
                 <a
                   href={txUrl(order.escrowTxHash)}
@@ -345,8 +355,12 @@ export default function MarketplacePage() {
                     ₹{parseFloat(order.pricePerUnit).toFixed(2)} / unit
                   </p>
                 </div>
-                <span className="font-sans text-[0.78rem] font-semibold text-white bg-black py-[6px] px-4 rounded-full">
-                  Buy
+                <span className={`font-sans text-[0.78rem] font-semibold py-1.5 px-4 rounded-full ${
+                  order.isMine
+                    ? "text-[#7b3fe4] border border-[#c4b5fd] bg-[#f5f0ff]"
+                    : "text-white bg-black"
+                }`}>
+                  {order.isMine ? "Your listing →" : "Buy"}
                 </span>
               </div>
             </Link>
@@ -358,11 +372,12 @@ export default function MarketplacePage() {
           <div className="text-center py-20 px-6">
             <div className="text-5xl mb-4">📭</div>
             <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-2">
-              No listings yet
+              No other listings yet
             </h3>
             <p className="font-sans text-sm text-[#888] max-w-[320px] mx-auto mb-6 leading-[1.6]">
-              Be the first to post a sell order. The marketplace opens to
-              verified members only.
+              {myOrders.length > 0
+                ? "Your listing is live and visible to buyers. No other sellers have posted yet."
+                : "Be the first to post a sell order. The marketplace opens to verified members only."}
             </p>
             {isVerified ? (
               <Link
