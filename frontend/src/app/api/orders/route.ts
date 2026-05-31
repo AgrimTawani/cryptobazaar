@@ -101,9 +101,6 @@ export async function POST(request: Request) {
       escrowTxHash,
       escrowContractAddress,
       paymentMethods,
-      sellerUpiId,
-      sellerBankAccount,
-      sellerIfsc,
     } = body;
 
     const amountNum = parseFloat(amount);
@@ -121,9 +118,9 @@ export async function POST(request: Request) {
         acceptedPaymentMethods: paymentMethods,
         escrowContractAddress: escrowContractAddress ?? null,
         escrowTxHash: escrowTxHash ?? null,
-        sellerUpiId: sellerUpiId ?? null,
-        sellerBankAccount: sellerBankAccount ?? null,
-        sellerIfsc: sellerIfsc ?? null,
+        sellerUpiId: user.upiId ?? null,
+        sellerBankAccount: user.bankAccount ?? null,
+        sellerIfsc: user.ifscCode ?? null,
         status: "LISTED",
       },
     });

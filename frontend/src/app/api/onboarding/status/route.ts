@@ -52,6 +52,9 @@ export async function GET() {
       kyc: kyc?.status ?? "NOT_STARTED",
       edd: edd?.status ?? "NOT_STARTED",
       interview: interview?.status ?? "NOT_STARTED",
+      upiId: user.upiId ?? null,
+      bankAccount: user.bankAccount ?? null,
+      ifscCode: user.ifscCode ?? null,
     });
   } catch (err) {
     console.error("[onboarding/status]", err);

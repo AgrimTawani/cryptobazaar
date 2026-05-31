@@ -158,10 +158,14 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
+    const upiId = (formData.get("upiId") as string | null)?.trim() || null;
+    const bankAccount = (formData.get("bankAccount") as string | null)?.trim() || null;
+    const ifscCode = (formData.get("ifscCode") as string | null)?.trim().toUpperCase() || null;
 
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
     if (file.type !== "application/pdf") return NextResponse.json({ error: "PDF only" }, { status: 400 });
     if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: "Max 10MB" }, { status: 400 });
+    if (!bankAccount || !ifscCode) return NextResponse.json({ error: "Bank account and IFSC are required" }, { status: 400 });
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -266,7 +270,7 @@ export async function POST(req: NextRequest) {
     // Always advance — compliance team reviews manually
     await db.user.update({
       where: { id: user.id },
-      data: { status: "ONBOARDING_PENDING" },
+      data: { status: "ONBOARDING_PENDING", upiId, bankAccount, ifscCode },
     });
 
     return NextResponse.json({

@@ -19,5 +19,15 @@ export async function POST() {
     update: { status: "PASSED", completedAt: new Date(), result: { dev: true } },
   });
 
+  // Set dummy payment details so sell page works in dev without re-onboarding
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      upiId: user.upiId ?? "dev@upi",
+      bankAccount: user.bankAccount ?? "000000000000",
+      ifscCode: user.ifscCode ?? "HDFC0000000",
+    },
+  });
+
   return NextResponse.json({ ok: true });
 }

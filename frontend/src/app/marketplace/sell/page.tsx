@@ -67,14 +67,16 @@ export default function SellPage() {
     address: string;
     chain: string;
   } | null>(null);
+  const [profilePayment, setProfilePayment] = useState<{
+    upiId: string | null;
+    bankAccount: string | null;
+    ifscCode: string | null;
+  } | null>(null);
   const [amount, setAmount] = useState("");
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     "UPI",
   ]);
-  const [upiId, setUpiId] = useState("");
-  const [bankAccount, setBankAccount] = useState("");
-  const [ifsc, setIfsc] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -88,6 +90,13 @@ export default function SellPage() {
       if (d.walletAddress && d.walletChain) {
         setWalletInfo({ address: d.walletAddress, chain: d.walletChain });
       }
+      setProfilePayment({
+        upiId: d.upiId ?? null,
+        bankAccount: d.bankAccount ?? null,
+        ifscCode: d.ifscCode ?? null,
+      });
+      // Only pre-select UPI if user has a UPI ID on profile
+      if (!d.upiId) setPaymentMethods((prev) => prev.filter((m) => m !== "UPI"));
       setIsLoadingDb(false);
     });
   }, []);
@@ -114,13 +123,8 @@ export default function SellPage() {
       return "Enter a valid price.";
     if (paymentMethods.length === 0)
       return "Select at least one payment method.";
-    if (paymentMethods.includes("UPI") && !upiId.trim())
-      return "Enter your UPI ID.";
-    if (
-      (paymentMethods.includes("IMPS") || paymentMethods.includes("NEFT")) &&
-      (!bankAccount.trim() || !ifsc.trim())
-    )
-      return "Enter your bank account number and IFSC code.";
+    if (!profilePayment?.bankAccount || !profilePayment?.ifscCode)
+      return "Payment details missing from your profile. Please complete the bank statement step in onboarding.";
     return null;
   };
 
@@ -173,7 +177,7 @@ export default function SellPage() {
 
       setTxHash(transactionHash);
 
-      // Step 3: Save to DB
+      // Step 3: Save to DB — payment details are pulled server-side from user profile
       setStep("saving");
       const orderId = `${ESCROW_ADDR.toLowerCase()}_${nextId.toString()}`;
       await fetch("/api/orders", {
@@ -188,9 +192,6 @@ export default function SellPage() {
           escrowTxHash: transactionHash,
           escrowContractAddress: ESCROW_ADDR,
           paymentMethods,
-          sellerUpiId: upiId || null,
-          sellerBankAccount: bankAccount || null,
-          sellerIfsc: ifsc || null,
         }),
       });
 
@@ -207,8 +208,6 @@ export default function SellPage() {
 
   const isBusy =
     step === "approving" || step === "creating" || step === "saving";
-  const needsBank =
-    paymentMethods.includes("IMPS") || paymentMethods.includes("NEFT");
 
   if (isLoadingDb) {
     return <LoadingSpinner />;
@@ -374,8 +373,8 @@ export default function SellPage() {
                 ["Price per USDC", `₹${pricePerUnit}`],
                 ["Total value", `₹${totalInr ? parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}`],
                 ["Payment methods", paymentMethods.join(", ")],
-                ...(upiId ? [["UPI ID", upiId]] : []),
-                ...(bankAccount ? [["Bank account", bankAccount], ["IFSC", ifsc]] : []),
+                ...(profilePayment?.upiId ? [["UPI ID", profilePayment.upiId]] : []),
+                ...(profilePayment?.bankAccount ? [["Bank account", profilePayment.bankAccount], ["IFSC", profilePayment.ifscCode ?? ""]] : []),
               ].map(([k, v]) => (
                 <div key={k}>
                   <p className="font-sans text-[0.68rem] text-[#999] uppercase tracking-[1px]">{k}</p>
@@ -464,7 +463,7 @@ export default function SellPage() {
               Accepted Payment Methods
             </label>
             <div className="flex gap-2">
-              {(["UPI", "IMPS", "NEFT"] as PaymentMethod[]).map((method) => (
+              {(["UPI", "IMPS", "NEFT"] as PaymentMethod[]).filter((m) => m !== "UPI" || !!profilePayment?.upiId).map((method) => (
                 <button
                   key={method}
                   type="button"
@@ -481,51 +480,35 @@ export default function SellPage() {
             </div>
           </div>
 
-          {/* UPI ID */}
-          {paymentMethods.includes("UPI") && (
-            <div>
-              <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
-                Your UPI ID
-              </label>
-              <input
-                type="text"
-                value={upiId}
-                onChange={(e) => setUpiId(e.target.value)}
-                placeholder="e.g. yourname@upi"
-                className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
-              />
-            </div>
-          )}
-
-          {/* Bank details */}
-          {needsBank && (
-            <div className="space-y-3">
-              <div>
-                <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
-                  Bank Account Number
-                </label>
-                <input
-                  type="text"
-                  value={bankAccount}
-                  onChange={(e) => setBankAccount(e.target.value)}
-                  placeholder="e.g. 123456789012"
-                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
-                />
+          {/* Payment details — read-only from profile */}
+          <div className="bg-[#f8f8f8] border border-[#e5e5e5] rounded-[12px] px-4 py-4 space-y-3">
+            <p className="font-sans text-[0.72rem] font-semibold text-[#999] uppercase tracking-[1px]">
+              Your Payment Details
+            </p>
+            {profilePayment?.bankAccount ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="font-sans text-[0.65rem] text-[#aaa] uppercase tracking-[1px] mb-[2px]">Bank Account</p>
+                  <p className="font-mono text-[0.85rem] font-semibold text-[#111]">{profilePayment.bankAccount}</p>
+                </div>
+                <div>
+                  <p className="font-sans text-[0.65rem] text-[#aaa] uppercase tracking-[1px] mb-[2px]">IFSC</p>
+                  <p className="font-mono text-[0.85rem] font-semibold text-[#111]">{profilePayment.ifscCode}</p>
+                </div>
+                {profilePayment.upiId && (
+                  <div className="col-span-2">
+                    <p className="font-sans text-[0.65rem] text-[#aaa] uppercase tracking-[1px] mb-[2px]">UPI ID</p>
+                    <p className="font-mono text-[0.85rem] font-semibold text-[#111]">{profilePayment.upiId}</p>
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
-                  IFSC Code
-                </label>
-                <input
-                  type="text"
-                  value={ifsc}
-                  onChange={(e) => setIfsc(e.target.value.toUpperCase())}
-                  placeholder="e.g. HDFC0001234"
-                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
-                />
-              </div>
-            </div>
-          )}
+            ) : (
+              <p className="font-sans text-[0.8rem] text-[#dc2626]">
+                No payment details on file. Complete the bank statement step in{" "}
+                <Link href="/onboarding/bank-statement" className="underline">onboarding</Link>.
+              </p>
+            )}
+          </div>
 
           {/* Error */}
           {errorMsg && (

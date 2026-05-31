@@ -142,6 +142,11 @@ model User {
   kycSessionId  String?   @map("kyc_session_id")
   kycVerifiedAt DateTime? @map("kyc_verified_at")
 
+  // Payment details — collected during bank statement step
+  upiId       String? @map("upi_id")
+  bankAccount String? @map("bank_account")
+  ifscCode    String? @map("ifsc_code")
+
   // Wallet
   walletAddress    String?   @unique @map("wallet_address")
   walletChain      String?   @map("wallet_chain")

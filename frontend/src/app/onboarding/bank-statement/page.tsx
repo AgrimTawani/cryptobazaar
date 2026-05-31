@@ -14,6 +14,10 @@ export default function BankStatementPage() {
   const [result, setResult] = useState<Result | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [upiId, setUpiId] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [ifscCode, setIfscCode] = useState("");
+
   const handleFile = (f: File) => {
     if (f.type !== "application/pdf") {
       setError("Only PDF files are accepted.");
@@ -33,14 +37,19 @@ export default function BankStatementPage() {
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   };
 
+  const canSubmit = !!file && bankAccount.trim().length > 0 && ifscCode.trim().length > 0;
+
   const handleSubmit = async () => {
-    if (!file || analyzing) return;
+    if (!canSubmit || analyzing) return;
     setAnalyzing(true);
     setError(null);
 
     try {
       const form = new FormData();
-      form.append("file", file);
+      form.append("file", file!);
+      form.append("upiId", upiId.trim());
+      form.append("bankAccount", bankAccount.trim());
+      form.append("ifscCode", ifscCode.trim().toUpperCase());
 
       const res = await fetch("/api/verification/analyze-statement", {
         method: "POST",
@@ -170,6 +179,52 @@ export default function BankStatementPage() {
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
             />
 
+            {/* Payment details */}
+            <div className="space-y-3 mb-5">
+              <p className="font-sans text-[0.72rem] font-semibold text-[#999] uppercase tracking-[1px]">
+                Your Payment Details
+              </p>
+              <div>
+                <label className="font-sans text-[0.75rem] font-semibold text-[#333] block mb-1">
+                  Bank Account Number <span className="text-[#e53e3e]">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={bankAccount}
+                  onChange={(e) => setBankAccount(e.target.value)}
+                  placeholder="e.g. 123456789012"
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="font-sans text-[0.75rem] font-semibold text-[#333] block mb-1">
+                  IFSC Code <span className="text-[#e53e3e]">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={ifscCode}
+                  onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. HDFC0001234"
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="font-sans text-[0.75rem] font-semibold text-[#333] block mb-1">
+                  UPI ID <span className="font-normal text-[#aaa]">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={upiId}
+                  onChange={(e) => setUpiId(e.target.value)}
+                  placeholder="e.g. yourname@upi"
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+              </div>
+              <p className="font-sans text-[0.7rem] text-[#aaa] leading-[1.5]">
+                These are stored on your profile and used to pre-fill every sell order you create. Buyers see them only after locking an order.
+              </p>
+            </div>
+
             {error && (
               <p className="font-sans text-[0.8rem] text-[#e53e3e] mb-4">
                 {error}
@@ -187,9 +242,9 @@ export default function BankStatementPage() {
 
             <button
               onClick={handleSubmit}
-              disabled={!file || analyzing}
+              disabled={!canSubmit || analyzing}
               className={`w-full py-[14px] border-0 rounded-[10px] font-sans text-[0.925rem] font-semibold transition-colors duration-200 ${
-                file && !analyzing
+                canSubmit && !analyzing
                   ? "bg-black text-white cursor-pointer"
                   : "bg-[#f0f0f0] text-[#aaa] cursor-not-allowed"
               }`}
