@@ -110,6 +110,17 @@ export async function PATCH(
             paymentWindowExpiresAt: new Date(Date.now() + 30 * 60 * 1000),
           },
         });
+
+        // Create chat room + opening system message
+        const room = await db.chatRoom.create({ data: { orderId: id } });
+        await db.chatMessage.create({
+          data: {
+            chatRoomId: room.id,
+            senderId: null,
+            type: "SYSTEM",
+            content: `Order locked by ${user.name ?? "buyer"}. You have 30 minutes to send ₹${parseFloat(order.totalValueInr.toString()).toLocaleString("en-IN")} and submit payment proof.`,
+          },
+        });
         break;
       }
 
@@ -127,6 +138,19 @@ export async function PATCH(
             paymentSubmittedAt: new Date(),
           },
         });
+
+        // System message
+        const roomPaid = await db.chatRoom.findUnique({ where: { orderId: id } });
+        if (roomPaid) {
+          await db.chatMessage.create({
+            data: {
+              chatRoomId: roomPaid.id,
+              senderId: null,
+              type: "SYSTEM",
+              content: `Buyer submitted payment proof${utr ? ` (UTR: ${utr})` : ""}. Seller — check your account before confirming.`,
+            },
+          });
+        }
         break;
       }
 
@@ -144,6 +168,19 @@ export async function PATCH(
             completedAt: new Date(),
           },
         });
+
+        // System message
+        const roomConfirm = await db.chatRoom.findUnique({ where: { orderId: id } });
+        if (roomConfirm) {
+          await db.chatMessage.create({
+            data: {
+              chatRoomId: roomConfirm.id,
+              senderId: null,
+              type: "SYSTEM",
+              content: "Seller confirmed INR received. USDC is being released to the buyer's wallet.",
+            },
+          });
+        }
         break;
       }
 
@@ -157,6 +194,19 @@ export async function PATCH(
           where: { id },
           data: { status: "DISPUTED" },
         });
+
+        // System message
+        const roomDispute = await db.chatRoom.findUnique({ where: { orderId: id } });
+        if (roomDispute) {
+          await db.chatMessage.create({
+            data: {
+              chatRoomId: roomDispute.id,
+              senderId: null,
+              type: "SYSTEM",
+              content: "Dispute raised. Admin will review and resolve within 24 hours. Do not make further payments.",
+            },
+          });
+        }
         break;
       }
 

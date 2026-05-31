@@ -35,7 +35,7 @@ const usdcContract = getContract({
   address: USDC_ADDR,
 });
 
-type Step = "form" | "approving" | "creating" | "saving" | "done" | "error";
+type Step = "form" | "review" | "approving" | "creating" | "saving" | "done" | "error";
 type PaymentMethod = "UPI" | "IMPS" | "NEFT";
 
 const STEPS: { key: Step; label: string }[] = [
@@ -333,10 +333,54 @@ export default function SellPage() {
           </div>
         )}
 
+        {/* Review panel */}
+        {step === "review" && (
+          <div className="bg-white border-[1.5px] border-black rounded-[14px] p-6 mb-6 space-y-4">
+            <h2 className="font-condensed text-[1.5rem] tracking-[0.5px]">Confirm your listing</h2>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                ["Amount", `${amount} USDC`],
+                ["Price per USDC", `₹${pricePerUnit}`],
+                ["Total value", `₹${totalInr ? parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}`],
+                ["Payment methods", paymentMethods.join(", ")],
+                ...(upiId ? [["UPI ID", upiId]] : []),
+                ...(bankAccount ? [["Bank account", bankAccount], ["IFSC", ifsc]] : []),
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <p className="font-sans text-[0.68rem] text-[#999] uppercase tracking-[1px]">{k}</p>
+                  <p className="font-sans text-[0.88rem] font-semibold text-[#111]">{v}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[10px] px-4 py-3">
+              <p className="font-sans text-[0.78rem] text-[#92400e] leading-[1.6]">
+                MetaMask will ask you to approve exactly <strong>{amount} USDC</strong> for the escrow — not unlimited. No extra permissions are granted.
+              </p>
+            </div>
+
+            <div className="flex gap-3 pt-1">
+              <button
+                onClick={() => setStep("form")}
+                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-[10px] font-sans text-[0.88rem] text-[#555] cursor-pointer bg-white"
+              >
+                ← Back to Edit
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="flex-1 py-3 bg-black text-white rounded-[10px] font-sans text-[0.88rem] font-semibold cursor-pointer"
+              >
+                Confirm & Approve USDC →
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Form */}
         <div
           className={`space-y-5 ${
-            isBusy || step === "done" ? "opacity-50 pointer-events-none" : ""
+            isBusy || step === "done" || step === "review" ? "opacity-50 pointer-events-none" : ""
           }`}
         >
           {/* Amount */}
@@ -460,10 +504,15 @@ export default function SellPage() {
             </div>
           )}
 
-          {/* Submit */}
+          {/* Submit — goes to review step first */}
           <button
             type="button"
-            onClick={handleSubmit}
+            onClick={() => {
+              const err = validate();
+              if (err) { setErrorMsg(err); return; }
+              setErrorMsg("");
+              setStep("review");
+            }}
             disabled={!account || isBusy || step === "done"}
             className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
@@ -473,7 +522,7 @@ export default function SellPage() {
                 : step === "creating"
                 ? "Creating Order…"
                 : "Saving…"
-              : "Create Order →"}
+              : "Review Order →"}
           </button>
 
           <p className="font-sans text-[0.78rem] text-[#999] text-center leading-[1.6]">
