@@ -6,8 +6,17 @@ import { useRouter } from "next/navigation";
 import { ConnectEmbed } from "thirdweb/react";
 import { useActiveAccount, useActiveWallet, useDisconnect } from "thirdweb/react";
 import { defineChain } from "thirdweb";
+import { createWallet } from "thirdweb/wallets";
 import { polygon } from "thirdweb/chains";
 import { thirdwebClient } from "@/lib/thirdweb";
+
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("walletConnect"),
+  createWallet("io.rabby"),
+  createWallet("io.zerion.wallet"),
+];
 
 const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "137");
 const activeChain = CHAIN_ID === 80002 ? defineChain(80002) : polygon;
@@ -144,6 +153,8 @@ export default function WalletPage() {
             <ConnectEmbed
               client={thirdwebClient}
               chain={activeChain}
+              wallets={wallets}
+              showThirdwebBranding={false}
               theme="light"
               style={{ width: "100%", border: "none", boxShadow: "none", padding: 0 }}
             />
