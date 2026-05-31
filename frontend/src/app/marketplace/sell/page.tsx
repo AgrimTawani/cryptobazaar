@@ -5,7 +5,9 @@ import {
   useActiveAccount,
   useSendTransaction,
   useActiveWalletConnectionStatus,
+  useConnect,
 } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 import {
   getContract,
   prepareContractCall,
@@ -52,7 +54,14 @@ export default function SellPage() {
   const account = useActiveAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
   const walletOk = connectionStatus === "connected" && !!account;
+  const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
+
+  const reconnectWallet = () => connect(async () => {
+    const wallet = createWallet("io.metamask");
+    await wallet.connect({ client: thirdwebClient });
+    return wallet;
+  });
 
   const [walletInfo, setWalletInfo] = useState<{
     address: string;
@@ -260,11 +269,17 @@ export default function SellPage() {
           </div>
         )}
         {!walletOk && connectionStatus !== "connecting" && (
-          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[14px] p-5 mb-6 flex items-center gap-3">
-            <span className="text-base shrink-0">🦊</span>
-            <p className="font-sans text-sm text-[#92400e]">
-              Open MetaMask and unlock your registered wallet to continue.
-            </p>
+          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[14px] p-5 mb-6 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-base shrink-0">🦊</span>
+              <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
+            </div>
+            <button
+              onClick={reconnectWallet}
+              className="font-sans text-[0.78rem] font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0 hover:bg-[#78350f] transition-colors"
+            >
+              Reconnect →
+            </button>
           </div>
         )}
 

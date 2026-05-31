@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus } from "thirdweb/react";
+import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, useConnect } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
@@ -79,7 +79,14 @@ const CHAT_STATES = ["BUYER_MATCHED", "BUYER_PAID", "COMPLETED", "DISPUTED"];
 export default function TradePage({ params }: { params: Promise<{ id: string }> }) {
   const account = useActiveAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
+  const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
+
+  const reconnectWallet = () => connect(async () => {
+    const wallet = createWallet("io.metamask");
+    await wallet.connect({ client: thirdwebClient });
+    return wallet;
+  });
 
   const [id, setId] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderDetail | null>(null);
@@ -321,11 +328,17 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           order.status === "BUYER_MATCHED" ||
           order.status === "BUYER_PAID"
         ) && (
-          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
-            <span className="text-base shrink-0">🦊</span>
-            <p className="font-sans text-[0.82rem] text-[#92400e]">
-              Open MetaMask and unlock your registered wallet to sign this transaction.
-            </p>
+          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl px-4 py-3 mb-6 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-base shrink-0">🦊</span>
+              <p className="font-sans text-[0.82rem] text-[#92400e]">Wallet disconnected.</p>
+            </div>
+            <button
+              onClick={reconnectWallet}
+              className="font-sans text-[0.78rem] font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0 hover:bg-[#78350f] transition-colors"
+            >
+              Reconnect →
+            </button>
           </div>
         )}
 
