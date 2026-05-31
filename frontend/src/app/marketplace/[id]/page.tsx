@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useActiveAccount, useSendTransaction } from "thirdweb/react";
+import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
 import { thirdwebClient } from "@/lib/thirdweb";
@@ -77,6 +78,7 @@ const CHAT_STATES = ["BUYER_MATCHED", "BUYER_PAID", "COMPLETED", "DISPUTED"];
 
 export default function TradePage({ params }: { params: Promise<{ id: string }> }) {
   const account = useActiveAccount();
+  const connectionStatus = useActiveWalletConnectionStatus();
   const { mutateAsync: sendTx } = useSendTransaction();
 
   const [id, setId] = useState<string | null>(null);
@@ -258,6 +260,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
   const { viewerRole: role } = order;
   const isEvm = order.chain === "POLYGON" || order.chain === "BSC";
+  // Wallet is ready to sign: non-EVM chain never needs it; EVM needs fully connected + account
+  const walletOk = !isEvm || (connectionStatus === "connected" && !!account);
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
@@ -304,11 +308,18 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           )}
         </div>
 
-        {/* MetaMask nudge — only when user needs to sign, no connect UI */}
-        {isEvm && !account && (
-          (order.status === "LISTED" && role !== "seller") ||
-          (order.status === "BUYER_MATCHED" && role === "buyer") ||
-          (order.status === "BUYER_PAID" && role === "seller")
+        {/* Reconnecting banner — ThirdWeb auto-connect in progress */}
+        {isEvm && connectionStatus === "connecting" && !TERMINAL.includes(order.status) && (
+          <div className="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+            <span className="w-4 h-4 border-2 border-[#0369a1] border-t-transparent rounded-full animate-spin shrink-0" />
+            <p className="font-sans text-[0.82rem] text-[#0369a1]">Reconnecting wallet…</p>
+          </div>
+        )}
+        {/* MetaMask nudge — fully disconnected and action required */}
+        {isEvm && !walletOk && connectionStatus !== "connecting" && (
+          order.status === "LISTED" ||
+          order.status === "BUYER_MATCHED" ||
+          order.status === "BUYER_PAID"
         ) && (
           <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
             <span className="text-base shrink-0">🦊</span>
@@ -356,7 +367,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       params: [onChainId],
                     }));
                   })}
-                  disabled={!!busy}
+                  disabled={!!busy || !walletOk}
                   className="font-sans text-[0.82rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-[8px] cursor-pointer disabled:opacity-40"
                 >
                   {busy === "cancel" ? "Cancelling…" : "Cancel Order"}
@@ -399,7 +410,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         params: [onChainId],
                       }));
                     })}
-                    disabled={!!busy || (!account && isEvm)}
+                    disabled={!!busy || !walletOk}
                     className="flex-1 py-3 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[0.5px] cursor-pointer disabled:opacity-40"
                   >
                     {busy === "lock" ? "Locking…" : "Lock Order & Start Timer →"}
@@ -409,7 +420,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             ) : (
               <button
                 onClick={() => setShowBuyConfirm(true)}
-                disabled={!!busy || (!account && isEvm)}
+                disabled={!!busy || !walletOk}
                 className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40"
               >
                 {`Buy → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
@@ -521,7 +532,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       params: [onChainId],
                     }));
                   })}
-                  disabled={!!busy || !utrInput.trim() || !screenshotUploaded}
+                  disabled={!!busy || !walletOk || !utrInput.trim() || !screenshotUploaded}
                   className="w-full py-4 bg-black text-white rounded-xl font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40"
                 >
                   {busy === "markPaid" ? "Submitting…" : "I've Paid — Submit Proof →"}
@@ -543,7 +554,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         params: [onChainId],
                       }));
                     })}
-                    disabled={!!busy}
+                    disabled={!!busy || !walletOk}
                     className="font-sans text-[0.82rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-[8px] cursor-pointer disabled:opacity-40"
                   >
                     {busy === "timeout" ? "Cancelling…" : "Reclaim (Timeout)"}
@@ -593,7 +604,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       params: [onChainId],
                     }));
                   })}
-                  disabled={!!busy}
+                  disabled={!!busy || !walletOk}
                   className="flex-1 py-4 bg-black text-white rounded-[12px] font-condensed text-[1.1rem] tracking-[1px] cursor-pointer disabled:opacity-40"
                 >
                   {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
@@ -606,7 +617,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       params: [onChainId],
                     }));
                   })}
-                  disabled={!!busy}
+                  disabled={!!busy || !walletOk}
                   className="px-5 py-4 border-[1.5px] border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-[12px] font-sans text-[0.85rem] font-semibold cursor-pointer disabled:opacity-40"
                 >
                   {busy === "dispute" ? "…" : "⚡ Dispute"}
@@ -623,7 +634,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     params: [onChainId],
                   }));
                 })}
-                disabled={!!busy}
+                disabled={!!busy || !walletOk}
                 className="font-sans text-[0.82rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-[8px] cursor-pointer disabled:opacity-40"
               >
                 {busy === "dispute" ? "Raising dispute…" : "⚡ Raise Dispute"}

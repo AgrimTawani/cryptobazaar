@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   useActiveAccount,
   useSendTransaction,
+  useActiveWalletConnectionStatus,
   ConnectButton,
 } from "thirdweb/react";
 import {
@@ -50,6 +51,8 @@ const STEP_ORDER = STEPS.map((s) => s.key);
 export default function SellPage() {
   const router = useRouter();
   const account = useActiveAccount();
+  const connectionStatus = useActiveWalletConnectionStatus();
+  const walletOk = connectionStatus === "connected" && !!account;
   const { mutateAsync: sendTx } = useSendTransaction();
 
   const [walletInfo, setWalletInfo] = useState<{
@@ -251,7 +254,13 @@ export default function SellPage() {
         </p>
 
         {/* Wallet connection */}
-        {!account && (
+        {connectionStatus === "connecting" && (
+          <div className="bg-[#f0f9ff] border border-[#bae6fd] rounded-[14px] p-5 mb-6 flex items-center gap-3">
+            <span className="w-4 h-4 border-2 border-[#0369a1] border-t-transparent rounded-full animate-spin shrink-0" />
+            <p className="font-sans text-sm text-[#0369a1]">Reconnecting wallet…</p>
+          </div>
+        )}
+        {!walletOk && connectionStatus !== "connecting" && (
           <div className="bg-[#f5f0ff] border border-[#c4b5fd] rounded-[14px] p-5 mb-6">
             <p className="font-sans text-sm text-[#5b21b6] mb-3">
               Connect your wallet to sign the transaction.
@@ -520,7 +529,7 @@ export default function SellPage() {
               setErrorMsg("");
               setStep("review");
             }}
-            disabled={!account || isBusy || step === "done"}
+            disabled={!walletOk || isBusy || step === "done"}
             className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
             {isBusy
