@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useActiveAccount, useSendTransaction, ConnectButton } from "thirdweb/react";
+import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
 import { thirdwebClient } from "@/lib/thirdweb";
@@ -304,15 +304,17 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           )}
         </div>
 
-        {/* Wallet connect prompt — only when user has an action requiring signing */}
+        {/* MetaMask nudge — only when user needs to sign, no connect UI */}
         {isEvm && !account && (
           (order.status === "LISTED" && role !== "seller") ||
           (order.status === "BUYER_MATCHED" && role === "buyer") ||
           (order.status === "BUYER_PAID" && role === "seller")
         ) && (
-          <div className="bg-[#f5f0ff] border border-[#c4b5fd] rounded-[14px] p-5 mb-6">
-            <p className="font-sans text-sm text-[#5b21b6] mb-3">Connect your wallet to interact with this order.</p>
-            <ConnectButton client={thirdwebClient} />
+          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+            <span className="text-base shrink-0">🦊</span>
+            <p className="font-sans text-[0.82rem] text-[#92400e]">
+              Open MetaMask and unlock your registered wallet to sign this transaction.
+            </p>
           </div>
         )}
 
