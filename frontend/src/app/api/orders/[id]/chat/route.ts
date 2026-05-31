@@ -33,13 +33,29 @@ export async function GET(
     const ctx = await resolveParties(id, clerkId);
     if (!ctx) return NextResponse.json({ error: "Not found or forbidden" }, { status: 403 });
 
-    const messages = ctx.order.chatRoom?.messages ?? [];
+    const room = ctx.order.chatRoom;
+    const messages = room?.messages ?? [];
+
+    // Mark messages from the other party as read
+    if (room) {
+      await db.chatMessage.updateMany({
+        where: {
+          chatRoomId: room.id,
+          senderId: { not: ctx.user.id },
+          isRead: false,
+          type: "TEXT",
+        },
+        data: { isRead: true },
+      });
+    }
+
     return NextResponse.json(
       messages.map((m) => ({
         id: m.id,
         type: m.type,
         content: m.content,
         mine: m.senderId === ctx.user.id,
+        isRead: m.isRead,
         senderName: m.sender?.name ?? null,
         senderAvatar: m.sender?.avatarUrl ?? null,
         createdAt: m.createdAt.toISOString(),

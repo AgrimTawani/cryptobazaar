@@ -63,9 +63,14 @@ interface ChatMsg {
   type: "TEXT" | "SYSTEM";
   content: string;
   mine: boolean;
+  isRead: boolean;
   senderName: string | null;
   senderAvatar: string | null;
   createdAt: string;
+}
+
+function fmtTime(iso: string) {
+  return new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
 }
 
 const CHAT_STATES = ["BUYER_MATCHED", "BUYER_PAID", "COMPLETED", "DISPUTED"];
@@ -266,7 +271,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
       </header>
 
       <div className={`mx-auto py-10 px-6 ${CHAT_STATES.includes(order.status) ? "max-w-[1100px]" : "max-w-[600px]"}`}>
-        <div className={CHAT_STATES.includes(order.status) ? "grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start" : ""}><div>
+        <div className={CHAT_STATES.includes(order.status) ? "grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8 items-start" : ""}><div>
 
         {/* Title */}
         <div className="mb-6">
@@ -299,8 +304,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           )}
         </div>
 
-        {/* Wallet connect prompt for EVM chains */}
-        {isEvm && !account && !TERMINAL.includes(order.status) && (
+        {/* Wallet connect prompt — only when user has an action requiring signing */}
+        {isEvm && !account && (
+          (order.status === "LISTED" && role !== "seller") ||
+          (order.status === "BUYER_MATCHED" && role === "buyer") ||
+          (order.status === "BUYER_PAID" && role === "seller")
+        ) && (
           <div className="bg-[#f5f0ff] border border-[#c4b5fd] rounded-[14px] p-5 mb-6">
             <p className="font-sans text-sm text-[#5b21b6] mb-3">Connect your wallet to interact with this order.</p>
             <ConnectButton client={thirdwebClient} />
@@ -724,12 +733,20 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     {msg.senderAvatar
                       ? <img src={msg.senderAvatar} className="w-7 h-7 rounded-full shrink-0 mt-1" alt="" />
                       : <div className="w-7 h-7 rounded-full bg-[#e5e5e5] shrink-0 mt-1" />}
-                    <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                    <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-[2px]`}>
                       <span className="font-sans text-[0.65rem] text-[#999]">{msg.senderName ?? "Unknown"}</span>
                       <div className={`font-sans text-[0.82rem] px-3 py-2 rounded-2xl leading-snug ${
                         isMe ? "bg-black text-white rounded-tr-none" : "bg-[#f0f0f0] text-[#111] rounded-tl-none"
                       }`}>
                         {msg.content}
+                      </div>
+                      <div className={`flex items-center gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                        <span className="font-sans text-[0.6rem] text-[#bbb]">{fmtTime(msg.createdAt)}</span>
+                        {isMe && (
+                          <span className={`text-[0.65rem] font-bold ${msg.isRead ? "text-[#7b3fe4]" : "text-[#ccc]"}`}>
+                            {msg.isRead ? "✓✓" : "✓"}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
