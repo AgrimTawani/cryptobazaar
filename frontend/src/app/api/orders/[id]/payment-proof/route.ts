@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "@/lib/db";
 import { r2 } from "@/lib/r2";
 
@@ -77,11 +78,16 @@ export async function GET(
 
     if (!order.paymentScreenshotIpfs) return NextResponse.json({ url: null });
 
-    // Build public R2 URL (requires public bucket or custom domain)
-    const endpoint = process.env.R2_ENDPOINT ?? "";
-    const bucket = process.env.R2_BUCKET_NAME ?? "";
-    const accountId = endpoint.match(/([a-f0-9]+)\.r2\.cloudflarestorage\.com/)?.[1] ?? "";
-    const url = `https://pub-${accountId}.r2.dev/${order.paymentScreenshotIpfs}`;
+    // Pre-signed URL — works with private buckets, expires in 1 hour
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const url = await getSignedUrl(
+      r2 as any,
+      new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: order.paymentScreenshotIpfs,
+      }),
+      { expiresIn: 3600 }
+    );
 
     return NextResponse.json({ url });
   } catch (err) {

@@ -12,6 +12,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",
     "@aws-sdk/client-s3": "^3.1045.0",
+    "@aws-sdk/s3-request-presigner": "^3.1057.0",
     "@clerk/nextjs": "^7.3.2",
     "@didit-protocol/sdk-web": "^0.2.0",
     "@google/generative-ai": "^0.24.1",
