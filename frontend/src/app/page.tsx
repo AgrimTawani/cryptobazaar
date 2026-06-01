@@ -325,10 +325,10 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.65 + i * 0.07 }}
                 className="flex flex-col items-center"
               >
-                <span className="font-condensed text-[2.2rem] text-black leading-none tracking-wide">
+                <span className="font-condensed text-[4rem] text-black leading-none tracking-wide [-webkit-text-stroke:1.5px_#000]">
                   {stat.value}
                 </span>
-                <span className="font-sans text-[0.6rem] text-black/50 tracking-[1.8px] uppercase mt-1.5 text-center">
+                <span className="font-sans text-[0.65rem] font-bold text-black/60 tracking-[2px] uppercase mt-2 text-center">
                   {stat.label}
                 </span>
               </motion.div>
