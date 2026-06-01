@@ -26,51 +26,6 @@ interface DashboardStats {
   activity: ActivityRow[];
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
-  LOGIN_DONE: {
-    label: "Onboarding Pending",
-    color: "#92400e",
-    bg: "#fffbeb",
-    desc: "You've signed in. Complete verification to start trading.",
-  },
-  ONBOARDING_PENDING: {
-    label: "Verification In Progress",
-    color: "#1e40af",
-    bg: "#eff6ff",
-    desc: "You're in the middle of verification. Pick up where you left off.",
-  },
-  WALLET_PENDING: {
-    label: "Wallet Connection Pending",
-    color: "#6b21a8",
-    bg: "#faf5ff",
-    desc: "Verification passed. Connect your wallet to start trading.",
-  },
-  VERIFICATION_PENDING: {
-    label: "Screening In Progress",
-    color: "#0f766e",
-    bg: "#f0fdfa",
-    desc: "Your application is under manual review by our compliance team. This typically takes 24–48 hours. You'll be notified once verified.",
-  },
-  VERIFIED: {
-    label: "Verified Member",
-    color: "#166534",
-    bg: "#f0fdf4",
-    desc: "You're fully verified. You can trade on the marketplace.",
-  },
-  REJECTED: {
-    label: "Verification Rejected",
-    color: "#991b1b",
-    bg: "#fef2f2",
-    desc: "One or more verification steps failed. Check your onboarding page.",
-  },
-  SUSPENDED: {
-    label: "Account Suspended",
-    color: "#1f2937",
-    bg: "#f9fafb",
-    desc: "Your account has been suspended. Contact support@cryptobazaar.co.in.",
-  },
-};
-
 interface OnboardingStatus {
   userStatus: string;
   memberNumber: number | null;
@@ -93,7 +48,7 @@ export default function DashboardPage() {
     Promise.all([
       fetch("/api/onboarding/status").then((r) => r.json()).catch(() => null),
       fetch("/api/dashboard/stats").then((r) => r.json()).catch(() => null),
-      new Promise((resolve) => setTimeout(resolve, 1500))
+      new Promise((resolve) => setTimeout(resolve, 1500)),
     ]).then(([statusData, statsData]) => {
       if (statusData) setDbStatus(statusData);
       if (statsData) setStats(statsData);
@@ -101,8 +56,8 @@ export default function DashboardPage() {
     });
   }, []);
 
-  const userStatus = (dbStatus?.userStatus ?? "LOGIN_DONE") as keyof typeof STATUS_CONFIG;
-  const statusConfig = STATUS_CONFIG[userStatus] ?? STATUS_CONFIG["LOGIN_DONE"];
+  const userStatus = dbStatus?.userStatus ?? "LOGIN_DONE";
+  const isVerified = userStatus === "VERIFIED";
 
   const handleSignOut = async () => {
     await signOut();
@@ -113,99 +68,112 @@ export default function DashboardPage() {
     return <LoadingSpinner />;
   }
 
+  const activityStatusStyle = (status: string) => {
+    if (status === "COMPLETED") return "bg-[#f0fdf4] text-[#166534]";
+    if (status === "CANCELLED" || status === "EXPIRED") return "bg-[#f5f5f5] text-[#888]";
+    if (status === "DISPUTED") return "bg-[#fef2f2] text-[#991b1b]";
+    return "bg-[#eff6ff] text-[#1e40af]";
+  };
+
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f5f5]">
       {/* Top bar */}
-      <header className="bg-white border-b border-[#f0f0f0] px-5 md:px-10 h-16 flex items-center justify-between">
+      <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[52px] flex items-center justify-between">
         <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/marketplace" className="font-sans text-[0.82rem] text-[#555] no-underline">
+          <Link href="/marketplace" className="font-sans text-[0.78rem] text-[#666] no-underline">
             Marketplace
           </Link>
           <button
             onClick={handleSignOut}
-            className="font-sans text-[0.82rem] text-[#888] bg-transparent border border-[#e5e5e5] rounded-full py-[6px] px-4 cursor-pointer"
+            className="font-sans text-[0.76rem] text-[#888] bg-transparent border border-[#e8e8e8] rounded-full py-[5px] px-[14px] cursor-pointer"
           >
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="max-w-[900px] mx-auto py-8 md:py-12 px-4 md:px-6">
+      <div className="max-w-[900px] mx-auto py-3 md:py-5 px-4 md:px-5">
+
         {/* Profile card */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6 mb-6">
+        <div className="bg-white border border-[#e8e8e8] rounded-[12px] p-3 md:p-4 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 mb-3">
           {user?.imageUrl && (
             <img
               src={user.imageUrl}
               alt={user.fullName ?? ""}
-              width={72}
-              height={72}
-              className="rounded-full shrink-0 border-[3px] border-[#f0f0f0]"
+              width={46}
+              height={46}
+              className="rounded-full shrink-0 border-2 border-[#f0f0f0]"
             />
           )}
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="font-condensed text-[2rem] tracking-[0.5px] leading-none">
+            <div className="flex items-center gap-[6px] flex-wrap mb-[2px]">
+              <h1 className="font-condensed text-[1.45rem] tracking-[0.5px] leading-none">
                 {user?.fullName ?? "Welcome"}
               </h1>
+              {/* Member number — subtle muted inline text, not a badge */}
               {dbStatus?.memberNumber && (
-                <span className="font-sans text-[0.7rem] font-semibold tracking-[1.5px] uppercase px-2 py-1 bg-black text-lime rounded-md">
-                  #{dbStatus.memberNumber}
+                <span className="font-sans text-[0.68rem] text-[#ccc]">
+                  · #{dbStatus.memberNumber}
+                </span>
+              )}
+              {/* Verified chip — lime, inline with name */}
+              {isVerified && (
+                <span className="font-sans text-[0.6rem] font-bold bg-lime text-black px-[6px] py-[1px] rounded-[3px] tracking-[0.3px]">
+                  ✓ VERIFIED
                 </span>
               )}
             </div>
-            <p className="font-sans text-sm text-[#888] mb-3">
+            <p className="font-sans text-[0.74rem] text-[#999]">
               {user?.primaryEmailAddress?.emailAddress}
             </p>
-            <div
-              className="inline-flex items-center gap-2 py-[6px] px-[14px] rounded-full"
-              style={{ background: statusConfig.bg }}
-            >
-              <span
-                className="w-[7px] h-[7px] rounded-full shrink-0"
-                style={{ background: statusConfig.color }}
-              />
-              <span
-                className="font-sans text-[0.78rem] font-semibold"
-                style={{ color: statusConfig.color }}
-              >
-                {statusConfig.label}
-              </span>
-            </div>
           </div>
 
-          {/* Action based on status */}
-          {userStatus !== "VERIFIED" && userStatus !== "SUSPENDED" && (
+          {isVerified ? (
+            <Link
+              href="/marketplace"
+              className="py-[7px] px-4 bg-black text-white rounded-[8px] font-condensed text-[0.92rem] tracking-[1px] no-underline shrink-0"
+            >
+              Marketplace →
+            </Link>
+          ) : (
             <Link
               href="/onboarding"
-              className="py-3 px-6 bg-black text-white rounded-[10px] font-condensed text-[1.1rem] tracking-[1px] no-underline shrink-0"
+              className="py-[7px] px-4 bg-black text-white rounded-[8px] font-condensed text-[0.92rem] tracking-[1px] no-underline shrink-0"
             >
               {userStatus === "LOGIN_DONE" ? "Start Verification →" : "Continue →"}
             </Link>
           )}
         </div>
 
-        {/* Status description */}
-        <div
-          className="rounded-xl py-4 px-5 mb-6"
-          style={{
-            background: statusConfig.bg,
-            border: `1.5px solid ${statusConfig.color}22`,
-          }}
-        >
-          <p
-            className="font-sans text-sm leading-[1.6]"
-            style={{ color: statusConfig.color }}
-          >
-            {statusConfig.desc}
-          </p>
+        {/* Stats grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-[6px] mb-3">
+          {[
+            { label: "Trades", value: stats ? String(stats.totalTrades) : "—" },
+            {
+              label: "Volume",
+              value: stats
+                ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
+                : "—",
+            },
+            { label: "Rating", value: "—" },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white border border-[#e8e8e8] rounded-[10px] py-3 px-4">
+              <div className="font-condensed text-[1.5rem] tracking-[0.5px] mb-[2px]">
+                {stat.value}
+              </div>
+              <div className="font-sans text-[0.62rem] text-[#aaa] uppercase tracking-[1px] font-semibold">
+                {stat.label}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Wallet balance widget */}
+        {/* Wallet balance card — already has chain + token switcher built in */}
         {dbStatus?.walletAddress && dbStatus?.walletChain && (
-          <div className="mb-6">
+          <div className="mb-3">
             <WalletBalanceCard
               walletAddress={dbStatus.walletAddress}
               walletChain={dbStatus.walletChain}
@@ -213,116 +181,89 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {[
-            {
-              label: "Total Trades",
-              value: stats ? String(stats.totalTrades) : "-",
-            },
-            {
-              label: "Trade Volume",
-              value: stats
-                ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
-                : "-",
-            },
-            { label: "Member Rating", value: "-" },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[14px] py-5 px-6">
-              <div className="font-condensed text-[2rem] tracking-[0.5px] mb-1">
-                {stat.value}
-              </div>
-              <div className="font-sans text-[0.75rem] text-[#999] uppercase tracking-[1px]">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Two-column: verification checklist + recent activity */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.6fr] gap-[6px]">
 
-        {/* Verification checklist */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-6 px-5 md:py-7 md:px-8 mb-6">
-          <h2 className="font-condensed text-[1.4rem] tracking-[0.5px] mb-5">
-            Verification Status
-          </h2>
-          {[
-            { label: "Google Login", done: true },
-            { label: "KYC - Identity Verification", done: dbStatus?.kyc === "PASSED" },
-            { label: "Bank Statement Review", done: dbStatus?.edd === "PASSED" },
-            { label: "AI Questionnaire", done: dbStatus?.interview === "PASSED" },
-            { label: "Wallet Connection", done: !!dbStatus?.walletAddress },
-          ].map((step) => (
-            <div key={step.label} className="flex items-center gap-3 py-3 border-b border-[#f5f5f5]">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[0.75rem] font-bold ${
-                  step.done ? "bg-lime" : "bg-[#f0f0f0]"
-                }`}
-              >
-                {step.done ? "✓" : ""}
-              </div>
-              <span
-                className={`font-sans text-sm ${step.done ? "text-black" : "text-[#999]"}`}
-              >
-                {step.label}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Recent activity */}
-        <div className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] py-6 px-5 md:py-7 md:px-8">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="font-condensed text-[1.4rem] tracking-[0.5px]">
-              Recent Activity
-            </h2>
-            <Link href="/marketplace" className="font-sans text-[0.78rem] text-[#888] no-underline">
-              View marketplace →
-            </Link>
-          </div>
-          {!stats || stats.activity.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="font-sans text-sm text-[#bbb]">
-                No trades yet. Complete verification to start trading.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col divide-y divide-[#f5f5f5]">
-              {stats.activity.map((row) => (
-                <Link
-                  key={row.id}
-                  href={`/marketplace/${row.id}`}
-                  className="flex items-center justify-between py-4 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors"
+          {/* Verification checklist */}
+          <div className="bg-white border border-[#e8e8e8] rounded-[10px] py-3 px-4">
+            <p className="font-sans text-[0.62rem] text-[#aaa] uppercase tracking-[1px] font-semibold mb-[10px]">
+              Verification
+            </p>
+            {[
+              { label: "Google Login",                done: true },
+              { label: "KYC — Identity",              done: dbStatus?.kyc === "PASSED" },
+              { label: "Bank Statement",              done: dbStatus?.edd === "PASSED" },
+              { label: "AI Questionnaire",            done: dbStatus?.interview === "PASSED" },
+              { label: "Wallet Connection",           done: !!dbStatus?.walletAddress },
+            ].map((step) => (
+              <div key={step.label} className="flex items-center gap-[8px] py-[5px] border-b border-[#f5f5f5] last:border-b-0">
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[0.52rem] font-bold ${
+                    step.done ? "bg-lime" : "bg-[#f2f2f2]"
+                  }`}
                 >
-                  <div>
-                    <p className="font-sans text-[0.85rem] font-semibold text-[#111]">
-                      {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
-                    </p>
-                    <p className="font-sans text-[0.75rem] text-[#888] mt-[2px]">
-                      {row.counterpartyName
-                        ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · `
-                        : ""}
-                      ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`font-sans text-[0.7rem] font-semibold px-3 py-[4px] rounded-full ${
-                        row.status === "COMPLETED"
-                          ? "bg-[#f0fdf4] text-[#166534]"
-                          : row.status === "CANCELLED" || row.status === "EXPIRED"
-                          ? "bg-[#f5f5f5] text-[#888]"
-                          : row.status === "DISPUTED"
-                          ? "bg-[#fef2f2] text-[#991b1b]"
-                          : "bg-[#eff6ff] text-[#1e40af]"
-                      }`}
-                    >
+                  {step.done ? "✓" : ""}
+                </div>
+                <span className={`font-sans text-[0.78rem] ${step.done ? "text-black" : "text-[#ccc]"}`}>
+                  {step.label}
+                </span>
+              </div>
+            ))}
+
+            {!isVerified && (
+              <Link
+                href="/onboarding"
+                className="mt-3 block text-center font-sans text-[0.75rem] font-semibold text-black bg-lime py-[6px] rounded-[7px] no-underline"
+              >
+                Continue verification →
+              </Link>
+            )}
+          </div>
+
+          {/* Recent activity */}
+          <div className="bg-white border border-[#e8e8e8] rounded-[10px] py-3 px-4">
+            <div className="flex justify-between items-center mb-[10px]">
+              <p className="font-sans text-[0.62rem] text-[#aaa] uppercase tracking-[1px] font-semibold">
+                Recent Activity
+              </p>
+              <Link href="/marketplace" className="font-sans text-[0.73rem] text-[#888] no-underline">
+                Marketplace →
+              </Link>
+            </div>
+
+            {!stats || stats.activity.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="font-sans text-sm text-[#ccc]">
+                  No trades yet.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col divide-y divide-[#f5f5f5]">
+                {stats.activity.map((row) => (
+                  <Link
+                    key={row.id}
+                    href={`/marketplace/${row.id}`}
+                    className="flex items-center justify-between py-[7px] no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors"
+                  >
+                    <div>
+                      <p className="font-sans text-[0.8rem] font-semibold text-[#111]">
+                        {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
+                      </p>
+                      <p className="font-sans text-[0.71rem] text-[#999] mt-[1px]">
+                        {row.counterpartyName
+                          ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · `
+                          : ""}
+                        ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                    <span className={`font-sans text-[0.63rem] font-semibold px-[9px] py-[2px] rounded-full whitespace-nowrap ${activityStatusStyle(row.status)}`}>
                       {row.statusLabel}
                     </span>
-                    <span className="font-sans text-[0.75rem] text-[#ccc]">→</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
