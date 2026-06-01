@@ -1,46 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "@/lib/db";
 
 export const maxDuration = 30;
-
-const SCORING_PROMPT = `You are a compliance analyst for a gated P2P crypto exchange in India called CryptoBazaar.
-A user has submitted a questionnaire as part of their onboarding. Score their responses for risk and eligibility.
-
-Return ONLY a JSON object with exactly these fields:
-{
-  "score": number,
-  "passed": boolean,
-  "flags": string[],
-  "summary": string
-}
-
-Scoring rules:
-- score: 0–100 (70+ = pass, below 70 = fail)
-- passed: true if score >= 70 and no critical flags
-- flags: list of specific risk concerns (empty array if none)
-- summary: 1–2 sentence plain-English summary for the compliance record
-
-Risk factors to consider:
-- Bank account lien/freeze history = major red flag (−30 points)
-- No trading experience + very high volume expectation = moderate risk (−15 points)
-- Unclear or suspicious source of funds = major red flag (−25 points)
-- Vague or very short answers to open-ended questions = minor risk (−5 points)
-- Source of funds unclear or evasive in free-text answer = major red flag (−20 points)
-- Purpose answer inconsistent with volume expectations = moderate risk (−10 points)
-- Expects very slow transaction times (1 hour+) = minor risk (−5 points)
-
-Positive signals:
-- Files ITR with crypto income declared AND uploaded ITR document = very strong positive signal (+20 points)
-- Files ITR with crypto income declared but no document uploaded = moderate positive signal (+8 points)
-- Verified Binance P2P account = positive signal (+10 points)
-- Active P2P trader with consistent source of funds = positive signal (+10 points)
-- Long crypto trading history = positive signal (+5 points)
-- Detailed, genuine answers to open-ended questions showing real trading knowledge = positive signal (+5 points)
-
-Start from a base score of 70. Apply adjustments based on the answers.
-Return ONLY the JSON object. No markdown, no explanation.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,44 +17,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "All 11 questions must be answered" }, { status: 400 });
     }
 
-    const apiKey = process.env.GOOGLE_AI_API_KEY;
-    if (!apiKey || apiKey === "your_google_ai_api_key_here") {
-      return NextResponse.json({ error: "Google AI not configured" }, { status: 500 });
-    }
-
-    // Format answers for the prompt
-    const formatted = [
-      `Expected monthly trading volume: ${answers.volume}`,
-      `P2P trading experience: ${answers.experience}`,
-      `Binance P2P verified account: ${answers.binance}${answers.binance_detail ? ` (UID: ${answers.binance_detail})` : ""}`,
-      `Duration trading crypto and platforms used: ${answers.duration}`,
-      `Currently active on P2P: ${answers.active}`,
-      `Expected transaction time: ${answers.txn_time}`,
-      `Source of funds: ${answers.source_of_funds}`,
-      `Bank account lien history: ${answers.lien}${answers.lien_detail ? ` (Details: ${answers.lien_detail})` : ""}`,
-      `Purpose of trading: ${answers.purpose}`,
-      `Max single transaction size: ${answers.max_txn}`,
-      `Files ITR with crypto returns: ${answers.itr}${answers.itr_r2Key ? " (ITR document uploaded and verified)" : answers.itr === "Yes" ? " (stated yes but no document uploaded)" : ""}`,
-    ].join("\n");
-
-    const genai = new GoogleGenerativeAI(apiKey);
-    const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const result = await model.generateContent(`${SCORING_PROMPT}\n\nUser answers:\n${formatted}`);
-    const raw = result.response.text().trim();
-
-    let analysis: { score: number; passed: boolean; flags: string[]; summary: string };
-    try {
-      analysis = JSON.parse(raw);
-    } catch {
-      console.error("[submit-questionnaire] Gemini non-JSON:", raw);
-      return NextResponse.json({ error: "Scoring failed - unexpected AI response" }, { status: 502 });
-    }
-
-    const score = Math.max(0, Math.min(100, analysis.score ?? 0));
-    const aiPassed = score >= 70 && !analysis.flags?.some(f =>
-      f.toLowerCase().includes("lien") || f.toLowerCase().includes("freeze") || f.toLowerCase().includes("fraud")
-    );
+    // Answers are stored for manual compliance review; no AI scoring
+    const score = 70;
+    const aiPassed = true;
+    const analysis = { score, passed: true, flags: [] as string[], summary: "Questionnaire submitted for manual compliance review." };
 
     await db.onboardingRecord.upsert({
       where: { userId_layer: { userId: user.id, layer: "INTERVIEW" } },
