@@ -5,67 +5,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
 
-function OnrampWidget() {
-  const [mode, setMode] = useState<"onramp" | "offramp">("onramp");
-  const [amount, setAmount] = useState("4500");
-  const [asset, setAsset] = useState<"USDC" | "USDT">("USDC");
-  const rate = asset === "USDC" ? 105.77 : 88.50;
-  const computed = isNaN(parseFloat(amount)) ? "—" : (parseFloat(amount) / rate).toFixed(4);
-
-  return (
-    <div className="bg-white border border-[#e0e0e0] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 w-[320px] mx-auto mt-10">
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[#f2f2f2] rounded-full p-1 mb-5">
-        {(["onramp", "offramp"] as const).map((m) => (
-          <button key={m} onClick={() => setMode(m)}
-            className={`flex-1 py-1.5 rounded-full font-sans text-sm font-semibold transition-all capitalize ${
-              mode === m ? "bg-white shadow-sm text-black" : "text-[#999] bg-transparent border-0"
-            }`}>
-            {m}
-          </button>
-        ))}
-      </div>
-
-      {/* You spend */}
-      <p className="font-sans text-xs text-[#999] mb-1.5">You spend</p>
-      <div className="flex items-center gap-3 mb-4">
-        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
-          className="font-sans text-[2rem] font-bold text-black flex-1 outline-none bg-transparent border-0 w-0 min-w-0" />
-        <div className="flex items-center gap-1.5 bg-[#f5f5f5] rounded-full px-3 py-1.5 shrink-0">
-          <span className="text-base">🇮🇳</span>
-          <span className="font-sans text-sm font-semibold">INR</span>
-          <span className="text-[#aaa] text-xs">▾</span>
-        </div>
-      </div>
-
-      <div className="border-t border-[#f0f0f0] mb-4" />
-
-      {/* You get */}
-      <p className="font-sans text-xs text-[#999] mb-1.5">You get</p>
-      <div className="flex items-center gap-3 mb-2">
-        <span className="font-sans text-[2rem] font-bold text-black flex-1 truncate">{computed}</span>
-        <div className="flex items-center gap-1.5 bg-[#f5f5f5] rounded-full px-3 py-1.5 shrink-0 cursor-pointer"
-          onClick={() => setAsset(asset === "USDC" ? "USDT" : "USDC")}>
-          <span className="text-blue-500 text-base">◎</span>
-          <span className="font-sans text-sm font-semibold">{asset}</span>
-          <span className="text-[#aaa] text-xs">▾</span>
-        </div>
-      </div>
-      <p className="font-sans text-xs text-[#888] mb-5">
-        <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1.5 align-middle" />
-        1 {asset} ≈ ₹{rate.toFixed(2)} INR
-      </p>
-
-      <button className="w-full bg-black text-white font-sans font-bold py-3.5 rounded-xl text-[0.9rem] tracking-wide">
-        {mode === "onramp" ? `Buy ${asset}` : `Sell ${asset}`}
-      </button>
-
-      <p className="text-center font-sans text-[0.65rem] text-[#bbb] mt-3">
-        Powered By <span className="text-[#888]">Settle</span> · <span className="text-[#888]">LedgerPe</span>
-      </p>
-    </div>
-  );
-}
 
 const FAQS = [
   {
@@ -397,8 +336,6 @@ export default function Home() {
               </motion.div>
             ))}
           </motion.div>
-
-          <OnrampWidget />
 
         </div>
       </section>
