@@ -305,9 +305,9 @@ export default function Home() {
             <button onClick={() => scrollTo("how")} className="cta-secondary">How It Works</button>
           </motion.div>
 
-          {/* ── Stat cards ── */}
+          {/* ── Stats ── */}
           <motion.div
-            className="flex flex-wrap justify-center gap-3 mt-10 w-full"
+            className="flex flex-wrap justify-center gap-8 mt-10 w-full"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -323,32 +323,15 @@ export default function Home() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.65 + i * 0.07 }}
-                className="flex flex-col items-center px-7 py-5 rounded-2xl bg-black border border-white/10 min-w-[120px]"
+                className="flex flex-col items-center"
               >
-                <span className="font-condensed text-[2rem] text-lime leading-none tracking-wide">
+                <span className="font-condensed text-[2.2rem] text-black leading-none tracking-wide">
                   {stat.value}
                 </span>
-                <span className="font-sans text-[0.6rem] text-white/40 tracking-[1.8px] uppercase mt-2 text-center">
+                <span className="font-sans text-[0.6rem] text-black/50 tracking-[1.8px] uppercase mt-1.5 text-center">
                   {stat.label}
                 </span>
               </motion.div>
-            ))}
-          </motion.div>
-
-          {/* ── Trust badges ── */}
-          <motion.div
-            className="flex flex-wrap justify-center gap-2 mt-5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.95 }}
-          >
-            {["Aadhaar KYC", "Smart Contract Escrow", "Non-Custodial"].map((badge) => (
-              <span
-                key={badge}
-                className="font-sans text-[0.63rem] tracking-[1.5px] uppercase px-4 py-2 rounded-full bg-black text-white/50 border border-white/10"
-              >
-                {badge}
-              </span>
             ))}
           </motion.div>
 
