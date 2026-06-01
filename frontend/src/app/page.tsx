@@ -40,32 +40,38 @@ const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Create your account",
-    desc: "Sign up with Google. Takes 10 seconds. No email or password to manage.",
+    desc: "Sign up with Google in ten seconds. No email or password to manage.",
+    pill: "Google Sign-In",
   },
   {
     step: "02",
     title: "Verify your identity",
-    desc: "Complete a quick Aadhaar + PAN + liveness check. This is mandatory - it's how we keep bad actors out.",
+    desc: "Quick Aadhaar + PAN + liveness check. Mandatory — it keeps bad actors out.",
+    pill: "Aadhaar + PAN",
   },
   {
     step: "03",
-    title: "Submit your bank statement",
-    desc: "Upload 6 months of statements. Our ML system reviews them for red flags. Your data is discarded after review - we never store it.",
+    title: "Submit bank statement",
+    desc: "Upload 6 months of statements. ML reviews for red flags, then discards the data — never stored.",
+    pill: "Discarded After Review",
   },
   {
     step: "04",
-    title: "Complete the AI Questionnaire",
-    desc: "Answer 10 short questions about your trading background. Scored by AI. Takes about 5 minutes.",
+    title: "Pass the AI screen",
+    desc: "Ten short questions on your trading background, scored by AI. Takes about five minutes.",
+    pill: "AI-Scored",
   },
   {
     step: "05",
-    title: "Connect your wallet & pick a plan",
-    desc: "Connect your crypto wallet (MetaMask, Phantom, etc.) and choose a membership tier that fits your monthly volume.",
+    title: "Connect wallet & plan",
+    desc: "Link MetaMask, Phantom or any compatible wallet and pick a membership tier for your monthly volume.",
+    pill: "Self-Custody",
   },
   {
     step: "06",
-    title: "Trade with full escrow protection",
-    desc: "List or browse trades. Crypto is locked in a smart contract from the moment a trade starts. INR is sent bank-to-bank. Release is automatic on confirmation. Nobody holds your funds but the code.",
+    title: "Trade with full escrow",
+    desc: "Crypto locks in a smart contract at trade start. INR moves bank-to-bank. Release is automatic. The code holds your funds — not us.",
+    pill: "Smart Contract Escrow",
   },
 ];
 
@@ -351,40 +357,53 @@ export default function Home() {
 
       {/* ── HOW IT WORKS ── */}
       <section id="how" className="bg-black py-16 md:py-[100px] px-5 md:px-10">
-        <div className="max-w-[900px] mx-auto">
-          <p className="font-sans text-[1.1rem] font-medium text-lime tracking-[4px] uppercase mb-4">
-            How It Works
-          </p>
-          <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px] mb-5">
-            TRADE P2P.<br />
-            <span className="text-lime">THE RIGHT WAY.</span>
-          </h2>
-          <p className="font-sans text-base text-white/50 max-w-[520px] leading-[1.7] mb-12">
-            CryptoBazaar is not just another P2P app. Every member is vetted, every trade is protected by a smart contract, and there is a service remedy fund for when our vetting fails.
-          </p>
+        <div className="max-w-[1100px] mx-auto">
 
-          <div className="flex flex-col">
+          {/* Section header — two columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mb-12 items-end">
+            <div>
+              <p className="font-sans text-[0.75rem] font-medium text-lime tracking-[4px] uppercase mb-4">
+                How It Works
+              </p>
+              <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px]">
+                TRADE P2P.<br />
+                <em className="not-italic text-lime">the</em>{" "}RIGHT WAY.
+              </h2>
+            </div>
+            <p className="font-sans text-base text-white/50 leading-[1.7] md:max-w-[380px] md:self-end">
+              Not just another P2P app. Every member vetted, every trade protected by smart contract, a remedy fund backing our screening.
+            </p>
+          </div>
+
+          {/* 3×2 cards grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {HOW_IT_WORKS.map((item, i) => (
               <motion.div
                 key={item.step}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className={`flex gap-4 md:gap-5 py-5 items-start md:items-center ${
-                  i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.08]" : ""
-                }`}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                className="relative overflow-hidden bg-white/[0.03] border border-white/[0.08] rounded-xl p-6 flex flex-col gap-3 min-h-[220px]"
               >
-                <div className="shrink-0 font-condensed text-3xl md:text-5xl text-lime leading-none w-[48px] md:w-[72px]">
+                {/* Watermark number */}
+                <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none">
                   {item.step}
-                </div>
-                <div>
-                  <div className="font-condensed text-[1.3rem] md:text-[1.8rem] text-white tracking-[0.5px] mb-1 md:mb-2">
-                    {item.title}
-                  </div>
-                  <div className="font-sans text-[0.9rem] md:text-[1.1rem] text-white/70 leading-[1.6] max-w-[600px]">
-                    {item.desc}
-                  </div>
+                </span>
+
+                <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                  {item.step}
+                </span>
+                <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                  {item.title}
+                </h3>
+                <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1">
+                  {item.desc}
+                </p>
+                <div className="mt-1">
+                  <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                    {item.pill}
+                  </span>
                 </div>
               </motion.div>
             ))}
@@ -397,52 +416,67 @@ export default function Home() {
 
       {/* ── FAQ ── */}
       <section id="faq" className="bg-[#fafafa] py-16 md:py-[100px] px-5 md:px-10">
-        <div className="max-w-[720px] mx-auto">
-          <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
-            Frequently Asked Questions
-          </p>
-          <h2 className="font-condensed text-[clamp(2.8rem,6vw,4.5rem)] text-black leading-none tracking-[1px] mb-14">
-            GOT QUESTIONS?
-          </h2>
+        <div className="max-w-[1000px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-12 md:gap-16">
 
-          <div className="flex flex-col">
-            {FAQS.map((faq, i) => (
-              <div
-                key={i}
-                className="border-b border-[#e5e5e5]"
+            {/* Left — sticky heading */}
+            <div className="md:sticky md:top-[80px] self-start">
+              <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
+                Frequently Asked
+              </p>
+              <h2 className="font-condensed text-[clamp(2.8rem,5vw,4rem)] text-black leading-none tracking-[1px] mb-5">
+                GOT QUESTIONS?
+              </h2>
+              <p className="font-sans text-sm text-[#666] leading-[1.7] mb-8">
+                Straight answers on verification, escrow and custody — the things that decide whether you trust a platform with your money.
+              </p>
+              <a
+                href="mailto:support@cryptobazaar.co.in"
+                className="inline-flex items-center gap-2 font-sans text-sm font-semibold bg-black text-white px-5 py-3 rounded-full no-underline"
               >
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="faq-toggle w-full flex justify-between items-center py-[22px] bg-transparent border-0 cursor-pointer text-left gap-4"
-                >
-                  <span className="font-condensed text-[1.2rem] tracking-[0.5px] text-black leading-[1.2]">
-                    {faq.q}
-                  </span>
-                  <span
-                    className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${
-                      openFaq === i ? "bg-black text-white" : "bg-[#f0f0f0] text-black"
-                    }`}
+                <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
+                We read every message
+              </a>
+            </div>
+
+            {/* Right — accordion */}
+            <div className="flex flex-col">
+              {FAQS.map((faq, i) => (
+                <div key={i} className="border-b border-[#e5e5e5]">
+                  <button
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="faq-toggle w-full flex justify-between items-center py-[22px] bg-transparent border-0 cursor-pointer text-left gap-4"
                   >
-                    {openFaq === i ? "−" : "+"}
-                  </span>
-                </button>
-                <AnimatePresence>
-                  {openFaq === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      style={{ overflow: "hidden" }}
+                    <span className="font-condensed text-[1.2rem] tracking-[0.5px] text-black leading-[1.2]">
+                      {faq.q}
+                    </span>
+                    <span
+                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${
+                        openFaq === i ? "bg-lime text-black" : "bg-[#f0f0f0] text-black"
+                      }`}
                     >
-                      <p className="font-sans text-[0.9rem] text-[#555] leading-[1.75] pb-[22px] max-w-[600px] whitespace-pre-wrap">
-                        {faq.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+                      {openFaq === i ? "−" : "+"}
+                    </span>
+                  </button>
+                  <AnimatePresence>
+                    {openFaq === i && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <p className="font-sans text-[0.9rem] text-[#555] leading-[1.75] pb-[22px] whitespace-pre-wrap">
+                          {faq.a}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
       </section>
