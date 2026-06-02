@@ -214,7 +214,9 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
               className="font-condensed text-[2.8rem] tracking-[0.5px] leading-none"
               style={{ color: meta.color }}
             >
-              {balance}
+              {balance && balance !== "-"
+                ? parseFloat(balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
+                : balance}
             </span>
             <span className="font-sans text-[0.9rem] font-semibold" style={{ color: meta.color + "99" }}>
               {symbol}

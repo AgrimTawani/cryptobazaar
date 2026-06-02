@@ -121,7 +121,7 @@ export default function MarketplacePage() {
       {!isVerified && (
         <div className="bg-black py-3 px-5 md:px-10 flex items-center justify-between flex-wrap gap-3">
           <p className="font-sans text-sm text-white/70">
-            👀 <strong className="text-white">View only.</strong> Complete verification to buy or sell.
+            <strong className="text-white">View only.</strong> Complete verification to buy or sell.
           </p>
           <Link href="/onboarding" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
             Complete Verification →
@@ -275,7 +275,7 @@ export default function MarketplacePage() {
         {/* Empty state */}
         {filtered.length === 0 && (
           <div className="text-center py-16 px-6">
-            <div className="text-5xl mb-4">📭</div>
+            <div className="text-5xl mb-4">—</div>
             <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-2">No listings yet</h3>
             <p className="font-sans text-sm text-[#888] max-w-xs mx-auto mb-6 leading-relaxed">
               {myOrders.length > 0

@@ -319,6 +319,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#22c55e]" />
                   <span className="font-sans text-sm font-semibold text-[#111]">Trade Chat</span>
+                  <span className="font-sans text-[0.62rem] text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] px-2 py-0.5 rounded-full font-semibold">End-to-end encrypted</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {timeLeft !== null && !TERMINAL.includes(order.status) && (

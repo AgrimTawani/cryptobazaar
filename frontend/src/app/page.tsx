@@ -220,7 +220,7 @@ export default function Home() {
               </span>
             </Link>
           ) : (
-            <Link href="/login" className="btn-login font-condensed">Login</Link>
+            <Link href="/login" className="btn-login font-condensed">Get Started</Link>
           )}
         </div>
         {/* Mobile hamburger */}
@@ -259,7 +259,7 @@ export default function Home() {
               {isSignedIn ? (
                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Dashboard</Link>
               ) : (
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Login</Link>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Get Started</Link>
               )}
             </div>
           </motion.div>
@@ -302,7 +302,7 @@ export default function Home() {
             {isSignedIn ? (
               <Link href="/dashboard" className="cta-primary">Dashboard</Link>
             ) : (
-              <Link href="/login" className="cta-primary">Login</Link>
+              <Link href="/login" className="cta-primary">Get Started</Link>
             )}
             <button onClick={() => setShowPreview(true)} className="cta-secondary">Have a Peek</button>
           </motion.div>
@@ -620,11 +620,6 @@ export default function Home() {
                 <p className="font-sans text-[0.75rem] text-white/25 leading-[1.5]">
                   Response time:<br />within 24 hours
                 </p>
-                <div className="mt-1 py-[10px] px-[14px] bg-lime/[0.07] border border-lime/[0.15] rounded-lg">
-                  <p className="font-sans text-[0.7rem] text-lime/70 leading-[1.5]">
-                    Udyam Registered<br />Indian Business
-                  </p>
-                </div>
               </div>
             </div>
           </div>
