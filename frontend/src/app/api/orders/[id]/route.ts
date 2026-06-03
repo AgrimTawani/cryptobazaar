@@ -19,13 +19,34 @@ export async function GET(
     const order = await db.order.findUnique({
       where: { id },
       include: {
-        seller:  { select: { id: true, name: true, avatarUrl: true } },
+        seller: {
+          select: {
+            id: true, name: true, avatarUrl: true,
+            avgSellerRating: true, avgSellerSpeedRating: true, avgSellerPoliteness: true,
+            sellerRatingCount: true, totalTradeCount: true,
+          },
+        },
         buyer:   { select: { id: true, name: true, avatarUrl: true } },
         ratings: { select: { raterId: true } },
       },
     });
+
     if (!order)
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+
+    const filteredReviews = await db.tradeRating.findMany({
+      where: { ratedUserId: order.sellerId, raterRole: "buyer" },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        overallRating: true,
+        speedRating: true,
+        politenessRating: true,
+        comment: true,
+        createdAt: true,
+        rater: { select: { name: true, avatarUrl: true } },
+      },
+    });
 
     const isSeller = user.id === order.sellerId;
     const isBuyer  = user.id === order.buyerId;
@@ -43,6 +64,20 @@ export async function GET(
       onChainId,
       sellerName:  order.seller.name  ?? "Anonymous",
       sellerAvatar: order.seller.avatarUrl ?? null,
+      sellerRatingCount: order.seller.sellerRatingCount,
+      sellerTotalTrades: order.seller.totalTradeCount,
+      sellerAvgRating: order.seller.avgSellerRating?.toNumber() ?? null,
+      sellerAvgSpeed: order.seller.avgSellerSpeedRating?.toNumber() ?? null,
+      sellerAvgPoliteness: order.seller.avgSellerPoliteness?.toNumber() ?? null,
+      sellerReviews: filteredReviews.map((r) => ({
+        overallRating: r.overallRating,
+        speedRating: r.speedRating,
+        politenessRating: r.politenessRating,
+        comment: r.comment,
+        createdAt: r.createdAt.toISOString(),
+        raterName: r.rater.name ?? "Anonymous",
+        raterAvatar: r.rater.avatarUrl ?? null,
+      })),
       buyerName:   order.buyer?.name  ?? null,
       buyerAvatar: order.buyer?.avatarUrl ?? null,
       asset: order.asset,

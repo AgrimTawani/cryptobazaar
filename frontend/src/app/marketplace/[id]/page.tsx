@@ -33,12 +33,28 @@ function activeChainLabel(id: number | undefined): string {
   return id ? (map[id] ?? `Chain ${id}`) : "Unknown Network";
 }
 
+interface SellerReview {
+  overallRating: number;
+  speedRating: number;
+  politenessRating: number;
+  comment: string | null;
+  createdAt: string;
+  raterName: string;
+  raterAvatar: string | null;
+}
+
 interface OrderDetail {
   id: string;
   orderId: string;
   onChainId: string;
   sellerName: string;
   sellerAvatar: string | null;
+  sellerRatingCount: number;
+  sellerTotalTrades: number;
+  sellerAvgRating: number | null;
+  sellerAvgSpeed: number | null;
+  sellerAvgPoliteness: number | null;
+  sellerReviews: SellerReview[];
   buyerName: string | null;
   buyerAvatar: string | null;
   asset: string;
@@ -76,6 +92,96 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           <span className={`${(hovered || value) >= n ? "text-lime" : "text-[#e0e0e0]"}`}>★</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+function Stars({ value, size = "sm" }: { value: number; size?: "sm" | "lg" }) {
+  const cls = size === "lg" ? "text-xl" : "text-sm";
+  return (
+    <span className={cls}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className={n <= Math.round(value) ? "text-lime-500" : "text-[#e0e0e0]"}>★</span>
+      ))}
+    </span>
+  );
+}
+
+function SellerProfileCard({ order }: { order: OrderDetail }) {
+  const hasRatings = order.sellerRatingCount > 0;
+  return (
+    <div className="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#f0f0f0]">
+        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Seller</p>
+        <div className="flex items-center gap-3">
+          {order.sellerAvatar
+            ? <img src={order.sellerAvatar} className="w-10 h-10 rounded-full shrink-0" alt="" />
+            : <div className="w-10 h-10 rounded-full bg-[#e5e5e5] shrink-0" />}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="font-sans text-sm font-semibold text-[#111]">{order.sellerName}</p>
+              <span className="font-sans text-[0.6rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-wide">✓ KYC</span>
+            </div>
+            <p className="font-sans text-xs text-[#999]">
+              {order.sellerTotalTrades} trade{order.sellerTotalTrades !== 1 ? "s" : ""} completed
+            </p>
+          </div>
+          {hasRatings && order.sellerAvgRating !== null && (
+            <div className="text-right shrink-0">
+              <p className="font-condensed text-2xl leading-none text-[#111]">{order.sellerAvgRating.toFixed(1)}</p>
+              <Stars value={order.sellerAvgRating} />
+              <p className="font-sans text-[0.6rem] text-[#bbb] mt-0.5">{order.sellerRatingCount} review{order.sellerRatingCount !== 1 ? "s" : ""}</p>
+            </div>
+          )}
+        </div>
+
+        {hasRatings && (
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            {[
+              ["Speed", order.sellerAvgSpeed],
+              ["Politeness", order.sellerAvgPoliteness],
+            ].map(([label, val]) => val !== null && (
+              <div key={label as string} className="bg-[#f8f8f8] rounded-lg px-3 py-2">
+                <p className="font-sans text-[0.6rem] text-[#999] uppercase tracking-widest">{label}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Stars value={val as number} />
+                  <span className="font-sans text-xs text-[#555]">{(val as number).toFixed(1)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!hasRatings && (
+          <p className="font-sans text-xs text-[#bbb] mt-3">No reviews yet — this seller is new to CryptoBazaar.</p>
+        )}
+      </div>
+
+      {order.sellerReviews.length > 0 && (
+        <div className="divide-y divide-[#f5f5f5]">
+          {order.sellerReviews.map((review, i) => (
+            <div key={i} className="px-5 py-3.5">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  {review.raterAvatar
+                    ? <img src={review.raterAvatar} className="w-6 h-6 rounded-full shrink-0" alt="" />
+                    : <div className="w-6 h-6 rounded-full bg-[#e5e5e5] shrink-0" />}
+                  <span className="font-sans text-xs font-semibold text-[#333] truncate">{review.raterName}</span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Stars value={review.overallRating} />
+                  <span className="font-sans text-[0.6rem] text-[#bbb]">
+                    {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                  </span>
+                </div>
+              </div>
+              {review.comment && (
+                <p className="font-sans text-xs text-[#666] leading-relaxed ml-8">{review.comment}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -875,15 +981,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
           {order.status === "LISTED" && (
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6 mb-5 space-y-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-[#f0f0f0]">
-                {order.sellerAvatar
-                  ? <img src={order.sellerAvatar} className="w-10 h-10 rounded-full" alt="" />
-                  : <div className="w-10 h-10 rounded-full bg-[#e5e5e5]" />}
-                <div>
-                  <p className="font-sans text-sm font-semibold text-[#111]">{order.sellerName}</p>
-                  <p className="font-sans text-xs text-[#999]">Verified Seller</p>
-                </div>
-              </div>
               <div>
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest mb-2">Accepts</p>
                 <div className="flex gap-2 flex-wrap">
@@ -989,7 +1086,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             </div>
           )}
 
-          <div className="bg-white border border-[#e5e5e5] rounded-xl px-5 py-4 grid grid-cols-2 gap-4">
+          <div className="bg-white border border-[#e5e5e5] rounded-xl px-5 py-4 grid grid-cols-2 gap-4 mb-5">
             {[
               ["Chain", order.chain], ["Asset", order.asset],
               ["Amount", `${order.amount} ${order.asset}`], ["Price", `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
@@ -1001,6 +1098,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               </div>
             ))}
           </div>
+
+          <SellerProfileCard order={order} />
         </div>
       )}
     </div>
