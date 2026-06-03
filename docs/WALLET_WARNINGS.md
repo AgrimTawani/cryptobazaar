@@ -5,6 +5,34 @@ Priority order: HIGH = real money at risk, MEDIUM = confusing, LOW = cosmetic.
 
 ---
 
+## CRITICAL — Must fix before adding Tron or Solana
+
+### Address architecture (schema change required)
+
+Currently every user has ONE walletAddress + ONE walletChain in the DB.
+This breaks when supporting multiple chain families:
+
+| Chain family | Address format | Relationship to EVM |
+|---|---|---|
+| Polygon + BSC | `0x9939D...` (same address on both) | Same — no issue |
+| Tron | `TStJtSU...` (base58) | Same underlying private key as EVM but different format — must store separately |
+| Solana | `67psDuS...` (base58, ed25519) | Completely different key — must store separately |
+
+**If we release Tron USDT to a user's stored EVM address without converting to Tron format, the user may not realise they control it.**
+**If we release Solana USDC to an EVM address, it either fails or goes to an uncontrolled address — funds lost.**
+
+Required DB change before going live with Tron/Solana:
+```
+User wallet storage must become:
+  evmAddress:    "0x9939D..."   (Polygon + BSC)
+  tronAddress:   "TStJtSU..."  (Tron — collected during Tron onboarding)
+  solanaAddress: "67psDuS..."  (Solana — collected during Solana onboarding)
+```
+
+Each address collected at the point a user first connects that chain type.
+
+---
+
 ## HIGH PRIORITY — Real money at risk
 
 ### 1. Trade page — buyer before locking
