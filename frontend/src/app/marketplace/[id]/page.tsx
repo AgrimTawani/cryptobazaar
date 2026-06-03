@@ -305,7 +305,10 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     <div className="min-h-screen bg-[#f5f5f5]">
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-14 flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">CRYPTOBAZAAR</Link>
-        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline">← Marketplace</Link>
+        <div className="flex items-center gap-4">
+          <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline">← Marketplace</Link>
+          <Link href="/dashboard" className="font-sans text-sm font-semibold text-black border border-[#e0e0e0] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors">Dashboard</Link>
+        </div>
       </header>
 
       {/* ── 3-COL CHAT LAYOUT ── */}
