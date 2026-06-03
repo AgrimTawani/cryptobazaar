@@ -37,6 +37,27 @@ interface OrderDetail {
   sellerUpiId: string | null;
   sellerBankAccount: string | null;
   sellerIfsc: string | null;
+  hasRated: boolean;
+}
+
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHovered(n)}
+          onMouseLeave={() => setHovered(0)}
+          onClick={() => onChange(n)}
+          className="text-[1.6rem] leading-none transition-transform hover:scale-110 cursor-pointer bg-transparent border-0 p-0"
+        >
+          <span className={`${(hovered || value) >= n ? "text-lime" : "text-[#e0e0e0]"}`}>★</span>
+        </button>
+      ))}
+    </div>
+  );
 }
 
 const STATUS: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -134,6 +155,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [now, setNow] = useState(Date.now());
   const [showBuyConfirm, setShowBuyConfirm] = useState(false);
   const [tcAgreed, setTcAgreed] = useState(false);
+  const [ratingPoliteness, setRatingPoliteness] = useState(0);
+  const [ratingOverall, setRatingOverall] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [ratingSubmitting, setRatingSubmitting] = useState(false);
+  const [ratingDone, setRatingDone] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
@@ -659,6 +685,71 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   })} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
                     Something wrong? Raise a dispute
                   </button>
+                </div>
+              )}
+
+              {/* ── Rating card — shown after completion ── */}
+              {order.status === "COMPLETED" && role !== "observer" && (
+                <div className="bg-black rounded-xl overflow-hidden">
+                  {/* Header */}
+                  <div className="px-5 pt-5 pb-4 border-b border-white/10">
+                    <p className="font-sans text-[0.6rem] text-lime tracking-[3px] uppercase font-semibold mb-1">Trade Complete</p>
+                    <h3 className="font-condensed text-[1.6rem] text-white tracking-[0.5px] leading-tight">
+                      RATE YOUR<br />EXPERIENCE
+                    </h3>
+                  </div>
+
+                  {ratingDone || order.hasRated ? (
+                    <div className="px-5 py-6 text-center">
+                      <div className="text-2xl mb-2">★★★★★</div>
+                      <p className="font-sans text-sm text-white/60">Thanks for your feedback.</p>
+                    </div>
+                  ) : (
+                    <div className="px-5 py-4 space-y-4">
+                      <p className="font-sans text-xs text-white/40">
+                        Rating {role === "buyer" ? order.sellerName : order.buyerName ?? "your counterparty"}
+                      </p>
+
+                      <div>
+                        <p className="font-sans text-xs text-white/50 uppercase tracking-widest font-semibold mb-2">Politeness</p>
+                        <StarPicker value={ratingPoliteness} onChange={setRatingPoliteness} />
+                      </div>
+
+                      <div>
+                        <p className="font-sans text-xs text-white/50 uppercase tracking-widest font-semibold mb-2">Overall</p>
+                        <StarPicker value={ratingOverall} onChange={setRatingOverall} />
+                      </div>
+
+                      <textarea
+                        value={ratingComment}
+                        onChange={(e) => setRatingComment(e.target.value)}
+                        placeholder="Leave a comment (optional)"
+                        rows={2}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/20 resize-none outline-none focus:border-white/25 transition-colors"
+                      />
+
+                      <button
+                        disabled={!ratingPoliteness || !ratingOverall || ratingSubmitting}
+                        onClick={async () => {
+                          if (!id || !ratingPoliteness || !ratingOverall) return;
+                          setRatingSubmitting(true);
+                          try {
+                            await fetch(`/api/orders/${id}/rate`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ politenessRating: ratingPoliteness, overallRating: ratingOverall, comment: ratingComment }),
+                            });
+                            setRatingDone(true);
+                          } finally {
+                            setRatingSubmitting(false);
+                          }
+                        }}
+                        className="w-full py-3 bg-lime text-black font-condensed text-xl tracking-[1px] rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                      >
+                        {ratingSubmitting ? "Submitting…" : "Submit Rating →"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

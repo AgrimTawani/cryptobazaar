@@ -19,8 +19,9 @@ export async function GET(
     const order = await db.order.findUnique({
       where: { id },
       include: {
-        seller: { select: { id: true, name: true, avatarUrl: true } },
-        buyer:  { select: { id: true, name: true, avatarUrl: true } },
+        seller:  { select: { id: true, name: true, avatarUrl: true } },
+        buyer:   { select: { id: true, name: true, avatarUrl: true } },
+        ratings: { select: { raterId: true } },
       },
     });
     if (!order)
@@ -61,6 +62,7 @@ export async function GET(
       sellerUpiId:       showPaymentDetails ? (order.sellerUpiId ?? null)       : null,
       sellerBankAccount: showPaymentDetails ? (order.sellerBankAccount ?? null) : null,
       sellerIfsc:        showPaymentDetails ? (order.sellerIfsc ?? null)        : null,
+      hasRated: order.ratings.some((r) => r.raterId === user.id),
     });
   } catch (err) {
     console.error("[orders/[id] GET]", err);
