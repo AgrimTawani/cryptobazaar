@@ -292,7 +292,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     ["Amount",  `${order.amount} ${order.asset}`],
                     ["Price",   `₹${parseFloat(order.pricePerUnit).toFixed(2)}/u`],
                     ["Total",   `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`],
-                    ["Fee",     `${fee.toFixed(4)} (0.75%)`],
+                    ["Fee",     `1 ${order.asset} (flat fee)`],
                   ].map(([k, v]) => (
                     <div key={k} className="flex justify-between items-baseline gap-2">
                       <span className="font-sans text-xs text-[#999] shrink-0">{k}</span>
@@ -547,7 +547,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <div className="border-t border-[#86efac] px-5 py-4 shrink-0 bg-[#f0fdf4]">
                   <p className="font-condensed text-2xl text-[#166534] mb-1">Trade Complete ✓</p>
                   <p className="font-sans text-sm text-[#15803d]">
-                    {role === "buyer" ? `You received ${payout.toFixed(4)} ${order.asset}.` : `Buyer received ${payout.toFixed(4)} ${order.asset}. Fee: ${fee.toFixed(4)} (0.75%)`}
+                    {role === "buyer" ? `You received ${payout.toFixed(4)} ${order.asset}.` : `Buyer received ${payout.toFixed(4)} ${order.asset}. Platform fee: 1 ${order.asset}.`}
                   </p>
                 </div>
               )}
@@ -812,7 +812,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             {[
               ["Chain", order.chain], ["Asset", order.asset],
               ["Amount", `${order.amount} ${order.asset}`], ["Price", `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
-              ["Total", `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`], ["Fee", `${fee.toFixed(4)} (0.75%)`],
+              ["Total", `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`], ["Fee", `1 ${order.asset} (flat fee)`],
             ].map(([k, v]) => (
               <div key={k}>
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest">{k}</p>

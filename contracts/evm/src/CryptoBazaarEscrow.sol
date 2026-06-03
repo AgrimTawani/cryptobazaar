@@ -4,11 +4,10 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/// @title CryptoBazaar P2P Escrow (lean version)
+/// @title CryptoBazaar P2P Escrow — flat 1 USDT fee per completed trade
 contract CryptoBazaarEscrow {
     using SafeERC20 for IERC20;
 
-    // Custom errors — far cheaper than string messages
     error Unauthorized();
     error InvalidToken();
     error InvalidState();
@@ -16,24 +15,25 @@ contract CryptoBazaarEscrow {
     error TimeoutNotReached();
     error ZeroAmount();
     error InvalidAddress();
+    error AmountTooSmall();   // amount must exceed flatFee
 
     enum Status { OPEN, LOCKED, PAID, DISPUTED, COMPLETED, CANCELLED }
 
-    // Tightly packed struct — fits in 4 storage slots instead of 6
+    // Tightly packed struct — 4 storage slots
     struct Order {
         address seller;    // slot 1 (20 bytes)
-        uint96  priceInr;  // slot 1 (12 bytes) — packed with seller
+        uint96  priceInr;  // slot 1 (12 bytes)
         address buyer;     // slot 2 (20 bytes)
-        uint64  lockedAt;  // slot 2 (8 bytes) — packed with buyer
+        uint64  lockedAt;  // slot 2 (8 bytes)
         address token;     // slot 3 (20 bytes)
-        uint64  paidAt;    // slot 3 (8 bytes) — packed with token
+        uint64  paidAt;    // slot 3 (8 bytes)
         uint128 amount;    // slot 4 (16 bytes)
-        Status  status;    // slot 4 (1 byte)  — packed with amount
+        Status  status;    // slot 4 (1 byte)
     }
 
     address public admin;
-    address public insuranceFund;
-    uint16  public feeBps = 75; // 0.75%
+    address public treasury;
+    uint128 public flatFee = 1_000_000; // 1 USDT / USDC (6 decimals)
     uint256 public nextOrderId;
 
     mapping(uint256 => Order) public orders;
@@ -53,10 +53,10 @@ contract CryptoBazaarEscrow {
         _;
     }
 
-    constructor(address _insuranceFund, address _initialToken) {
-        if (_insuranceFund == address(0)) revert InvalidAddress();
-        admin         = msg.sender;
-        insuranceFund = _insuranceFund;
+    constructor(address _treasury, address _initialToken) {
+        if (_treasury == address(0)) revert InvalidAddress();
+        admin    = msg.sender;
+        treasury = _treasury;
         if (_initialToken != address(0)) whitelisted[_initialToken] = true;
     }
 
@@ -66,14 +66,13 @@ contract CryptoBazaarEscrow {
         whitelisted[token] = status;
     }
 
-    function setInsuranceFund(address _fund) external onlyAdmin {
-        if (_fund == address(0)) revert InvalidAddress();
-        insuranceFund = _fund;
+    function setTreasury(address _treasury) external onlyAdmin {
+        if (_treasury == address(0)) revert InvalidAddress();
+        treasury = _treasury;
     }
 
-    function setFeeBps(uint16 _feeBps) external onlyAdmin {
-        if (_feeBps > 200) revert Unauthorized();
-        feeBps = _feeBps;
+    function setFlatFee(uint128 _flatFee) external onlyAdmin {
+        flatFee = _flatFee;
     }
 
     // ─── Seller ────────────────────────────────────────────────────────────────
@@ -81,16 +80,16 @@ contract CryptoBazaarEscrow {
     function createOrder(address token, uint128 amount, uint96 priceInr) external {
         if (!whitelisted[token]) revert InvalidToken();
         if (amount == 0) revert ZeroAmount();
+        if (amount <= flatFee) revert AmountTooSmall();
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-        uint256 id    = nextOrderId++;
+        uint256 id = nextOrderId++;
         Order storage o = orders[id];
         o.seller   = msg.sender;
         o.token    = token;
         o.amount   = amount;
         o.priceInr = priceInr;
-        // status defaults to OPEN (0)
 
         emit OrderCreated(id, msg.sender, token, amount, priceInr);
     }
@@ -107,29 +106,29 @@ contract CryptoBazaarEscrow {
 
     function timeoutCancel(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.LOCKED)                      revert InvalidState();
-        if (msg.sender != o.seller)                         revert Unauthorized();
-        if (block.timestamp < o.lockedAt + 30 minutes)      revert TimeoutNotReached();
+        if (o.status != Status.LOCKED)                 revert InvalidState();
+        if (msg.sender != o.seller)                    revert Unauthorized();
+        if (block.timestamp < o.lockedAt + 30 minutes) revert TimeoutNotReached();
 
         o.status = Status.CANCELLED;
         IERC20(o.token).safeTransfer(o.seller, o.amount);
         emit OrderTimedOut(id);
     }
 
-    // State updated BEFORE transfer (checks-effects-interactions — no reentrancy guard needed)
+    // State updated BEFORE transfers (checks-effects-interactions)
     function confirmPayment(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.PAID)    revert InvalidState();
-        if (msg.sender != o.seller)     revert Unauthorized();
+        if (o.status != Status.PAID)  revert InvalidState();
+        if (msg.sender != o.seller)   revert Unauthorized();
 
-        uint128 fee    = uint128((uint256(o.amount) * feeBps) / 10000);
+        uint128 fee    = flatFee;
         uint128 payout = o.amount - fee;
         address buyer  = o.buyer;
         address token  = o.token;
 
-        o.status = Status.COMPLETED; // effect before interaction
+        o.status = Status.COMPLETED;
 
-        IERC20(token).safeTransfer(insuranceFund, fee);
+        IERC20(token).safeTransfer(treasury, fee);
         IERC20(token).safeTransfer(buyer, payout);
         emit OrderCompleted(id, buyer, payout, fee);
     }
@@ -138,8 +137,8 @@ contract CryptoBazaarEscrow {
 
     function lockOrder(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.OPEN)    revert InvalidState();
-        if (msg.sender == o.seller)     revert Unauthorized();
+        if (o.status != Status.OPEN)  revert InvalidState();
+        if (msg.sender == o.seller)   revert Unauthorized();
 
         o.buyer    = msg.sender;
         o.status   = Status.LOCKED;
@@ -149,8 +148,8 @@ contract CryptoBazaarEscrow {
 
     function markPaid(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.LOCKED)  revert InvalidState();
-        if (msg.sender != o.buyer)      revert Unauthorized();
+        if (o.status != Status.LOCKED) revert InvalidState();
+        if (msg.sender != o.buyer)     revert Unauthorized();
 
         o.status = Status.PAID;
         o.paidAt = uint64(block.timestamp);
@@ -161,8 +160,8 @@ contract CryptoBazaarEscrow {
 
     function raiseDispute(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.PAID)                            revert InvalidState();
-        if (msg.sender != o.seller && msg.sender != o.buyer)   revert NotParty();
+        if (o.status != Status.PAID)                          revert InvalidState();
+        if (msg.sender != o.seller && msg.sender != o.buyer) revert NotParty();
 
         o.status = Status.DISPUTED;
         emit DisputeRaised(id, msg.sender);
@@ -170,8 +169,8 @@ contract CryptoBazaarEscrow {
 
     function resolveDispute(uint256 id, address winner) external onlyAdmin {
         Order storage o = orders[id];
-        if (o.status != Status.DISPUTED)                revert InvalidState();
-        if (winner != o.buyer && winner != o.seller)    revert NotParty();
+        if (o.status != Status.DISPUTED)             revert InvalidState();
+        if (winner != o.buyer && winner != o.seller) revert NotParty();
 
         o.status = Status.COMPLETED;
         IERC20(o.token).safeTransfer(winner, o.amount);
