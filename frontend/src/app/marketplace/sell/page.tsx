@@ -6,6 +6,7 @@ import {
   useSendTransaction,
   useActiveWalletConnectionStatus,
   useConnect,
+  useActiveWalletChain,
 } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import {
@@ -44,6 +45,13 @@ export default function SellPage() {
   const account = useActiveAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
   const walletOk = connectionStatus === "connected" && !!account;
+  const activeChain = useActiveWalletChain();
+  const sellChainId = parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002");
+  const chainOk = !account || !activeChain || activeChain.id === sellChainId;
+  const sellChainLabel = sellChainId === 80002 ? "Polygon Amoy" : "Polygon";
+  const activeChainName = activeChain
+    ? ({ 1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy", 56: "BNB Chain", 97: "BNB Testnet" } as Record<number,string>)[activeChain.id] ?? `Chain ${activeChain.id}`
+    : null;
   const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
 
@@ -379,6 +387,14 @@ export default function SellPage() {
             </div>
           )}
 
+          {!chainOk && activeChainName && (
+            <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-xl px-4 py-3 flex items-start gap-2">
+              <span className="text-[#ea580c] shrink-0 mt-0.5">⚠</span>
+              <p className="font-sans text-sm text-[#9a3412] leading-relaxed">
+                Your wallet is on <strong>{activeChainName}</strong>. Switch to <strong>{sellChainLabel}</strong> in MetaMask to post this order.
+              </p>
+            </div>
+          )}
           <button type="button"
             onClick={() => {
               const err = validate();
@@ -386,7 +402,7 @@ export default function SellPage() {
               setErrorMsg("");
               setStep("review");
             }}
-            disabled={!walletOk || isBusy || step === "done"}
+            disabled={!walletOk || !chainOk || isBusy || step === "done"}
             className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
             {isBusy
               ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"

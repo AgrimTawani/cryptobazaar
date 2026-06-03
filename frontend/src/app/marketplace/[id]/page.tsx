@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, useConnect } from "thirdweb/react";
+import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, useConnect, useActiveWalletChain } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
@@ -14,6 +14,19 @@ import { txUrl } from "@/lib/explorer";
 const amoyChain = defineChain(80002);
 const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ?? "") as `0x${string}`;
 const escrowContract = getContract({ client: thirdwebClient, chain: amoyChain, address: ESCROW_ADDR });
+
+// Expected chain ID per order chain (extend when BSC/Tron go live)
+const ORDER_CHAIN_ID: Record<string, number> = {
+  POLYGON: parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002"),
+  BSC:     parseInt(process.env.NEXT_PUBLIC_BSC_CHAIN_ID     ?? "56"),
+};
+const ORDER_CHAIN_LABEL: Record<string, string> = {
+  POLYGON: "Polygon", BSC: "BNB Chain", TRON: "Tron", SOLANA: "Solana",
+};
+function activeChainLabel(id: number | undefined): string {
+  const map: Record<number, string> = { 1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy", 56: "BNB Chain", 97: "BNB Testnet" };
+  return id ? (map[id] ?? `Chain ${id}`) : "Unknown Network";
+}
 
 interface OrderDetail {
   id: string;
@@ -297,6 +310,13 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const { viewerRole: role } = order;
   const isEvm = order.chain === "POLYGON" || order.chain === "BSC";
   const walletOk = !isEvm || (connectionStatus === "connected" && !!account);
+  const activeChain = useActiveWalletChain();
+  const expectedChainId = isEvm ? (ORDER_CHAIN_ID[order.chain] ?? null) : null;
+  // chainOk = true if: non-EVM, wallet not connected yet, or chain IDs match
+  const chainOk = !isEvm || !account || !expectedChainId || activeChain?.id === expectedChainId;
+  const wrongChainMsg = !chainOk
+    ? `This order is on ${ORDER_CHAIN_LABEL[order.chain]}. Your wallet is on ${activeChainLabel(activeChain?.id)}. Switch networks in MetaMask.`
+    : null;
   const inChat = CHAT_STATES.includes(order.status);
   const counterpartyName = role === "buyer" ? order.sellerName : order.buyerName;
   const counterpartyAvatar = role === "buyer" ? order.sellerAvatar : order.buyerAvatar;
@@ -564,10 +584,17 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   )}
                   {error && <p className="font-sans text-sm text-[#dc2626] mb-3">{error}</p>}
                   {role === "seller" && (
+                    <div className="flex flex-col gap-2">
+                      {wrongChainMsg && (
+                        <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-lg px-3 py-2.5 flex items-start gap-2">
+                          <span className="text-[#ea580c] shrink-0 mt-0.5">⚠</span>
+                          <p className="font-sans text-xs text-[#9a3412] leading-relaxed">{wrongChainMsg}</p>
+                        </div>
+                      )}
                     <div className="flex gap-2">
                       <button onClick={() => run("confirm", async () => {
                         await sendTx(prepareContractCall({ contract: escrowContract, method: "function confirmPayment(uint256 id)", params: [onChainId] }));
-                      })} disabled={!!busy || !walletOk}
+                      })} disabled={!!busy || !walletOk || !chainOk}
                         className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer disabled:opacity-40">
                         {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
                       </button>
@@ -577,6 +604,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-sans text-sm font-semibold cursor-pointer disabled:opacity-40">
                         {busy === "dispute" ? "…" : "⚡ Dispute"}
                       </button>
+                    </div>
                     </div>
                   )}
                   {role === "buyer" && (
@@ -902,6 +930,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       . I understand I must send ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")} within 30 minutes of locking or the order will expire.
                     </span>
                   </label>
+                  {wrongChainMsg && (
+                    <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-lg px-3 py-2.5 flex items-start gap-2">
+                      <span className="text-[#ea580c] shrink-0 mt-0.5">⚠</span>
+                      <p className="font-sans text-xs text-[#9a3412] leading-relaxed">{wrongChainMsg}</p>
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <button onClick={() => { setShowBuyConfirm(false); setTcAgreed(false); }}
                       className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
@@ -909,17 +943,25 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </button>
                     <button onClick={() => run("lock", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function lockOrder(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk || !tcAgreed}
+                    })} disabled={!!busy || !walletOk || !tcAgreed || !chainOk}
                       className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer disabled:opacity-40">
                       {busy === "lock" ? "Locking…" : "Lock Order & Start Timer →"}
                     </button>
                   </div>
                 </div>
               ) : (
-                <button onClick={() => setShowBuyConfirm(true)} disabled={!!busy || !walletOk}
-                  className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40">
-                  {`Buy → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
-                </button>
+                <div className="space-y-3">
+                  {wrongChainMsg && (
+                    <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-lg px-3 py-2.5 flex items-start gap-2">
+                      <span className="text-[#ea580c] shrink-0 mt-0.5">⚠</span>
+                      <p className="font-sans text-xs text-[#9a3412] leading-relaxed">{wrongChainMsg}</p>
+                    </div>
+                  )}
+                  <button onClick={() => setShowBuyConfirm(true)} disabled={!!busy || !walletOk || !chainOk}
+                    className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40">
+                    {`Buy → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
+                  </button>
+                </div>
               )}
             </div>
           )}
