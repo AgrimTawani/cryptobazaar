@@ -317,7 +317,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const isEvm = order.chain === "POLYGON" || order.chain === "BSC";
   const walletOk = !isEvm || (connectionStatus === "connected" && !!account);
   const expectedChainId = isEvm ? (ORDER_CHAIN_ID[order.chain] ?? null) : null;
-  // EVM: block if wrong chain. Non-EVM (Tron/Solana): warn but don't block (no escrow contract yet)
+  // EVM: require exact match — !activeChain (Solana/unknown) is NOT ok
   const chainOk = !isEvm || !account || !expectedChainId || activeChain?.id === expectedChainId;
   const wrongChainMsg = account
     ? isEvm && !chainOk

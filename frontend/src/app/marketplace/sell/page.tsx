@@ -47,11 +47,18 @@ export default function SellPage() {
   const walletOk = connectionStatus === "connected" && !!account;
   const activeChain = useActiveWalletChain();
   const sellChainId = parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002");
-  const chainOk = !account || !activeChain || activeChain.id === sellChainId;
+  // Require exact chain match — !activeChain (Solana/unknown) is NOT ok
+  const chainOk = !account || activeChain?.id === sellChainId;
   const sellChainLabel = sellChainId === 80002 ? "Polygon Amoy" : "Polygon";
+  const CHAIN_LABELS: Record<number, string> = {
+    1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy",
+    56: "BNB Chain", 97: "BNB Testnet",
+    728126428: "Tron", 3448148188: "Tron Nile", 2494104990: "Tron Shasta",
+    1399811149: "Solana", 103: "Solana Devnet",
+  };
   const activeChainName = activeChain
-    ? ({ 1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy", 56: "BNB Chain", 97: "BNB Testnet" } as Record<number,string>)[activeChain.id] ?? `Chain ${activeChain.id}`
-    : null;
+    ? (CHAIN_LABELS[activeChain.id] ?? `Chain ${activeChain.id}`)
+    : account ? "Unknown Network" : null;
   const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
 
@@ -331,6 +338,28 @@ export default function SellPage() {
                 Total value: ₹{parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
               </p>
             )}
+          </div>
+
+          {/* Network — detected from MetaMask */}
+          <div>
+            <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
+              Network
+            </label>
+            <div className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
+              chainOk ? "bg-[#f0fdf4] border-[#bbf7d0]" : "bg-[#fff7ed] border-[#fed7aa]"
+            }`}>
+              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${chainOk ? "bg-[#22c55e]" : "bg-[#f97316]"}`} />
+              <div>
+                <p className="font-sans text-sm font-semibold text-[#111]">
+                  {activeChainName ?? (account ? "Detecting…" : "Not connected")}
+                </p>
+                <p className={`font-sans text-xs mt-0.5 ${chainOk ? "text-[#16a34a]" : "text-[#9a3412]"}`}>
+                  {chainOk
+                    ? `✓ Correct network — orders post to ${sellChainLabel}`
+                    : `Switch to ${sellChainLabel} in MetaMask to continue`}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div>
