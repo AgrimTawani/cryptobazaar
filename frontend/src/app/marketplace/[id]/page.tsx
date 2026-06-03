@@ -24,7 +24,12 @@ const ORDER_CHAIN_LABEL: Record<string, string> = {
   POLYGON: "Polygon", BSC: "BNB Chain", TRON: "Tron", SOLANA: "Solana",
 };
 function activeChainLabel(id: number | undefined): string {
-  const map: Record<number, string> = { 1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy", 56: "BNB Chain", 97: "BNB Testnet" };
+  const map: Record<number, string> = {
+    1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy",
+    56: "BNB Chain", 97: "BNB Testnet",
+    728126428: "Tron", 3448148188: "Tron Nile", 2494104990: "Tron Shasta",
+    1399811149: "Solana", 103: "Solana Devnet",
+  };
   return id ? (map[id] ?? `Chain ${id}`) : "Unknown Network";
 }
 
@@ -312,10 +317,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const walletOk = !isEvm || (connectionStatus === "connected" && !!account);
   const activeChain = useActiveWalletChain();
   const expectedChainId = isEvm ? (ORDER_CHAIN_ID[order.chain] ?? null) : null;
-  // chainOk = true if: non-EVM, wallet not connected yet, or chain IDs match
+  // EVM: block if wrong chain. Non-EVM (Tron/Solana): warn but don't block (no escrow contract yet)
   const chainOk = !isEvm || !account || !expectedChainId || activeChain?.id === expectedChainId;
-  const wrongChainMsg = !chainOk
-    ? `This order is on ${ORDER_CHAIN_LABEL[order.chain]}. Your wallet is on ${activeChainLabel(activeChain?.id)}. Switch networks in MetaMask.`
+  const wrongChainMsg = account
+    ? isEvm && !chainOk
+      ? `This order is on ${ORDER_CHAIN_LABEL[order.chain]}. Your wallet is on ${activeChainLabel(activeChain?.id)}. Switch networks in MetaMask to continue.`
+      : !isEvm
+      ? `This order is on ${ORDER_CHAIN_LABEL[order.chain]}. Make sure your ${ORDER_CHAIN_LABEL[order.chain]} wallet is active in MetaMask before trading.`
+      : null
     : null;
   const inChat = CHAT_STATES.includes(order.status);
   const counterpartyName = role === "buyer" ? order.sellerName : order.buyerName;
