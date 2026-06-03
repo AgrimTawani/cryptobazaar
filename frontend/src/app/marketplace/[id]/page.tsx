@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, useConnect } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
@@ -160,6 +161,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [ratingComment, setRatingComment] = useState("");
   const [ratingSubmitting, setRatingSubmitting] = useState(false);
   const [ratingDone, setRatingDone] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
@@ -249,6 +251,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   }, [id]);
 
   useEffect(() => { if (order?.status === "BUYER_PAID") fetchProofUrl(); }, [order?.status, fetchProofUrl]);
+  useEffect(() => {
+    if (order?.status === "COMPLETED" && order?.viewerRole !== "observer" && !order.hasRated && !ratingDone) {
+      const t = setTimeout(() => setShowRatingModal(true), 800);
+      return () => clearTimeout(t);
+    }
+  }, [order?.status, order?.viewerRole, order?.hasRated, ratingDone]);
 
   const run = async (dbAction: string, contractFn?: () => Promise<void>) => {
     setBusy(dbAction); setError(null);
@@ -695,75 +703,92 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   </button>
                 </div>
               )}
-
-              {/* ── Rating card — shown after completion ── */}
-              {order.status === "COMPLETED" && role !== "observer" && (
-                <div className="bg-black rounded-xl overflow-hidden">
-                  {/* Header */}
-                  <div className="px-5 pt-5 pb-4 border-b border-white/10">
-                    <p className="font-sans text-[0.6rem] text-lime tracking-[3px] uppercase font-semibold mb-1">Trade Complete</p>
-                    <h3 className="font-condensed text-[1.6rem] text-white tracking-[0.5px] leading-tight">
-                      RATE YOUR<br />EXPERIENCE
-                    </h3>
-                  </div>
-
-                  {ratingDone || order.hasRated ? (
-                    <div className="px-5 py-6 text-center">
-                      <div className="text-2xl mb-2">★★★★★</div>
-                      <p className="font-sans text-sm text-white/60">Thanks for your feedback.</p>
-                    </div>
-                  ) : (
-                    <div className="px-5 py-4 space-y-4">
-                      <p className="font-sans text-xs text-white/40">
-                        Rating {role === "buyer" ? order.sellerName : order.buyerName ?? "your counterparty"}
-                      </p>
-
-                      <div>
-                        <p className="font-sans text-xs text-white/50 uppercase tracking-widest font-semibold mb-2">Politeness</p>
-                        <StarPicker value={ratingPoliteness} onChange={setRatingPoliteness} />
-                      </div>
-
-                      <div>
-                        <p className="font-sans text-xs text-white/50 uppercase tracking-widest font-semibold mb-2">Overall</p>
-                        <StarPicker value={ratingOverall} onChange={setRatingOverall} />
-                      </div>
-
-                      <textarea
-                        value={ratingComment}
-                        onChange={(e) => setRatingComment(e.target.value)}
-                        placeholder="Leave a comment (optional)"
-                        rows={2}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/20 resize-none outline-none focus:border-white/25 transition-colors"
-                      />
-
-                      <button
-                        disabled={!ratingPoliteness || !ratingOverall || ratingSubmitting}
-                        onClick={async () => {
-                          if (!id || !ratingPoliteness || !ratingOverall) return;
-                          setRatingSubmitting(true);
-                          try {
-                            await fetch(`/api/orders/${id}/rate`, {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ politenessRating: ratingPoliteness, overallRating: ratingOverall, comment: ratingComment }),
-                            });
-                            setRatingDone(true);
-                          } finally {
-                            setRatingSubmitting(false);
-                          }
-                        }}
-                        className="w-full py-3 bg-lime text-black font-condensed text-xl tracking-[1px] rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
-                      >
-                        {ratingSubmitting ? "Submitting…" : "Submit Rating →"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>
       )}
+
+      {/* ── Rating modal ── */}
+      <AnimatePresence>
+        {showRatingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-sm bg-black/30"
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) setShowRatingModal(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 12 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-[400px] overflow-hidden border border-[#e8e8e8]"
+            >
+              {/* Header */}
+              <div className="px-6 pt-6 pb-4 border-b border-[#f0f0f0] flex items-start justify-between">
+                <div>
+                  <p className="font-sans text-[0.6rem] text-lime-700 bg-lime/20 px-2 py-0.5 rounded-full tracking-[2px] uppercase font-bold inline-block mb-2">Trade Complete</p>
+                  <h3 className="font-condensed text-[1.8rem] text-black tracking-[0.5px] leading-tight">RATE YOUR<br />EXPERIENCE</h3>
+                  <p className="font-sans text-xs text-[#999] mt-1">
+                    Rating {role === "buyer" ? order?.sellerName : order?.buyerName ?? "your counterparty"}
+                  </p>
+                </div>
+                <button onClick={() => setShowRatingModal(false)} className="text-[#bbb] hover:text-[#888] text-xl leading-none mt-1 cursor-pointer bg-transparent border-0">✕</button>
+              </div>
+
+              {ratingDone ? (
+                <div className="px-6 py-8 text-center">
+                  <div className="text-3xl mb-3 text-lime">★★★★★</div>
+                  <p className="font-condensed text-xl tracking-[0.5px] text-black mb-1">THANKS!</p>
+                  <p className="font-sans text-sm text-[#888]">Your feedback has been recorded.</p>
+                  <button onClick={() => setShowRatingModal(false)} className="mt-5 font-sans text-sm text-[#555] underline cursor-pointer bg-transparent border-0">Close</button>
+                </div>
+              ) : (
+                <div className="px-6 py-5 space-y-4">
+                  <div>
+                    <p className="font-sans text-xs text-[#888] uppercase tracking-widest font-semibold mb-2">Politeness</p>
+                    <StarPicker value={ratingPoliteness} onChange={setRatingPoliteness} />
+                  </div>
+                  <div>
+                    <p className="font-sans text-xs text-[#888] uppercase tracking-widest font-semibold mb-2">Overall</p>
+                    <StarPicker value={ratingOverall} onChange={setRatingOverall} />
+                  </div>
+                  <textarea
+                    value={ratingComment}
+                    onChange={(e) => setRatingComment(e.target.value)}
+                    placeholder="Leave a comment (optional)"
+                    rows={2}
+                    className="w-full bg-[#f8f8f8] border border-[#e8e8e8] rounded-xl px-3 py-2.5 font-sans text-sm text-black placeholder-[#bbb] resize-none outline-none focus:border-[#bbb] transition-colors"
+                  />
+                  <button
+                    disabled={!ratingPoliteness || !ratingOverall || ratingSubmitting}
+                    onClick={async () => {
+                      if (!id || !ratingPoliteness || !ratingOverall) return;
+                      setRatingSubmitting(true);
+                      try {
+                        await fetch(`/api/orders/${id}/rate`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ politenessRating: ratingPoliteness, overallRating: ratingOverall, comment: ratingComment }),
+                        });
+                        setRatingDone(true);
+                      } finally {
+                        setRatingSubmitting(false);
+                      }
+                    }}
+                    className="w-full py-3 bg-black text-white font-condensed text-xl tracking-[1px] rounded-xl cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                  >
+                    {ratingSubmitting ? "Submitting…" : "Submit Rating →"}
+                  </button>
+                  <button onClick={() => setShowRatingModal(false)} className="w-full font-sans text-xs text-[#bbb] cursor-pointer bg-transparent border-0 pb-1">Skip for now</button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── SINGLE-COL (LISTED / CANCELLED / EXPIRED) ── */}
       {!inChat && (
