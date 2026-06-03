@@ -133,6 +133,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const [showBuyConfirm, setShowBuyConfirm] = useState(false);
+  const [tcAgreed, setTcAgreed] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
@@ -756,14 +757,29 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       </div>
                     ))}
                   </div>
+                  <label className="flex items-start gap-3 bg-[#f8f8f8] border border-[#e8e8e8] rounded-xl px-4 py-3 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={tcAgreed}
+                      onChange={(e) => setTcAgreed(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 accent-black shrink-0 cursor-pointer"
+                    />
+                    <span className="font-sans text-sm text-[#555] leading-relaxed">
+                      I have read and agree to the{" "}
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-black underline font-semibold">
+                        Terms of Use
+                      </a>
+                      . I understand I must send ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")} within 30 minutes of locking or the order will expire.
+                    </span>
+                  </label>
                   <div className="flex gap-3">
-                    <button onClick={() => setShowBuyConfirm(false)}
+                    <button onClick={() => { setShowBuyConfirm(false); setTcAgreed(false); }}
                       className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
                       Cancel
                     </button>
                     <button onClick={() => run("lock", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function lockOrder(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk}
+                    })} disabled={!!busy || !walletOk || !tcAgreed}
                       className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer disabled:opacity-40">
                       {busy === "lock" ? "Locking…" : "Lock Order & Start Timer →"}
                     </button>
