@@ -167,12 +167,17 @@ export async function PATCH(
         if (order.status !== "BUYER_MATCHED")
           return NextResponse.json({ error: "Invalid state" }, { status: 400 });
 
+        const paidAt = new Date();
+        const buyerPaymentTimeSecs = order.buyerMatchedAt
+          ? Math.round((paidAt.getTime() - order.buyerMatchedAt.getTime()) / 1000)
+          : null;
         await db.order.update({
           where: { id },
           data: {
             status: "BUYER_PAID",
             utr: utr ?? null,
-            paymentSubmittedAt: new Date(),
+            paymentSubmittedAt: paidAt,
+            buyerPaymentTimeSecs,
           },
         });
 
@@ -197,12 +202,17 @@ export async function PATCH(
         if (order.status !== "BUYER_PAID")
           return NextResponse.json({ error: "Invalid state" }, { status: 400 });
 
+        const confirmedAt = new Date();
+        const sellerConfirmTimeSecs = order.paymentSubmittedAt
+          ? Math.round((confirmedAt.getTime() - order.paymentSubmittedAt.getTime()) / 1000)
+          : null;
         await db.order.update({
           where: { id },
           data: {
             status: "COMPLETED",
-            sellerConfirmedAt: new Date(),
-            completedAt: new Date(),
+            sellerConfirmedAt: confirmedAt,
+            completedAt: confirmedAt,
+            sellerConfirmTimeSecs,
           },
         });
 
