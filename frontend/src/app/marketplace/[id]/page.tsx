@@ -158,6 +158,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const router = useRouter();
   const account = useActiveAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
+  const activeChain = useActiveWalletChain();
   const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
 
@@ -315,7 +316,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const { viewerRole: role } = order;
   const isEvm = order.chain === "POLYGON" || order.chain === "BSC";
   const walletOk = !isEvm || (connectionStatus === "connected" && !!account);
-  const activeChain = useActiveWalletChain();
   const expectedChainId = isEvm ? (ORDER_CHAIN_ID[order.chain] ?? null) : null;
   // EVM: block if wrong chain. Non-EVM (Tron/Solana): warn but don't block (no escrow contract yet)
   const chainOk = !isEvm || !account || !expectedChainId || activeChain?.id === expectedChainId;
