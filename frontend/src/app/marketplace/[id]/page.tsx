@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, useConnect } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
@@ -136,6 +137,7 @@ function TradeSteps({ status }: { status: string }) {
 }
 
 export default function TradePage({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
   const account = useActiveAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
   const { connect } = useConnect();
@@ -774,6 +776,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                           body: JSON.stringify({ politenessRating: ratingPoliteness, overallRating: ratingOverall, comment: ratingComment }),
                         });
                         setRatingDone(true);
+                        setTimeout(() => router.push("/dashboard"), 1200);
                       } finally {
                         setRatingSubmitting(false);
                       }
