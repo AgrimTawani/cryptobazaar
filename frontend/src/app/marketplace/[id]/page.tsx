@@ -107,81 +107,35 @@ function Stars({ value, size = "sm" }: { value: number; size?: "sm" | "lg" }) {
   );
 }
 
-function SellerProfileCard({ order }: { order: OrderDetail }) {
-  const hasRatings = order.sellerRatingCount > 0;
+function SellerReviewsCard({ order }: { order: OrderDetail }) {
+  const reviews = order.sellerReviews.filter((r) => r.comment);
+  if (reviews.length === 0) return null;
   return (
     <div className="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-[#f0f0f0]">
-        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Seller</p>
-        <div className="flex items-center gap-3">
-          {order.sellerAvatar
-            ? <img src={order.sellerAvatar} className="w-10 h-10 rounded-full shrink-0" alt="" />
-            : <div className="w-10 h-10 rounded-full bg-[#e5e5e5] shrink-0" />}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-sans text-sm font-semibold text-[#111]">{order.sellerName}</p>
-              <span className="font-sans text-[0.6rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-wide">✓ KYC</span>
-            </div>
-            <p className="font-sans text-xs text-[#999]">
-              {order.sellerTotalTrades} trade{order.sellerTotalTrades !== 1 ? "s" : ""} completed
-            </p>
-          </div>
-          {hasRatings && order.sellerAvgRating !== null && (
-            <div className="text-right shrink-0">
-              <p className="font-condensed text-2xl leading-none text-[#111]">{order.sellerAvgRating.toFixed(1)}</p>
-              <Stars value={order.sellerAvgRating} />
-              <p className="font-sans text-[0.6rem] text-[#bbb] mt-0.5">{order.sellerRatingCount} review{order.sellerRatingCount !== 1 ? "s" : ""}</p>
-            </div>
-          )}
-        </div>
-
-        {hasRatings && (
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {[
-              ["Speed", order.sellerAvgSpeed],
-              ["Politeness", order.sellerAvgPoliteness],
-            ].map(([label, val]) => val !== null && (
-              <div key={label as string} className="bg-[#f8f8f8] rounded-lg px-3 py-2">
-                <p className="font-sans text-[0.6rem] text-[#999] uppercase tracking-widest">{label}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Stars value={val as number} />
-                  <span className="font-sans text-xs text-[#555]">{(val as number).toFixed(1)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!hasRatings && (
-          <p className="font-sans text-xs text-[#bbb] mt-3">No reviews yet — this seller is new to CryptoBazaar.</p>
-        )}
+      <div className="px-5 py-3 border-b border-[#f0f0f0]">
+        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Seller Reviews</p>
       </div>
-
-      {order.sellerReviews.length > 0 && (
-        <div className="divide-y divide-[#f5f5f5]">
-          {order.sellerReviews.map((review, i) => (
-            <div key={i} className="px-5 py-3.5">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  {review.raterAvatar
-                    ? <img src={review.raterAvatar} className="w-6 h-6 rounded-full shrink-0" alt="" />
-                    : <div className="w-6 h-6 rounded-full bg-[#e5e5e5] shrink-0" />}
-                  <span className="font-sans text-xs font-semibold text-[#333] truncate">{review.raterName}</span>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Stars value={review.overallRating} />
-                  <span className="font-sans text-[0.6rem] text-[#bbb]">
-                    {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
-                  </span>
-                </div>
+      <div className="divide-y divide-[#f5f5f5]">
+        {reviews.map((review, i) => (
+          <div key={i} className="px-5 py-3.5">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2 min-w-0">
+                {review.raterAvatar
+                  ? <img src={review.raterAvatar} className="w-5 h-5 rounded-full shrink-0" alt="" />
+                  : <div className="w-5 h-5 rounded-full bg-[#e5e5e5] shrink-0" />}
+                <span className="font-sans text-xs font-semibold text-[#333] truncate">{review.raterName}</span>
               </div>
-              {review.comment && (
-                <p className="font-sans text-xs text-[#666] leading-relaxed ml-8">{review.comment}</p>
-              )}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Stars value={review.overallRating} />
+                <span className="font-sans text-[0.6rem] text-[#bbb]">
+                  {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                </span>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+            <p className="font-sans text-xs text-[#666] leading-relaxed ml-7">{review.comment}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1099,7 +1053,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             ))}
           </div>
 
-          <SellerProfileCard order={order} />
+          <SellerReviewsCard order={order} />
         </div>
       )}
     </div>

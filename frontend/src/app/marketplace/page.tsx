@@ -22,6 +22,9 @@ interface OrderRow {
   orderId: string;
   sellerName: string;
   sellerAvatar: string | null;
+  sellerAvgRating: number | null;
+  sellerRatingCount: number;
+  sellerAvgReleaseSecs: number | null;
   asset: string;
   chain: string;
   amount: string;
@@ -33,6 +36,12 @@ interface OrderRow {
   status: string;
   statusLabel: string;
   isMine: boolean;
+}
+
+function fmtRelease(secs: number | null): string | null {
+  if (!secs || secs <= 0) return null;
+  if (secs < 60) return `~${secs}s release`;
+  return `~${Math.round(secs / 60)}m release`;
 }
 
 const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
@@ -209,7 +218,22 @@ export default function MarketplacePage() {
                 {order.sellerAvatar
                   ? <img src={order.sellerAvatar} alt="" width={28} height={28} className="rounded-full shrink-0" />
                   : <div className="w-7 h-7 rounded-full bg-[#e5e5e5] shrink-0" />}
-                <span className="font-sans text-sm text-[#111] truncate font-medium">{order.sellerName}</span>
+                <div className="min-w-0">
+                  <p className="font-sans text-sm text-[#111] truncate font-medium">{order.sellerName}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {order.sellerAvgRating !== null && order.sellerRatingCount > 0 ? (
+                      <span className="font-sans text-xs text-[#888]">
+                        ★ {order.sellerAvgRating.toFixed(1)}
+                        <span className="text-[#bbb] ml-0.5">({order.sellerRatingCount})</span>
+                      </span>
+                    ) : (
+                      <span className="font-sans text-xs text-[#bbb]">New</span>
+                    )}
+                    {fmtRelease(order.sellerAvgReleaseSecs) && (
+                      <span className="font-sans text-xs text-[#bbb]">· {fmtRelease(order.sellerAvgReleaseSecs)}</span>
+                    )}
+                  </div>
+                </div>
               </div>
               <span className="font-sans text-sm font-semibold text-[#111]">{order.asset}</span>
               <span className="font-mono text-sm text-[#111]">₹{parseFloat(order.pricePerUnit).toFixed(2)}</span>
@@ -251,9 +275,21 @@ export default function MarketplacePage() {
               className="bg-white border border-[#e8e8e8] rounded-xl p-4 no-underline block">
               <div className="flex items-center gap-2 mb-3">
                 {order.sellerAvatar
-                  ? <img src={order.sellerAvatar} alt="" width={26} height={26} className="rounded-full" />
-                  : <div className="w-[26px] h-[26px] rounded-full bg-[#e5e5e5]" />}
-                <span className="font-sans text-sm text-[#111] font-medium">{order.sellerName}</span>
+                  ? <img src={order.sellerAvatar} alt="" width={26} height={26} className="rounded-full shrink-0" />
+                  : <div className="w-[26px] h-[26px] rounded-full bg-[#e5e5e5] shrink-0" />}
+                <div>
+                  <p className="font-sans text-sm text-[#111] font-medium">{order.sellerName}</p>
+                  <div className="flex items-center gap-1.5">
+                    {order.sellerAvgRating !== null && order.sellerRatingCount > 0 ? (
+                      <span className="font-sans text-xs text-[#888]">★ {order.sellerAvgRating.toFixed(1)} ({order.sellerRatingCount})</span>
+                    ) : (
+                      <span className="font-sans text-xs text-[#bbb]">New</span>
+                    )}
+                    {fmtRelease(order.sellerAvgReleaseSecs) && (
+                      <span className="font-sans text-xs text-[#bbb]">· {fmtRelease(order.sellerAvgReleaseSecs)}</span>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="flex justify-between items-end">
                 <div>

@@ -19,13 +19,21 @@ function mapOrder(o: {
   totalValueInr: { toString(): string }; acceptedPaymentMethods: string[];
   escrowTxHash: string | null; escrowContractAddress: string | null;
   status: string; sellerId: number;
-  seller: { name: string | null; avatarUrl: string | null };
+  seller: {
+    name: string | null; avatarUrl: string | null;
+    avgSellerRating: { toNumber(): number } | null;
+    sellerRatingCount: number;
+    avgSellerConfirmTimeSecs: number | null;
+  };
 }, currentUserId: number) {
   return {
     id: o.id,
     orderId: o.orderId,
     sellerName: o.seller.name ?? "Anonymous",
     sellerAvatar: o.seller.avatarUrl ?? null,
+    sellerAvgRating: o.seller.avgSellerRating?.toNumber() ?? null,
+    sellerRatingCount: o.seller.sellerRatingCount,
+    sellerAvgReleaseSecs: o.seller.avgSellerConfirmTimeSecs ?? null,
     asset: o.asset,
     chain: o.chain,
     amount: o.amount.toString(),
@@ -60,7 +68,7 @@ export async function GET(request: Request) {
           status: { in: ACTIVE_STATUSES as never[] },
           OR: [{ sellerId: user.id }, { buyerId: user.id }],
         },
-        include: { seller: { select: { name: true, avatarUrl: true } } },
+        include: { seller: { select: { name: true, avatarUrl: true, avgSellerRating: true, sellerRatingCount: true, avgSellerConfirmTimeSecs: true } } },
         orderBy: { createdAt: "desc" },
       });
       return NextResponse.json(orders.map((o) => mapOrder(o, user.id)));
@@ -69,7 +77,7 @@ export async function GET(request: Request) {
     // Public marketplace - LISTED only, include own orders (marked isMine)
     const orders = await db.order.findMany({
       where: { status: "LISTED" },
-      include: { seller: { select: { name: true, avatarUrl: true } } },
+      include: { seller: { select: { name: true, avatarUrl: true, avgSellerRating: true, sellerRatingCount: true, avgSellerConfirmTimeSecs: true } } },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(orders.map((o) => mapOrder(o, user.id)));
