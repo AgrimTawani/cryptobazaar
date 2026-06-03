@@ -136,7 +136,7 @@ export default function SellPage() {
       setTxHash(transactionHash);
       setStep("saving");
       const orderId = `${ESCROW_ADDR.toLowerCase()}_${nextId.toString()}`;
-      await fetch("/api/orders", {
+      const saveRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -146,6 +146,10 @@ export default function SellPage() {
           paymentMethods,
         }),
       });
+      if (!saveRes.ok) {
+        const body = await saveRes.json().catch(() => ({})) as { error?: string };
+        throw new Error(`Order saved on-chain (tx: ${transactionHash}) but failed to save to database: ${body.error ?? saveRes.status}. Contact support with this transaction hash.`);
+      }
 
       setStep("done");
       setTimeout(() => router.push("/marketplace"), 1500);
