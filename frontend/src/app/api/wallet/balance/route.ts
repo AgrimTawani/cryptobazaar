@@ -45,11 +45,10 @@ async function evmBalance(
     method: "function balanceOf(address account) view returns (uint256)",
     params: [walletAddress as `0x${string}`],
   });
-  const divisorBig = BigInt(10 ** Math.min(token.decimals, 12));
-  const remainder = BigInt(10 ** Math.max(token.decimals - 12, 0));
-  const adjusted = Number(raw / divisorBig) / Number(remainder);
+  // Use Number division — safe up to ~10^9 tokens (well within USDT/USDC range)
+  const adjusted = Number(raw) / 10 ** token.decimals;
   return {
-    balance: adjusted.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    balance: adjusted.toString(),
     symbol: tokenKey,
   };
 }
@@ -69,10 +68,7 @@ async function solanaBalance(walletAddress: string) {
   const accounts = data.result?.value ?? [];
   const uiAmount: number =
     accounts[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
-  return {
-    balance: uiAmount.toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    symbol: "USDC",
-  };
+  return { balance: uiAmount.toString(), symbol: "USDC" };
 }
 
 async function tronBalance(walletAddress: string, tokenKey: "USDT" | "USDC") {
@@ -90,10 +86,7 @@ async function tronBalance(walletAddress: string, tokenKey: "USDT" | "USDC") {
   const trc20: Record<string, string>[] = account.trc20 ?? [];
   const entry = trc20.find((t) => t[contractAddr] !== undefined);
   const raw = entry ? Number(entry[contractAddr]) : 0;
-  return {
-    balance: (raw / 1e6).toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    symbol: tokenKey,
-  };
+  return { balance: (raw / 1e6).toString(), symbol: tokenKey };
 }
 
 export async function GET(request: Request) {
