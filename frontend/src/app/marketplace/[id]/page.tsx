@@ -346,7 +346,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#22c55e]" />
                   <span className="font-sans text-sm font-semibold text-[#111]">Trade Chat</span>
-                  <span className="font-sans text-[0.62rem] text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] px-2 py-0.5 rounded-full font-semibold">End-to-end encrypted</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {timeLeft !== null && !TERMINAL.includes(order.status) && (
@@ -380,6 +379,15 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-[#fafafa]">
+                <div className="flex items-center justify-center gap-1.5 mb-3">
+                  <div className="h-px flex-1 bg-[#efefef]" />
+                  <span className="font-sans text-[0.6rem] text-[#bbb] flex items-center gap-1">
+                    <svg width="9" height="10" viewBox="0 0 9 10" fill="none" className="shrink-0"><rect x="1" y="4" width="7" height="6" rx="1" fill="#bbb"/><path d="M2.5 4V3a2 2 0 1 1 4 0v1" stroke="#bbb" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    End-to-end encrypted
+                  </span>
+                  <div className="h-px flex-1 bg-[#efefef]" />
+                </div>
+
                 {messages.length === 0 && (
                   <p className="font-sans text-sm text-[#bbb] text-center mt-8">No messages yet.</p>
                 )}
