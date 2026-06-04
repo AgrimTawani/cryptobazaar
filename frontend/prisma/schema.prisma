@@ -277,6 +277,9 @@ model Order {
   // Trade constraints
   minTradeSize           Decimal?       @map("min_trade_size") @db.Decimal(20, 2)
   maxTradeSize           Decimal?       @map("max_trade_size") @db.Decimal(20, 2)
+  partialAllowed         Boolean        @default(false) @map("partial_allowed")
+  originalAmount         Decimal        @default(0) @map("original_amount") @db.Decimal(20, 8)
+  lockedAmount           Decimal?       @map("locked_amount") @db.Decimal(20, 8)
   acceptedPaymentMethods PaymentMethod[] @map("accepted_payment_methods")
 
   // Seller payment details (encrypted at app layer)
