@@ -52,7 +52,8 @@ const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
 };
 
 export default function MarketplacePage() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
+  const isGuest = !isSignedIn;
   const [assetFilter, setAssetFilter] = useState("All");
   const [chainFilter, setChainFilter] = useState("All Chains");
   const [isVerified, setIsVerified] = useState(false);
@@ -64,15 +65,15 @@ export default function MarketplacePage() {
     const fetchData = (initial = false) => {
       const requests = initial
         ? [
-            fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
+            isGuest ? Promise.resolve({}) : fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
             fetch("/api/orders").then((r) => r.json()).catch(() => []),
-            fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+            isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
             new Promise((resolve) => setTimeout(resolve, 1500)),
           ]
         : [
             Promise.resolve(null),
             fetch("/api/orders").then((r) => r.json()).catch(() => []),
-            fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+            isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
             Promise.resolve(null),
           ];
 
@@ -87,7 +88,7 @@ export default function MarketplacePage() {
     fetchData(true);
     const interval = setInterval(() => fetchData(false), 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isGuest]);
 
   const filtered = orders.filter((o) => {
     const assetMatch = assetFilter === "All" || o.asset === assetFilter;
@@ -126,8 +127,20 @@ export default function MarketplacePage() {
         </div>
       </header>
 
-      {/* Verification banner — only unverified users */}
-      {!isVerified && (
+      {/* Guest banner */}
+      {isGuest && (
+        <div className="bg-black py-3 px-5 md:px-10 flex items-center justify-between flex-wrap gap-3">
+          <p className="font-sans text-sm text-white/70">
+            <strong className="text-white">Guest view.</strong> Seller names are hidden. Sign in to buy, sell, and see full details.
+          </p>
+          <Link href="/login" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
+            Sign In to Trade →
+          </Link>
+        </div>
+      )}
+
+      {/* Verification banner — only signed-in unverified users */}
+      {!isGuest && !isVerified && (
         <div className="bg-black py-3 px-5 md:px-10 flex items-center justify-between flex-wrap gap-3">
           <p className="font-sans text-sm text-white/70">
             <strong className="text-white">View only.</strong> Complete verification to buy or sell.
@@ -215,11 +228,13 @@ export default function MarketplacePage() {
           {filtered.map((order) => (
             <div key={order.id} className="grid grid-cols-[1fr_90px_130px_140px_160px_120px] gap-3 items-center py-3 px-5 border-b border-[#f2f2f2] hover:bg-[#fafafa] transition-colors last:border-b-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                {order.sellerAvatar
+                {!isGuest && order.sellerAvatar
                   ? <img src={order.sellerAvatar} alt="" width={28} height={28} className="rounded-full shrink-0" />
                   : <div className="w-7 h-7 rounded-full bg-[#e5e5e5] shrink-0" />}
                 <div className="min-w-0">
-                  <p className="font-sans text-sm text-[#111] truncate font-medium">{order.sellerName}</p>
+                  <p className={`font-sans text-sm text-[#111] truncate font-medium ${isGuest ? "blur-sm select-none" : ""}`}>
+                    {order.sellerName}
+                  </p>
                   <div className="flex items-center gap-2 flex-wrap">
                     {order.sellerAvgRating !== null && order.sellerRatingCount > 0 ? (
                       <span className="font-sans text-xs text-[#888]">
@@ -246,7 +261,12 @@ export default function MarketplacePage() {
                 ))}
               </div>
               <div className="flex flex-col items-start gap-1">
-                {order.isMine ? (
+                {isGuest ? (
+                  <Link href="/login"
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-[8px] text-center no-underline hover:bg-[#333] transition-colors">
+                    Sign In
+                  </Link>
+                ) : order.isMine ? (
                   <Link href={`/marketplace/${order.id}`}
                     className="font-sans text-sm font-semibold text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-[8px] text-center no-underline hover:bg-[#ede9fe] transition-colors">
                     Yours →
@@ -274,11 +294,13 @@ export default function MarketplacePage() {
             <Link key={order.id} href={`/marketplace/${order.id}`}
               className="bg-white border border-[#e8e8e8] rounded-xl p-4 no-underline block">
               <div className="flex items-center gap-2 mb-3">
-                {order.sellerAvatar
+                {!isGuest && order.sellerAvatar
                   ? <img src={order.sellerAvatar} alt="" width={26} height={26} className="rounded-full shrink-0" />
                   : <div className="w-[26px] h-[26px] rounded-full bg-[#e5e5e5] shrink-0" />}
                 <div>
-                  <p className="font-sans text-sm text-[#111] font-medium">{order.sellerName}</p>
+                  <p className={`font-sans text-sm text-[#111] font-medium ${isGuest ? "blur-sm select-none" : ""}`}>
+                    {order.sellerName}
+                  </p>
                   <div className="flex items-center gap-1.5">
                     {order.sellerAvgRating !== null && order.sellerRatingCount > 0 ? (
                       <span className="font-sans text-xs text-[#888]">★ {order.sellerAvgRating.toFixed(1)} ({order.sellerRatingCount})</span>
@@ -298,11 +320,18 @@ export default function MarketplacePage() {
                   </p>
                   <p className="font-mono text-sm text-[#888]">₹{parseFloat(order.pricePerUnit).toFixed(2)} / unit</p>
                 </div>
-                <span className={`font-sans text-sm font-semibold py-1.5 px-4 rounded-[8px] ${
-                  order.isMine ? "text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]" : "text-white bg-black"
-                }`}>
-                  {order.isMine ? "Yours →" : "Buy"}
-                </span>
+                {isGuest ? (
+                  <Link href="/login"
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-[8px] no-underline hover:bg-[#333] transition-colors">
+                    Sign In
+                  </Link>
+                ) : (
+                  <span className={`font-sans text-sm font-semibold py-1.5 px-4 rounded-[8px] ${
+                    order.isMine ? "text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]" : "text-white bg-black"
+                  }`}>
+                    {order.isMine ? "Yours →" : "Buy"}
+                  </span>
+                )}
               </div>
             </Link>
           ))}

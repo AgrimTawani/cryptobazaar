@@ -51,18 +51,52 @@ function mapOrder(o: {
 export async function GET(request: Request) {
   try {
     const { userId: clerkId } = await auth();
-    if (!clerkId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const user = await db.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const { searchParams } = new URL(request.url);
     const mine = searchParams.get("mine") === "true";
 
+    // Guest (unauthenticated) — return public listing with redacted seller info
+    if (!clerkId) {
+      // "mine" makes no sense without auth
+      if (mine) return NextResponse.json([]);
+
+      const orders = await db.order.findMany({
+        where: { status: "LISTED" },
+        include: { seller: { select: { name: true, avatarUrl: true, avgSellerRating: true, sellerRatingCount: true, avgSellerConfirmTimeSecs: true } } },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return NextResponse.json(
+        orders.map((o) => ({
+          id: o.id,
+          orderId: o.orderId,
+          sellerName: "••••••",
+          sellerAvatar: null,
+          sellerAvgRating: o.seller.avgSellerRating?.toNumber() ?? null,
+          sellerRatingCount: o.seller.sellerRatingCount,
+          sellerAvgReleaseSecs: o.seller.avgSellerConfirmTimeSecs ?? null,
+          asset: o.asset,
+          chain: o.chain,
+          amount: o.amount.toString(),
+          pricePerUnit: o.pricePerUnit.toString(),
+          totalValueInr: o.totalValueInr.toString(),
+          acceptedPaymentMethods: o.acceptedPaymentMethods,
+          escrowTxHash: o.escrowTxHash ?? null,
+          escrowContractAddress: o.escrowContractAddress ?? null,
+          status: o.status,
+          statusLabel: STATUS_LABEL[o.status] ?? o.status,
+          isMine: false,
+          guest: true,
+        }))
+      );
+    }
+
+    // Authenticated flow
+    const user = await db.user.findUnique({ where: { clerkId } });
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
     if (mine) {
-      // All active orders where user is seller or buyer
       const orders = await db.order.findMany({
         where: {
           status: { in: ACTIVE_STATUSES as never[] },

@@ -54,7 +54,7 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
       .finally(() => setLoading(false));
   }, [token, fixedToken]);
 
-  useEffect(() => { fetchBalance(); }, [fetchBalance]);
+  useEffect(() => { (async () => { await fetchBalance(); })(); }, [fetchBalance]);
 
   const switchChain = async (newChain: string) => {
     if (newChain === chain || switching) return;

@@ -349,7 +349,7 @@ export default function TermsPage() {
           {/* Important notice */}
           <div className="bg-[#fffbeb] border-[1.5px] border-[#fde68a] rounded-xl py-5 px-6 mb-12">
             <p className="font-sans text-[0.85rem] text-[#92400e] leading-[1.7]">
-              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar's screening failures - it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
+              <strong>Important:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar&apos;s screening failures - it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const QUOTES = [
@@ -13,13 +13,10 @@ const QUOTES = [
 ];
 
 export function LoadingSpinner() {
-  const [quote, setQuote] = useState<string>("");
-
-  useEffect(() => {
-    // Pick a random quote on mount to avoid hydration mismatch
-    const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    setQuote(randomQuote);
-  }, []);
+  // Lazy initialiser avoids hydration mismatch without a setState-in-effect
+  const [quote] = useState<string>(
+    () => QUOTES[Math.floor(Math.random() * QUOTES.length)]
+  );
 
   return (
     <div className="w-full h-[60vh] flex flex-col items-center justify-center p-6 text-center">
@@ -38,7 +35,7 @@ export function LoadingSpinner() {
               transition={{ duration: 0.5 }}
               className="font-condensed text-2xl md:text-3xl tracking-[1px] text-[#444] leading-[1.3]"
             >
-              "{quote}"
+              &ldquo;{quote}&rdquo;
             </motion.p>
           )}
         </AnimatePresence>

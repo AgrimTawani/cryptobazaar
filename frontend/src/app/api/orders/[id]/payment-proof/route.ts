@@ -79,9 +79,9 @@ export async function GET(
     if (!order.paymentScreenshotIpfs) return NextResponse.json({ url: null });
 
     // Pre-signed URL — works with private buckets, expires in 1 hour
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const url = await getSignedUrl(
-      r2 as any,
+      // @ts-expect-error S3Client typing mismatch with getSignedUrl
+      r2,
       new GetObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME!,
         Key: order.paymentScreenshotIpfs,

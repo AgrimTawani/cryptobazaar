@@ -234,7 +234,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [busy, setBusy] = useState<string | null>(null);
   const [utrInput, setUtrInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [showBuyConfirm, setShowBuyConfirm] = useState(false);
   const [tcAgreed, setTcAgreed] = useState(false);
   const [ratingPoliteness, setRatingPoliteness] = useState(0);
@@ -272,8 +272,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   }, [id]);
 
   useEffect(() => {
-    fetchOrder(true);
-    const interval = setInterval(() => fetchOrder(false), 5000);
+    (async () => { await fetchOrder(true); })();
+    const interval = setInterval(() => { (async () => { await fetchOrder(false); })(); }, 5000);
     return () => clearInterval(interval);
   }, [fetchOrder]);
 
@@ -291,8 +291,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     if (!order || !CHAT_STATES.includes(order.status)) return;
-    fetchChat();
-    const t = setInterval(fetchChat, 3000);
+    (async () => { await fetchChat(); })();
+    const t = setInterval(() => { (async () => { await fetchChat(); })(); }, 3000);
     return () => clearInterval(t);
   }, [fetchChat, order?.status]);
 
@@ -331,7 +331,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     if (res.ok) { const data = await res.json(); setProofUrl(data.url ?? null); }
   }, [id]);
 
-  useEffect(() => { if (order?.status === "BUYER_PAID") fetchProofUrl(); }, [order?.status, fetchProofUrl]);
+  useEffect(() => { if (order?.status === "BUYER_PAID") (async () => { await fetchProofUrl(); })(); }, [order?.status, fetchProofUrl]);
   useEffect(() => {
     if (order?.status === "COMPLETED" && order?.viewerRole !== "observer" && !order.hasRated && !ratingDone) {
       const t = setTimeout(() => setShowRatingModal(true), 800);

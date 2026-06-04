@@ -117,7 +117,8 @@ function LotteryCounter({
       }, 100);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      setDisplayValue(value);
+      // Defer to avoid calling setState synchronously inside the effect body
+      setTimeout(() => setDisplayValue(value ?? ""), 0);
     }
 
     return () => {
@@ -185,8 +186,10 @@ export default function Home() {
     if (!isDeleting && currentWord === fullText) {
       timer = setTimeout(() => setIsDeleting(true), 3500);
     } else if (isDeleting && currentWord === "") {
-      setIsDeleting(false);
-      setLoopNum(loopNum + 1);
+      setTimeout(() => {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }, 0);
     }
     return () => clearTimeout(timer);
   }, [currentWord, isDeleting, loopNum]);
@@ -363,7 +366,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            India's most rigorously vetted P2P exchange for USDT and USDC against INR.
+            India&apos;s most rigorously vetted P2P exchange for USDT and USDC against INR.
             <br className="hidden md:block" />Every member verified. Every trade held in escrow.
           </motion.p>
 
@@ -725,7 +728,7 @@ export default function Home() {
               © 2026 CryptoBazaar. All rights reserved.
             </p>
             <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] md:text-right">
-              The Member Protection Fund is a service remedy for CryptoBazaar's screening failures - not an insurance product and not regulated as such. Disbursements require documented proof that the freeze was caused by a failure in our vetting process. Subject to fund availability. No amount is guaranteed.
+              The Member Protection Fund is a service remedy for CryptoBazaar&apos;s screening failures - not an insurance product and not regulated as such. Disbursements require documented proof that the freeze was caused by a failure in our vetting process. Subject to fund availability. No amount is guaranteed.
             </p>
           </div>
         </div>
