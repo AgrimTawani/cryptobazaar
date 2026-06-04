@@ -327,6 +327,389 @@ Notices to us must be sent in writing to the legal email above. Notices to you w
 
 const ARTICLES_DATA: Article[] = [
   {
+    id: "what-is-usdt",
+    title: "What Is USDT?",
+    shortDesc: "An introduction to Tether (USDT), the world's most traded stablecoin.",
+    sections: [
+      {
+        id: "stablecoin-basics",
+        title: "1. Stablecoin Basics",
+        content: `A stablecoin is a type of cryptocurrency designed to maintain a stable value relative to a specific asset, usually the US Dollar. 
+
+USDT (Tether) is the original and most widely used stablecoin. It bridges the gap between traditional fiat currencies (like INR or USD) and the cryptocurrency market, allowing traders to hold a digital asset that doesn't suffer from the extreme price volatility of Bitcoin or Ethereum.`
+      },
+      {
+        id: "how-usdt-maintains-value",
+        title: "2. How USDT Maintains Its Value",
+        content: `USDT maintains its 1:1 peg to the US Dollar because its issuing company, Tether Limited, claims to hold equivalent reserves for every USDT token in circulation. 
+
+These reserves consist of cash, cash equivalents (like short-term US Treasury bills), corporate bonds, and other assets. Theoretically, anyone with a direct account with Tether can redeem 1 USDT for $1 at any time, which keeps the price anchored in the open market.`
+      },
+      {
+        id: "use-cases",
+        title: "3. Use Cases",
+        content: `USDT is the backbone of the crypto economy. Its primary use cases include:
+- **Trading Pairs:** Most crypto assets on global exchanges are priced and traded against USDT (e.g., BTC/USDT).
+- **P2P Trading:** It is the primary asset used in the Indian P2P market to enter or exit the crypto ecosystem.
+- **DeFi:** USDT is widely used for lending, borrowing, and providing liquidity in Decentralized Finance protocols.`
+      },
+      {
+        id: "advantages",
+        title: "4. Advantages",
+        content: `The biggest advantage of USDT is its **unmatched liquidity**. 
+
+It has the highest trading volume of any cryptocurrency. Because it is so ubiquitous, you will almost always find a buyer or seller for USDT instantly on CryptoBazaar. It is also supported across dozens of blockchains, making it incredibly versatile for moving funds cheaply across networks like Tron (TRC-20) and Polygon.`
+      },
+      {
+        id: "risks",
+        title: "5. Risks",
+        content: `While USDT is stable, it carries counterparty risk:
+- **Reserve Transparency:** Tether has faced regulatory scrutiny over the exact composition of its reserves, as they are not fully audited by a Big Four accounting firm (they provide "attestations" instead).
+- **Centralization:** Tether Limited has the technical ability to freeze USDT in any wallet address upon request from law enforcement.`
+      }
+    ]
+  },
+  {
+    id: "what-is-usdc",
+    title: "What Is USDC?",
+    shortDesc: "Everything you need to know about USD Coin (USDC), the regulated stablecoin.",
+    sections: [
+      {
+        id: "overview",
+        title: "1. Overview",
+        content: `USDC (USD Coin) is a stablecoin pegged to the US Dollar. It was launched in 2018 by Centre (a consortium originally founded by Circle and Coinbase) and is now solely issued by Circle, a US-based financial technology company.
+
+USDC was created as a transparent, regulated alternative to USDT, focusing heavily on compliance with US financial laws.`
+      },
+      {
+        id: "backing-and-reserves",
+        title: "2. Backing and Reserves",
+        content: `USDC is backed 100% by cash and short-dated US Treasury securities. 
+
+The reserves are held in custody by regulated US financial institutions, including BlackRock and BNY Mellon. This strict reserve composition ensures that USDC is fully backed by highly liquid, risk-free assets, meaning redemptions can be processed quickly even during market panics.`
+      },
+      {
+        id: "regulatory-position",
+        title: "3. Regulatory Position",
+        content: `Circle is a licensed Money Services Business (MSB) in the United States and holds money transmitter licenses across numerous US states. 
+
+They publish monthly attestation reports conducted by Deloitte (a Big Four accounting firm) to prove that the exact amount of USDC in circulation matches the US Dollars held in their reserve bank accounts. This makes USDC the standard for institutional compliance.`
+      },
+      {
+        id: "advantages",
+        title: "4. Advantages",
+        content: `The primary advantage of USDC is **trust and transparency**. 
+
+For users who hold large amounts of stablecoins for long periods, USDC provides peace of mind due to its regulated nature and audited reserves. It is also the preferred stablecoin for many major Decentralized Finance (DeFi) protocols and institutional investors.`
+      },
+      {
+        id: "risks",
+        title: "5. Risks",
+        content: `Like USDT, USDC is centralized, meaning Circle can blacklist addresses and freeze funds at the behest of US law enforcement. 
+
+Additionally, for retail P2P traders in India, USDC has **lower liquidity** compared to USDT. You may find fewer listings and slightly wider spreads when buying or selling USDC on CryptoBazaar, although this gap is shrinking as USDC grows in popularity.`
+      }
+    ]
+  },
+  {
+    id: "why-stablecoins-popular",
+    title: "Why Stablecoins Are Popular in India",
+    shortDesc: "Exploring the massive adoption of USDT and USDC among Indian users.",
+    sections: [
+      {
+        id: "protection-against-volatility",
+        title: "1. Protection Against Volatility",
+        content: `Cryptocurrencies like Bitcoin and Ethereum can swing 10% to 20% in a single day. For the average Indian investor looking to preserve capital while staying within the crypto ecosystem, this volatility is unacceptable.
+
+Stablecoins offer a safe harbor. By converting volatile crypto profits into USDT or USDC, Indian traders can lock in their gains without having to withdraw to a traditional bank account (which triggers taxable events and banking fees).`
+      },
+      {
+        id: "cross-border-transfers",
+        title: "2. Cross-Border Transfers",
+        content: `Sending money internationally via traditional banking (SWIFT) can take 3 to 5 business days and incur fees of 3% to 5% due to forex markups and intermediary bank charges.
+
+Stablecoins allow Indian users to send or receive US Dollar-equivalent value anywhere in the world in seconds. A transfer on the Polygon or Tron network costs mere cents and settles instantly, making it vastly superior to traditional fiat rails.`
+      },
+      {
+        id: "freelance-payments",
+        title: "3. Freelance Payments",
+        content: `India is a global hub for IT and Web3 freelancers. Many developers, designers, and marketers working for international clients or decentralized autonomous organizations (DAOs) prefer to be paid in stablecoins.
+
+Getting paid in USDT/USDC bypasses the delays and high currency conversion fees of platforms like PayPal or Upwork. Freelancers can then cash out their stablecoins for INR locally on platforms like CryptoBazaar.`
+      },
+      {
+        id: "merchant-settlements",
+        title: "4. Merchant Settlements",
+        content: `Small and medium-sized businesses (SMEs) engaged in import/export face massive friction in B2B cross-border payments. 
+
+While operating in a regulatory grey area, some merchants use stablecoins as an efficient settlement layer with their international suppliers to avoid the delays and steep forex spreads imposed by traditional banking channels.`
+      },
+      {
+        id: "remittances",
+        title: "5. Remittances",
+        content: `India is the largest recipient of remittances in the world. NRIs (Non-Resident Indians) are increasingly exploring stablecoins as a way to send money home to their families. By buying USDT abroad and having their families sell it via P2P in India, they can often achieve a better effective exchange rate than traditional remittance services.`
+      }
+    ]
+  },
+  {
+    id: "how-stablecoins-work",
+    title: "How Stablecoins Work Behind the Scenes",
+    shortDesc: "The technical mechanics of how fiat-pegged tokens operate on the blockchain.",
+    sections: [
+      {
+        id: "blockchain-basics",
+        title: "1. Blockchain Basics",
+        content: `Unlike Bitcoin, which has its own dedicated blockchain, stablecoins like USDT and USDC are issued as "tokens" on existing blockchains. 
+
+For example, USDT operates as an ERC-20 token on the Ethereum network, a TRC-20 token on the Tron network, and similarly on Polygon, Solana, and others. The underlying blockchain handles the security, consensus, and transfer mechanics, while the stablecoin issuer simply manages the smart contract that tracks who owns what.`
+      },
+      {
+        id: "reserve-backing",
+        title: "2. Reserve Backing",
+        content: `The core mechanism that gives a fiat-backed stablecoin its value is the reserve. 
+
+For every 1 digital token that exists on the blockchain, the issuing company (Tether or Circle) must hold $1 worth of real-world assets (cash, treasury bonds, commercial paper) in a traditional bank account or custodian. This ensures the digital token is fully collateralized by real-world value.`
+      },
+      {
+        id: "minting-and-redemption",
+        title: "3. Minting and Redemption",
+        content: `When an institutional client (like a major crypto exchange) deposits $10 Million in fiat currency into Circle's bank account, Circle "mints" (creates) 10 Million new USDC tokens on the blockchain and sends them to the client's crypto wallet. This increases the total supply of USDC.
+
+Conversely, when a client wants to cash out, they send 10 Million USDC back to Circle's smart contract. Circle "burns" (destroys) those digital tokens and wires $10 Million in real fiat from their bank to the client's bank. This decreases the total supply.`
+      },
+      {
+        id: "on-chain-transfers",
+        title: "4. On-Chain Transfers",
+        content: `Once minted, stablecoins trade freely between individuals without the issuer's involvement. 
+
+When you send USDT to a friend, you sign a digital transaction with your private key. The blockchain validators process this transaction, updating the smart contract ledger to deduct the balance from your address and add it to your friend's address. The issuer (Tether) does not process or approve this transfer—the decentralized blockchain does.`
+      },
+      {
+        id: "security-considerations",
+        title: "5. Security Considerations",
+        content: `While on-chain transfers are highly secure, stablecoins introduce specific risks:
+
+**Smart Contract Risk:** The code governing the stablecoin could theoretically contain bugs, though USDT and USDC have been heavily audited and battle-tested for years.
+**Centralization Risk:** Both Tether and Circle maintain admin keys to their smart contracts. This allows them to freeze addresses involved in hacks, scams, or illegal activities by adding them to a blocklist on the blockchain.`
+      }
+    ]
+  },
+  {
+    id: "common-p2p-scams",
+    title: "Common P2P Crypto Scams in India",
+    shortDesc: "Learn how to spot and avoid the most prevalent frauds in the P2P market.",
+    sections: [
+      {
+        id: "fake-payment-screenshot",
+        title: "1. Fake Payment Screenshot Scam",
+        content: `Scammers often use modified APKs or photo-editing software to create realistic-looking payment confirmation screens from popular UPI apps like PhonePe, GPay, or Paytm. 
+        
+They will send you this screenshot and pressure you to release the crypto quickly, claiming the bank servers are delayed.
+
+**How to avoid it:** Never release crypto based on a screenshot. Always log into your own banking app and verify that the exact amount has been credited to your account.`
+      },
+      {
+        id: "utr-manipulation",
+        title: "2. UTR Manipulation Scam",
+        content: `In this scam, the buyer clicks "I Have Paid" but enters a random or recycled UTR (Unique Transaction Reference) number from a previous, unrelated transaction.
+
+If you don't check your bank statement carefully, you might see the UTR format looks correct and accidentally release the funds.
+
+**How to avoid it:** Cross-reference the UTR provided on the platform with the exact UTR shown in your bank statement for that specific incoming credit.`
+      },
+      {
+        id: "third-party-payment",
+        title: "3. Third-Party Payment Scam",
+        content: `The scammer pays you from a bank account that does not belong to them. The name on the incoming bank transfer will not match their verified name on CryptoBazaar.
+
+This is extremely dangerous. The funds could be stolen or linked to cybercrime. When the real owner of the bank account files a police complaint, your bank account will be frozen.
+
+**How to avoid it:** Always verify that the sender's name in your bank app exactly matches the buyer's verified name on CryptoBazaar. If it doesn't, do not release the crypto. Raise a dispute immediately.`
+      },
+      {
+        id: "chargeback-scams",
+        title: "4. Chargeback Scams",
+        content: `After a successful trade where you received the INR and released the crypto, the buyer contacts their bank and claims the transaction was unauthorized or fraudulent. The bank may then freeze your account or reverse the transaction (chargeback).
+
+**How to avoid it:** This is mitigated on CryptoBazaar through our strict 3-layer KYC. However, if a chargeback happens, immediately provide the CryptoBazaar trade history, chat logs, and the buyer's verified details to your bank and the Cyber Cell to prove it was a legitimate transaction.`
+      },
+      {
+        id: "identity-impersonation",
+        title: "5. Identity Impersonation",
+        content: `Scammers may try to impersonate CryptoBazaar support staff, or pretend to be highly-rated sellers by creating visually similar usernames.
+
+**How to avoid it:** CryptoBazaar support will never contact you via Telegram or WhatsApp, and will never ask you to release crypto manually or send funds to a "safe wallet". All trades must stay within the platform's escrow.`
+      },
+      {
+        id: "telegram-whatsapp",
+        title: "6. Telegram/WhatsApp Fraud",
+        content: `A buyer or seller will ask you to move the conversation to Telegram or WhatsApp, usually promising a better rate or zero fees. Once off-platform, you have no escrow protection, and they will steal your funds.
+
+**How to avoid it:** Never communicate or trade off-platform. If someone asks for your WhatsApp number, refuse and report them.`
+      },
+      {
+        id: "escrow-bypass",
+        title: "7. Escrow Bypass Scams",
+        content: `The scammer tries to convince you to release the crypto before the payment arrives, often citing a "medical emergency" or claiming that the smart contract requires you to release first to "unlock" the fiat payment.
+
+**How to avoid it:** The escrow smart contract NEVER holds fiat (INR). It only holds crypto. Never release the escrow until the INR is fully cleared in your bank account.`
+      },
+      {
+        id: "fake-support",
+        title: "8. Fake Customer Support Scams",
+        content: `You receive an email or SMS claiming your CryptoBazaar account is locked, or that a large deposit is pending, with a link to a fake login page designed to steal your credentials.
+
+**How to avoid it:** Only log in via the official cryptobazaar.co.in website. We use Google OAuth, so you should never be entering a password directly on our site.`
+      },
+      {
+        id: "how-to-stay-protected",
+        title: "9. How to Stay Protected",
+        content: `The golden rules of P2P safety:
+1. Trade only with verified users.
+2. Never trust screenshots; always check your bank app.
+3. Reject third-party payments instantly.
+4. Keep all communication on the platform.
+5. Take your time. Never let a counterparty rush you.`
+      }
+    ]
+  },
+  {
+    id: "red-flags-usdt",
+    title: "10 Red Flags Before Releasing Your USDT",
+    shortDesc: "A quick checklist to ensure every trade is safe before you click release.",
+    sections: [
+      {
+        id: "payment-not-reflecting",
+        title: "1. Payment Not Reflecting in Bank Account",
+        content: `The buyer clicked "Paid" but your bank balance hasn't increased. Never rely on SMS alerts (they can be spoofed) or the buyer's screenshots. Open your banking app and verify the final balance and transaction history.`
+      },
+      {
+        id: "mismatched-sender",
+        title: "2. Mismatched Sender Name",
+        content: `The name on the incoming IMPS/UPI transfer is different from the buyer's verified name on CryptoBazaar. This is the #1 cause of bank freezes. Do not release the crypto.`
+      },
+      {
+        id: "outside-platform",
+        title: "3. Requests to Communicate Outside Platform",
+        content: `The counterparty asks you to call them or chat on Telegram/WhatsApp to "sort out an issue." Scammers do this to remove evidence from the platform. Keep everything in the trade chat.`
+      },
+      {
+        id: "urgent-pressure",
+        title: "4. Urgent Pressure Tactics",
+        content: `Messages like "Bro please release fast, it's an emergency," or "Release now or I will report you." Scammers create false urgency so you panic and skip verifying the payment properly.`
+      },
+      {
+        id: "split-payments",
+        title: "5. Split Payments",
+        content: `The trade is for ₹1,00,000, but the buyer sends ₹40,000 from one account, ₹50,000 from another, and ₹10,000 from a third. This is called structuring and is a massive AML red flag. All payments must come from the single, verified bank account of the user.`
+      },
+      {
+        id: "suspicious-references",
+        title: "6. Suspicious Payment References",
+        content: `The buyer adds remarks like "Crypto", "USDT Buy", or "Binance" to the bank transfer. This can trigger automated bank risk systems to freeze your account. Always advise buyers to leave remarks blank or use simple terms like "Freelance" or "Gift".`
+      },
+      {
+        id: "new-account",
+        title: "7. New Account Warning Signs",
+        content: `Be cautious if a brand new account (created today) with zero previous trades immediately tries to open a massive ₹5,00,000 buy order. While CryptoBazaar's KYC catches most bad actors, high-value trades with fresh accounts carry inherently higher risk.`
+      }
+    ]
+  },
+  {
+    id: "what-to-do-scammed",
+    title: "What to Do If You Are Scammed in a P2P Trade",
+    shortDesc: "A step-by-step action plan if a trade goes wrong.",
+    sections: [
+      {
+        id: "immediate-steps",
+        title: "1. Immediate Steps",
+        content: `If you realize you are being scammed (e.g., the buyer sent a fake screenshot, or you accidentally sent funds to the wrong person):
+- **Do NOT release the escrow.** If you hold the crypto, your funds are safe as long as they are in the smart contract.
+- **Click 'Dispute'.** Immediately escalate the trade to our compliance team. This freezes the escrow contract until an investigation is complete.`
+      },
+      {
+        id: "collecting-evidence",
+        title: "2. Collecting Evidence",
+        content: `Gather everything required to prove your case:
+- Download your official PDF bank statements showing the transaction (or lack thereof).
+- Take screenshots of the trade details, UTR numbers, and chat history.
+- If a third-party payment occurred, get a statement proving the sender's name.`
+      },
+      {
+        id: "reporting-user",
+        title: "3. Reporting the User",
+        content: `Use the 'Report' button on the user's profile. This alerts our risk engine. If multiple users report the same account, our automated systems will temporarily suspend their trading privileges pending review.`
+      },
+      {
+        id: "cybercrime-complaint",
+        title: "4. Filing a Cybercrime Complaint",
+        content: `If you have lost funds (e.g., you released crypto and the fiat was reversed, or you paid fiat and the seller absconded via an off-platform scam):
+- Go to the National Cyber Crime Reporting Portal (cybercrime.gov.in).
+- File an official complaint detailing the UTR, the scammer's bank details, and the timeline.
+- Keep the acknowledgment number (FIR equivalent) handy.`
+      },
+      {
+        id: "contacting-bank",
+        title: "5. Contacting Your Bank",
+        content: `Call your bank's fraud department immediately. Provide them with the cybercrime acknowledgment number. If you sent money to a scammer, ask the bank to attempt a "lien" or freeze on the beneficiary's account to stop the funds from moving further.`
+      },
+      {
+        id: "preventive-measures",
+        title: "6. Preventive Measures",
+        content: `To avoid future issues:
+- Never trade off-platform.
+- Never accept third-party payments.
+- Only trade with users who have high completion rates and good reviews.`
+      }
+    ]
+  },
+  {
+    id: "third-party-payments",
+    title: "Third-Party Payments Explained: Why They Are Risky",
+    shortDesc: "Understanding the biggest cause of bank freezes in Indian P2P.",
+    sections: [
+      {
+        id: "what-are-they",
+        title: "1. What are Third-Party Payments?",
+        content: `A third-party payment occurs when the person sending the fiat currency (INR) uses a bank account that does not belong to them. 
+
+For example: The CryptoBazaar account is verified under the name "Rahul Sharma". However, the bank transfer you receive comes from an account named "Priya Enterprises" or "Amit Kumar".`
+      },
+      {
+        id: "why-scammers-use",
+        title: "2. Why Scammers Use Them",
+        content: `Scammers use third-party payments to launder stolen money. 
+They compromise a victim's bank account (via phishing or a separate scam), then use those stolen funds to buy crypto from you. 
+
+When the original victim realizes their money is gone, they file a police complaint. The police trace the money to *your* bank account, and the cyber cell orders your bank to freeze your account because you received "tainted" funds.`
+      },
+      {
+        id: "regulatory-concerns",
+        title: "3. Regulatory Concerns",
+        content: `Allowing third-party payments violates basic Anti-Money Laundering (AML) laws. The Financial Intelligence Unit (FIU-IND) requires platforms to ensure that the fiat rails match the verified identity of the crypto trader. Failing to do so facilitates money laundering and terrorist financing.`
+      },
+      {
+        id: "platform-policies",
+        title: "4. Platform Policies",
+        content: `CryptoBazaar maintains a strict **Zero-Tolerance Policy** for third-party payments.
+
+If you are a buyer: You MUST pay from a bank account where the name perfectly matches your verified Aadhaar/PAN. If you use a friend's, spouse's, or company's account, you will lose the dispute, lose your funds, and be banned.
+
+If you are a seller: You MUST reject any third-party payment. Do not release the crypto. Raise a dispute immediately. If you accept a third-party payment, you forfeit your right to any protection under the Member Protection Fund.`
+      },
+      {
+        id: "safer-alternatives",
+        title: "5. Safer Alternatives",
+        content: `If your primary bank account is hitting its UPI limits, the safe alternative is to:
+1. Use NEFT or IMPS from your own verified account for larger limits.
+2. Link a second bank account to your CryptoBazaar profile (provided it is also in your exact name).
+3. Upgrade your banking tier with your institution.
+
+Never resort to using someone else's account just for convenience.`
+      }
+    ]
+  },
+  {
     id: "how-p2p-works",
     title: "How Our P2P Trading Platform Works",
     shortDesc: "A complete walkthrough of CryptoBazaar — from sign-up to settlement.",
@@ -939,6 +1322,8 @@ export default function ArticlesPage() {
   const [activeSectionId, setActiveSectionId] = useState<string>("");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { isSignedIn, user } = useUser();
+  const articleTopRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   const activeArticle = ARTICLES_DATA.find((a) => a.id === activeArticleId) || ARTICLES_DATA[0];
 
@@ -953,12 +1338,24 @@ export default function ArticlesPage() {
     }
   }, []);
 
-  // Sync initial section ID when changing active article
+  // Sync initial section ID and scroll to top when changing active article
   useEffect(() => {
     if (activeArticle.sections.length > 0) {
       setActiveSectionId(activeArticle.sections[0].id);
     } else {
       setActiveSectionId("");
+    }
+
+    // Scroll to the top of the page (skip on initial mount)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      // Delay to ensure DOM has updated after React re-render
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 50);
+      });
     }
   }, [activeArticleId, activeArticle.sections]);
 
@@ -1036,52 +1433,65 @@ export default function ArticlesPage() {
         
         {/* Sidebar TOC - Desktop */}
         <aside className="w-[300px] border-r border-zinc-200 p-8 shrink-0 hidden md:block sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
-          <div className="mb-8">
+          <div>
             <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-4">
               Documentation Hub
             </h3>
-            <nav className="flex flex-col gap-2">
+            <nav className="flex flex-col gap-1">
               {ARTICLES_DATA.map((article) => (
-                <button
-                  key={article.id}
-                  onClick={() => setActiveArticleId(article.id)}
-                  className={`flex flex-col w-full p-3 rounded-xl font-sans text-left transition-all duration-200 border ${
-                    activeArticleId === article.id
-                      ? "bg-zinc-100 border-zinc-300 text-black shadow-sm"
-                      : "bg-transparent border-transparent text-zinc-500 hover:text-black hover:bg-zinc-50"
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <p className="font-condensed text-base tracking-[0.5px] leading-tight font-bold">
-                      {article.title}
-                    </p>
-                    <p className="text-[0.7rem] text-zinc-400 truncate mt-0.5 font-sans">
-                      {article.shortDesc}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </nav>
-          </div>
+                <div key={article.id}>
+                  <button
+                    onClick={() => setActiveArticleId(article.id)}
+                    className={`flex flex-col w-full p-3 rounded-xl font-sans text-left transition-all duration-200 border ${
+                      activeArticleId === article.id
+                        ? "bg-zinc-100 border-zinc-300 text-black shadow-sm"
+                        : "bg-transparent border-transparent text-zinc-500 hover:text-black hover:bg-zinc-50"
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <p className="font-condensed text-base tracking-[0.5px] leading-tight font-bold">
+                        {article.title}
+                      </p>
+                      <p className="text-[0.7rem] text-zinc-400 truncate mt-0.5 font-sans">
+                        {article.shortDesc}
+                      </p>
+                    </div>
+                  </button>
 
-          {/* Sub-sections of current selected article */}
-          <div className="border-t border-zinc-200 pt-6">
-            <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-4">
-              On This Page
-            </h3>
-            <nav className="flex flex-col gap-1.5 pl-1">
-              {activeArticle.sections.map((sec) => (
-                <button
-                  key={sec.id}
-                  onClick={() => scrollToSection(sec.id)}
-                  className={`font-sans text-xs text-left leading-relaxed py-1.5 px-3 border-l-2 transition-all duration-150 ${
-                    activeSectionId === sec.id
-                      ? "border-black text-black font-bold bg-zinc-50 rounded-r-lg"
-                      : "border-transparent text-zinc-400 hover:text-zinc-900 hover:border-zinc-200"
-                  }`}
-                >
-                  {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
-                </button>
+                  {/* On This Page — inline below the active article */}
+                  <AnimatePresence initial={false}>
+                    {activeArticleId === article.id && article.sections.length > 0 && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-2 pb-3 pl-4 pr-1">
+                          <p className="font-condensed text-[0.65rem] tracking-[3px] uppercase text-zinc-400 mb-2 pl-3">
+                            On This Page
+                          </p>
+                          <nav className="flex flex-col gap-0.5">
+                            {article.sections.map((sec) => (
+                              <button
+                                key={sec.id}
+                                onClick={() => scrollToSection(sec.id)}
+                                className={`font-sans text-[0.7rem] text-left leading-relaxed py-1 px-3 border-l-2 transition-all duration-150 ${
+                                  activeSectionId === sec.id
+                                    ? "border-black text-black font-bold bg-zinc-50 rounded-r-lg"
+                                    : "border-transparent text-zinc-400 hover:text-zinc-900 hover:border-zinc-200"
+                                }`}
+                              >
+                                {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
+                              </button>
+                            ))}
+                          </nav>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ))}
             </nav>
           </div>
@@ -1103,44 +1513,47 @@ export default function ArticlesPage() {
                   </h3>
                   <div className="grid gap-2">
                     {ARTICLES_DATA.map((article) => (
-                      <button
-                        key={article.id}
-                        onClick={() => {
-                          setActiveArticleId(article.id);
-                          setMobileSidebarOpen(false);
-                        }}
-                        className={`flex flex-col w-full p-4 rounded-xl border font-sans text-left transition-all ${
-                          activeArticleId === article.id
-                            ? "bg-zinc-100 border-zinc-300 text-black"
-                            : "bg-zinc-50 border-zinc-200 text-zinc-600"
-                        }`}
-                      >
-                        <div>
-                          <p className="font-condensed text-base tracking-[0.5px] font-bold">{article.title}</p>
-                          <p className="text-xs text-zinc-400 font-sans mt-0.5">{article.shortDesc}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                      <div key={article.id}>
+                        <button
+                          onClick={() => {
+                            setActiveArticleId(article.id);
+                          }}
+                          className={`flex flex-col w-full p-4 rounded-xl border font-sans text-left transition-all ${
+                            activeArticleId === article.id
+                              ? "bg-zinc-100 border-zinc-300 text-black"
+                              : "bg-zinc-50 border-zinc-200 text-zinc-600"
+                          }`}
+                        >
+                          <div>
+                            <p className="font-condensed text-base tracking-[0.5px] font-bold">{article.title}</p>
+                            <p className="text-xs text-zinc-400 font-sans mt-0.5">{article.shortDesc}</p>
+                          </div>
+                        </button>
 
-                <div className="border-t border-zinc-200 pt-6">
-                  <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-3">
-                    Sections
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    {activeArticle.sections.map((sec) => (
-                      <button
-                        key={sec.id}
-                        onClick={() => scrollToSection(sec.id)}
-                        className={`font-sans text-sm text-left py-2 px-3 border-l-2 transition-all ${
-                          activeSectionId === sec.id
-                            ? "border-black text-black font-bold bg-zinc-50"
-                            : "border-transparent text-zinc-500"
-                        }`}
-                      >
-                        {sec.title}
-                      </button>
+                        {/* Inline sections below active article */}
+                        {activeArticleId === article.id && article.sections.length > 0 && (
+                          <div className="pt-2 pb-2 pl-4 pr-1">
+                            <p className="font-condensed text-[0.65rem] tracking-[3px] uppercase text-zinc-400 mb-2 pl-3">
+                              On This Page
+                            </p>
+                            <div className="flex flex-col gap-1">
+                              {article.sections.map((sec) => (
+                                <button
+                                  key={sec.id}
+                                  onClick={() => scrollToSection(sec.id)}
+                                  className={`font-sans text-sm text-left py-2 px-3 border-l-2 transition-all ${
+                                    activeSectionId === sec.id
+                                      ? "border-black text-black font-bold bg-zinc-50"
+                                      : "border-transparent text-zinc-500"
+                                  }`}
+                                >
+                                  {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1160,7 +1573,7 @@ export default function ArticlesPage() {
         <main className="flex-1 p-6 md:p-12 min-w-0 max-w-[900px]">
           
           {/* Article Header Card */}
-          <div className="mb-10 pb-8 border-b border-zinc-250">
+          <div ref={articleTopRef} className="mb-10 pb-8 border-b border-zinc-250">
             <div className="flex items-center gap-3 mb-3">
               <span className="font-sans text-xs tracking-[4px] uppercase text-lime-dark font-bold">
                 CryptoBazaar Knowledge Base
