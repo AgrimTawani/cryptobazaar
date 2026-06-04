@@ -727,9 +727,6 @@ export default function Home() {
             <p className="font-sans text-[0.7rem] text-white/[0.18]">
               © 2026 CryptoBazaar. All rights reserved.
             </p>
-            <p className="font-sans text-[0.7rem] text-white/[0.18] max-w-[560px] leading-[1.6] md:text-right">
-              The Member Protection Fund is a service remedy for CryptoBazaar&apos;s screening failures - not an insurance product and not regulated as such. Disbursements require documented proof that the freeze was caused by a failure in our vetting process. Subject to fund availability. No amount is guaranteed.
-            </p>
           </div>
         </div>
       </footer>
