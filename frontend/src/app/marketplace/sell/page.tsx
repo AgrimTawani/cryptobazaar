@@ -77,6 +77,8 @@ export default function SellPage() {
   const [amount, setAmount] = useState("");
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(["UPI"]);
+  const [partialAllowed, setPartialAllowed] = useState(false);
+  const [minOrderAmount, setMinOrderAmount] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -110,6 +112,16 @@ export default function SellPage() {
     if (paymentMethods.length === 0) return "Select at least one payment method.";
     if (!profilePayment?.bankAccount || !profilePayment?.ifscCode)
       return "Payment details missing. Complete the bank statement step in onboarding.";
+    if (partialAllowed) {
+      const min = parseFloat(minOrderAmount);
+      const total = parseFloat(amount);
+      if (!minOrderAmount || isNaN(min) || min <= 0)
+        return "Enter a valid minimum order amount.";
+      if (min >= total)
+        return "Minimum order must be less than total amount.";
+      if (min < 1)
+        return "Minimum order must be at least 1 USDC.";
+    }
     return null;
   };
 
@@ -159,6 +171,8 @@ export default function SellPage() {
           amount: parseFloat(amount), pricePerUnit: parseFloat(pricePerUnit),
           escrowTxHash: transactionHash, escrowContractAddress: ESCROW_ADDR,
           paymentMethods,
+          partialAllowed,
+          minOrderAmount: partialAllowed ? parseFloat(minOrderAmount) : null,
         }),
       });
       if (!saveRes.ok) {
@@ -287,6 +301,7 @@ export default function SellPage() {
                 ["Price per USDC", `₹${pricePerUnit}`],
                 ["Total value", `₹${totalInr ? parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}`],
                 ["Payment methods", paymentMethods.join(", ")],
+                ["Partial orders", partialAllowed ? `Yes — min ${minOrderAmount} USDC` : "No (full order only)"],
                 ...(profilePayment?.upiId ? [["UPI ID", profilePayment.upiId]] : []),
                 ...(profilePayment?.bankAccount ? [["Bank account", profilePayment.bankAccount], ["IFSC", profilePayment.ifscCode ?? ""]] : []),
               ].map(([k, v]) => (
@@ -324,6 +339,53 @@ export default function SellPage() {
             <input type="number" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g. 10"
               className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-3 font-mono text-base text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors" />
+          </div>
+
+          {/* Partial orders toggle */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block">
+                  Allow Partial Orders
+                </label>
+                <p className="font-sans text-xs text-[#999] mt-0.5">
+                  Let buyers purchase less than the full amount
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setPartialAllowed((p) => !p); setMinOrderAmount(""); }}
+                className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer border-0 shrink-0 ${
+                  partialAllowed ? "bg-[#7b3fe4]" : "bg-[#e5e5e5]"
+                }`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  partialAllowed ? "translate-x-6" : "translate-x-0.5"
+                }`} />
+              </button>
+            </div>
+
+            {partialAllowed && (
+              <div>
+                <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
+                  Minimum Order (USDC)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={minOrderAmount}
+                  onChange={(e) => setMinOrderAmount(e.target.value)}
+                  placeholder={`e.g. ${amount ? Math.floor(parseFloat(amount) * 0.1) || 10 : 10}`}
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-3 font-mono text-base text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+                {minOrderAmount && amount && (
+                  <p className="font-sans text-xs text-[#7b3fe4] mt-1.5">
+                    Buyers can purchase between {minOrderAmount} and {amount} USDC
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div>

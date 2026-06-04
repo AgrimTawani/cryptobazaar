@@ -135,14 +135,9 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const {
-      orderId,
-      chain,
-      asset,
-      amount,
-      pricePerUnit,
-      escrowTxHash,
-      escrowContractAddress,
-      paymentMethods,
+      orderId, chain, asset, amount, pricePerUnit,
+      escrowTxHash, escrowContractAddress, paymentMethods,
+      partialAllowed, minOrderAmount,
     } = body;
 
     const amountNum = parseFloat(amount);
@@ -164,6 +159,9 @@ export async function POST(request: Request) {
         sellerBankAccount: user.bankAccount ?? null,
         sellerIfsc: user.ifscCode ?? null,
         status: "LISTED",
+        partialAllowed:  partialAllowed ?? false,
+        originalAmount:  amountNum,
+        minTradeSize:    (partialAllowed && minOrderAmount) ? minOrderAmount : null,
       },
     });
 

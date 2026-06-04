@@ -139,24 +139,44 @@ export async function PATCH(
         if (user.status !== "VERIFIED")
           return NextResponse.json({ error: "Must be verified to buy" }, { status: 403 });
 
+        const orderAmount = parseFloat(order.amount.toString());
+        const minTrade = order.minTradeSize ? parseFloat(order.minTradeSize.toString()) : orderAmount;
+        const rawBuyAmount = body.buyAmount ? parseFloat(body.buyAmount) : null;
+        const buyAmount = rawBuyAmount ?? orderAmount;
+
+        if (!order.partialAllowed && Math.abs(buyAmount - orderAmount) > 0.000001) {
+          return NextResponse.json({ error: "This order does not allow partial fills" }, { status: 400 });
+        }
+        if (buyAmount < minTrade - 0.000001) {
+          return NextResponse.json({
+            error: `Minimum order is ${minTrade} ${order.asset}`,
+          }, { status: 400 });
+        }
+        if (buyAmount > orderAmount + 0.000001) {
+          return NextResponse.json({ error: "Buy amount exceeds available" }, { status: 400 });
+        }
+
+        const lockedValueInr = buyAmount * parseFloat(order.pricePerUnit.toString());
+
         await db.order.update({
           where: { id },
           data: {
             buyerId: user.id,
             status: "BUYER_MATCHED",
+            lockedAmount: buyAmount,
+            totalValueInr: lockedValueInr,
             buyerMatchedAt: new Date(),
             paymentWindowExpiresAt: new Date(Date.now() + 30 * 60 * 1000),
           },
         });
 
-        // Create chat room + opening system message
         const room = await db.chatRoom.create({ data: { orderId: id } });
         await db.chatMessage.create({
           data: {
             chatRoomId: room.id,
             senderId: null,
             type: "SYSTEM",
-            content: `Order locked by ${user.name ?? "buyer"}. You have 30 minutes to send ₹${parseFloat(order.totalValueInr.toString()).toLocaleString("en-IN")} and submit payment proof.`,
+            content: `Order locked by ${user.name ?? "buyer"} for ${buyAmount} ${order.asset}. You have 30 minutes to send ₹${lockedValueInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })} and submit payment proof.`,
           },
         });
         break;
@@ -207,17 +227,30 @@ export async function PATCH(
         const sellerConfirmTimeSecs = order.paymentSubmittedAt
           ? Math.round((confirmedAt.getTime() - order.paymentSubmittedAt.getTime()) / 1000)
           : null;
+
+        const locked = order.lockedAmount ? parseFloat(order.lockedAmount.toString()) : parseFloat(order.amount.toString());
+        const remaining = parseFloat(order.amount.toString()) - locked;
+        const fullyFilled = remaining <= 0.000001;
+
         await db.order.update({
           where: { id },
           data: {
-            status: "COMPLETED",
+            status: fullyFilled ? "COMPLETED" : "LISTED",
+            amount: fullyFilled ? order.amount : remaining,
+            lockedAmount: null,
+            buyerId: fullyFilled ? order.buyerId : null,
             sellerConfirmedAt: confirmedAt,
-            completedAt: confirmedAt,
+            completedAt: fullyFilled ? confirmedAt : null,
             sellerConfirmTimeSecs,
+            ...(fullyFilled ? {} : {
+              buyerMatchedAt: null,
+              paymentWindowExpiresAt: null,
+              paymentSubmittedAt: null,
+              utr: null,
+            }),
           },
         });
 
-        // System message
         const roomConfirm = await db.chatRoom.findUnique({ where: { orderId: id } });
         if (roomConfirm) {
           await db.chatMessage.create({
@@ -225,7 +258,9 @@ export async function PATCH(
               chatRoomId: roomConfirm.id,
               senderId: null,
               type: "SYSTEM",
-              content: "Seller confirmed INR received. USDC is being released to the buyer's wallet.",
+              content: fullyFilled
+                ? "Seller confirmed INR received. USDC is being released to the buyer's wallet."
+                : `Seller confirmed INR received. ${remaining.toFixed(2)} ${order.asset} remaining — order is live again on the marketplace.`,
             },
           });
         }
