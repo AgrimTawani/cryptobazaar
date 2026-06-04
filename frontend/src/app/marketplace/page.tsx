@@ -44,6 +44,13 @@ function fmtRelease(secs: number | null): string | null {
   return `~${Math.round(secs / 60)}m release`;
 }
 
+const CHAIN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+  POLYGON: { label: "Polygon", color: "#7b3fe4", bg: "#f0ebff" },
+  BSC:     { label: "BSC",     color: "#b45309", bg: "#fef9ee" },
+  SOLANA:  { label: "Solana",  color: "#9945ff", bg: "#f5f0ff" },
+  TRON:    { label: "Tron",    color: "#dc2626", bg: "#fff1f2" },
+};
+
 const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
   LISTED:        { color: "#555",    bg: "#f5f5f5" },
   BUYER_MATCHED: { color: "#1e40af", bg: "#eff6ff" },
@@ -250,7 +257,15 @@ export default function MarketplacePage() {
                   </div>
                 </div>
               </div>
-              <span className="font-sans text-sm font-semibold text-[#111]">{order.asset}</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-sans text-sm font-semibold text-[#111]">{order.asset}</span>
+                {CHAIN_BADGE[order.chain] && (
+                  <span className="font-sans text-[0.6rem] font-semibold px-1.5 py-0.5 rounded-full w-fit"
+                    style={{ color: CHAIN_BADGE[order.chain].color, background: CHAIN_BADGE[order.chain].bg }}>
+                    {CHAIN_BADGE[order.chain].label}
+                  </span>
+                )}
+              </div>
               <span className="font-mono text-sm text-[#111]">₹{parseFloat(order.pricePerUnit).toFixed(2)}</span>
               <span className="font-mono text-sm text-[#111]">
                 {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
@@ -315,9 +330,17 @@ export default function MarketplacePage() {
               </div>
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="font-sans text-base font-semibold text-[#111] mb-0.5">
-                    {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
-                  </p>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="font-sans text-base font-semibold text-[#111]">
+                      {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
+                    </p>
+                    {CHAIN_BADGE[order.chain] && (
+                      <span className="font-sans text-[0.6rem] font-semibold px-1.5 py-0.5 rounded-full"
+                        style={{ color: CHAIN_BADGE[order.chain].color, background: CHAIN_BADGE[order.chain].bg }}>
+                        {CHAIN_BADGE[order.chain].label}
+                      </span>
+                    )}
+                  </div>
                   <p className="font-mono text-sm text-[#888]">₹{parseFloat(order.pricePerUnit).toFixed(2)} / unit</p>
                 </div>
                 {isGuest ? (
