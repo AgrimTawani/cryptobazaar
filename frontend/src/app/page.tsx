@@ -87,6 +87,57 @@ function formatVolume(inr: number) {
   return `₹${inr.toLocaleString("en-IN")}`;
 }
 
+function LotteryCounter({
+  value,
+  type,
+}: {
+  value: string | null;
+  type: "volume" | "members" | "trades";
+}) {
+  const [displayValue, setDisplayValue] = useState("—");
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (value === null) {
+      intervalRef.current = setInterval(() => {
+        let randStr = "";
+        if (type === "volume") {
+          const isCr = Math.random() > 0.4;
+          if (isCr) {
+            randStr = `₹${(Math.random() * 9 + 1).toFixed(1)} Cr`;
+          } else {
+            randStr = `₹${Math.floor(Math.random() * 90 + 10)} L`;
+          }
+        } else if (type === "members") {
+          randStr = Math.floor(Math.random() * 900 + 100).toString();
+        } else if (type === "trades") {
+          randStr = Math.floor(Math.random() * 9000 + 1000).toString();
+        }
+        setDisplayValue(randStr);
+      }, 100);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setDisplayValue(value);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [value, type]);
+
+  return (
+    <motion.span
+      key={displayValue === value ? "settled" : "rolling"}
+      initial={displayValue === value ? { scale: 1.1, filter: "blur(3px)", opacity: 0.7 } : {}}
+      animate={displayValue === value ? { scale: 1, filter: "blur(0px)", opacity: 1 } : {}}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className="inline-block tabular-nums"
+    >
+      {displayValue}
+    </motion.span>
+  );
+}
+
 export default function Home() {
   const words = ["secure", "protected", "trusted"];
   const [currentWord, setCurrentWord] = useState("");
@@ -98,10 +149,23 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const { isSignedIn, user } = useUser();
 
   useEffect(() => {
-    fetch("/api/stats").then(r => r.json()).then(setPlatformStats).catch(() => {});
+    const startTime = Date.now();
+    fetch("/api/stats")
+      .then(r => r.json())
+      .then(data => {
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, 1200 - elapsed);
+        setTimeout(() => setPlatformStats(data), delay);
+      })
+      .catch(() => {
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, 1200 - elapsed);
+        setTimeout(() => setPlatformStats({ verifiedMembers: 0, totalTrades: 0, totalVolumeInr: 0 }), delay);
+      });
   }, []);
 
   useEffect(() => {
@@ -127,13 +191,23 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [currentWord, isDeleting, loopNum]);
 
-  // Navbar: convert to glassmorphism on scroll
+  // Navbar and Scroll-Top handlers
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 20);
+
+      const howSection = document.getElementById("how");
+      if (howSection) {
+        const rect = howSection.getBoundingClientRect();
+        // Only visible when scrolled past hero and "how" section is on-screen
+        setShowScrollTop(y > 100 && rect.top <= window.innerHeight - 100);
+      } else {
+        setShowScrollTop(y > 500);
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -309,26 +383,46 @@ export default function Home() {
 
           {/* ── Stats ── */}
           <motion.div
-            className="flex flex-wrap justify-center gap-8 mt-10 w-full"
+            className="flex flex-nowrap justify-center gap-10 mt-10 w-full"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             {[
-              { value: platformStats ? formatVolume(platformStats.totalVolumeInr) : "—", label: "Total Traded" },
-              { value: platformStats ? platformStats.verifiedMembers.toString() : "—", label: "Verified Members" },
-              { value: platformStats ? platformStats.totalTrades.toString() : "—", label: "Trades Done" },
-              { value: "0", label: "Custody Risk" },
+              {
+                value: platformStats ? formatVolume(platformStats.totalVolumeInr) : null,
+                type: "volume" as const,
+                label: "Total Traded",
+              },
+              {
+                value: platformStats ? platformStats.verifiedMembers.toString() : null,
+                type: "members" as const,
+                label: "Verified Members",
+              },
+              {
+                value: platformStats ? platformStats.totalTrades.toString() : null,
+                type: "trades" as const,
+                label: "Trades Done",
+              },
+              {
+                value: "0",
+                type: null,
+                label: "Custody Risk",
+              },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.65 + i * 0.07 }}
-                className="flex flex-col items-center"
+                className="flex flex-col items-center shrink-0"
               >
-                <span className="font-condensed text-[4rem] text-black leading-none tracking-wide [-webkit-text-stroke:1.5px_#000]">
-                  {stat.value}
+                <span className="text-center font-condensed text-[4rem] text-black leading-none tracking-wide [-webkit-text-stroke:1.5px_#000] whitespace-nowrap">
+                  {stat.type ? (
+                    <LotteryCounter value={stat.value} type={stat.type} />
+                  ) : (
+                    stat.value
+                  )}
                 </span>
                 <span className="font-sans text-[0.65rem] font-bold text-black/60 tracking-[2px] uppercase mt-2 text-center">
                   {stat.label}
@@ -406,26 +500,27 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="relative overflow-hidden bg-white/[0.03] border border-white/[0.08] rounded-xl p-6 flex flex-col gap-3 min-h-[220px]"
               >
-                {/* Watermark number */}
-                <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none">
-                  {item.step}
-                </span>
-
-                <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
-                  {item.step}
-                </span>
-                <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
-                  {item.title}
-                </h3>
-                <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1">
-                  {item.desc}
-                </p>
-                <div className="mt-1">
-                  <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
-                    {item.pill}
+                <div className="group relative overflow-hidden bg-white/[0.03] border border-white/[0.08] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-white/[0.05] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
+                  {/* Watermark number */}
+                  <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/12">
+                    {item.step}
                   </span>
+
+                  <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                    {item.step}
+                  </span>
+                  <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                    {item.title}
+                  </h3>
+                  <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1">
+                    {item.desc}
+                  </p>
+                  <div className="mt-1">
+                    <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                      {item.pill}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -635,6 +730,22 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ clipPath: "inset(0% 50% 0% 50%)", opacity: 0 }}
+            animate={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }}
+            exit={{ clipPath: "inset(0% 50% 0% 50%)", opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-[99] flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-black border border-lime text-lime font-condensed text-[1.15rem] tracking-wider uppercase transition-all duration-300 hover:bg-lime hover:text-black hover:shadow-[0_8px_24px_rgba(212,255,0,0.35)] active:scale-95"
+            aria-label="Scroll to top"
+          >
+            <span className="font-sans font-black text-[1.15rem]">⬆</span>
+            <span>MOVE TO TOP</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
