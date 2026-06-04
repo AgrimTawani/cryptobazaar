@@ -61,6 +61,9 @@ interface OrderDetail {
   asset: string;
   chain: string;
   amount: string;
+  partialAllowed: boolean;
+  minTradeSize: string | null;
+  originalAmount: string;
   pricePerUnit: string;
   totalValueInr: string;
   acceptedPaymentMethods: string[];
@@ -275,6 +278,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [screenshotFileName, setScreenshotFileName] = useState<string | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
+  const [buyAmount, setBuyAmount] = useState<string>("");
 
   useEffect(() => { params.then((p) => setId(p.id)); }, [params]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
@@ -289,7 +293,10 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
         res = await fetch(`/api/orders/${id}`);
       }
       const data = await res.json();
-      if (res.ok) setOrder(data);
+      if (res.ok) {
+        setOrder(data);
+        setBuyAmount((prev) => prev === "" ? (data.partialAllowed ? "" : data.amount) : prev);
+      }
     } catch { /* transient */ }
     finally { setLoading(false); }
   }, [id]);
@@ -362,14 +369,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     }
   }, [order?.status, order?.viewerRole, order?.hasRated, ratingDone]);
 
-  const run = async (dbAction: string, contractFn?: () => Promise<void>) => {
+  const run = async (dbAction: string, contractFn?: () => Promise<void>, extraBody?: Record<string, unknown>) => {
     setBusy(dbAction); setError(null);
     try {
       if (contractFn) await contractFn();
       const res = await fetch(`/api/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: dbAction, utr: utrInput || undefined }),
+        body: JSON.stringify({ action: dbAction, utr: utrInput || undefined, ...extraBody }),
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Action failed"); }
       await fetchOrder();
@@ -390,6 +397,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const statusCfg = STATUS[order.status] ?? STATUS.LISTED;
   const onChainId = BigInt(order.onChainId);
   const amount = parseFloat(order.amount);
+  const availableAmount = parseFloat(order.amount);
+  const minTrade = order.minTradeSize ? parseFloat(order.minTradeSize) : availableAmount;
+  const effectiveBuyAmount = order.partialAllowed && buyAmount
+    ? parseFloat(buyAmount)
+    : availableAmount;
   const fee = (amount * 75) / 10000;
   const payout = amount - fee;
   const timeLeft = order.paymentWindowExpiresAt
@@ -1019,14 +1031,48 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       <p className="font-sans text-xs text-[#9a3412] leading-relaxed">{wrongChainMsg}</p>
                     </div>
                   )}
+                  {order.partialAllowed && (
+                    <div className="mb-4">
+                      <label className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold block mb-2">
+                        How much do you want to buy?
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={minTrade}
+                          max={availableAmount}
+                          step="0.01"
+                          value={buyAmount}
+                          onChange={(e) => setBuyAmount(e.target.value)}
+                          placeholder={`Min ${minTrade} — Max ${availableAmount}`}
+                          className="flex-1 border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-2.5 font-mono text-sm text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                        />
+                        <span className="font-sans text-sm text-[#666] shrink-0">{order.asset}</span>
+                      </div>
+                      {buyAmount && parseFloat(buyAmount) >= minTrade && (
+                        <p className="font-sans text-xs text-[#7b3fe4] mt-1.5">
+                          Total: ₹{(parseFloat(buyAmount) * parseFloat(order.pricePerUnit)).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                        </p>
+                      )}
+                      {buyAmount && parseFloat(buyAmount) < minTrade && (
+                        <p className="font-sans text-xs text-[#dc2626] mt-1.5">
+                          Minimum is {minTrade} {order.asset}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <button onClick={() => { setShowBuyConfirm(false); setTcAgreed(false); }}
                       className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
                       Cancel
                     </button>
                     <button onClick={() => run("lock", async () => {
-                      await sendTx(prepareContractCall({ contract: escrowContract, method: "function lockOrder(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk || !tcAgreed || !chainOk}
+                      await sendTx(prepareContractCall({ contract: escrowContract, method: "function lockOrder(uint256 id, uint128 buyAmount)", params: [BigInt(onChainId), BigInt(Math.round(effectiveBuyAmount * 1e6))] }));
+                    }, order.partialAllowed ? { buyAmount: parseFloat(buyAmount) } : {})} disabled={!!busy || !walletOk || !tcAgreed || !chainOk || (order.partialAllowed && (
+                      !buyAmount ||
+                      parseFloat(buyAmount) < minTrade ||
+                      parseFloat(buyAmount) > availableAmount
+                    ))}
                       className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer disabled:opacity-40">
                       {busy === "lock" ? "Locking…" : "Lock Order & Start Timer →"}
                     </button>
@@ -1066,7 +1112,10 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           <div className="bg-white border border-[#e5e5e5] rounded-xl px-5 py-4 grid grid-cols-2 gap-4 mb-5">
             {[
               ["Chain", order.chain], ["Asset", order.asset],
-              ["Amount", `${order.amount} ${order.asset}`], ["Price", `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
+              ["Amount", order.partialAllowed && order.originalAmount !== order.amount
+                ? `${parseFloat(order.amount).toFixed(2)} / ${parseFloat(order.originalAmount).toFixed(2)} ${order.asset} remaining`
+                : `${order.amount} ${order.asset}`],
+              ["Price", `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
               ["Total", `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`], ["Fee", `1 ${order.asset} (flat fee)`],
             ].map(([k, v]) => (
               <div key={k}>

@@ -19,6 +19,9 @@ function mapOrder(o: {
   totalValueInr: { toString(): string }; acceptedPaymentMethods: string[];
   escrowTxHash: string | null; escrowContractAddress: string | null;
   status: string; sellerId: number;
+  partialAllowed: boolean;
+  minTradeSize: { toString(): string } | null;
+  originalAmount: { toString(): string };
   seller: {
     name: string | null; avatarUrl: string | null;
     avgSellerRating: { toNumber(): number } | null;
@@ -37,6 +40,9 @@ function mapOrder(o: {
     asset: o.asset,
     chain: o.chain,
     amount: o.amount.toString(),
+    partialAllowed: o.partialAllowed,
+    minTradeSize: o.minTradeSize?.toString() ?? null,
+    originalAmount: o.originalAmount.toString(),
     pricePerUnit: o.pricePerUnit.toString(),
     totalValueInr: o.totalValueInr.toString(),
     acceptedPaymentMethods: o.acceptedPaymentMethods,
@@ -78,6 +84,9 @@ export async function GET(request: Request) {
           asset: o.asset,
           chain: o.chain,
           amount: o.amount.toString(),
+          partialAllowed: o.partialAllowed,
+          minTradeSize: o.minTradeSize?.toString() ?? null,
+          originalAmount: o.originalAmount.toString(),
           pricePerUnit: o.pricePerUnit.toString(),
           totalValueInr: o.totalValueInr.toString(),
           acceptedPaymentMethods: o.acceptedPaymentMethods,

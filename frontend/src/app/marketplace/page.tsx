@@ -29,6 +29,9 @@ interface OrderRow {
   asset: string;
   chain: string;
   amount: string;
+  partialAllowed: boolean;
+  minTradeSize: string | null;
+  originalAmount: string;
   pricePerUnit: string;
   totalValueInr: string;
   acceptedPaymentMethods: string[];
@@ -314,9 +317,16 @@ export default function MarketplacePage() {
                 )}
               </div>
               <span className="font-mono text-sm text-[#111]">₹{parseFloat(order.pricePerUnit).toFixed(2)}</span>
-              <span className="font-mono text-sm text-[#111]">
-                {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-mono text-sm text-[#111]">
+                  {parseFloat(order.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {order.asset}
+                </span>
+                {order.partialAllowed && order.minTradeSize && (
+                  <span className="font-sans text-[0.6rem] text-[#888]">
+                    Min: {parseFloat(order.minTradeSize).toFixed(2)} {order.asset}
+                  </span>
+                )}
+              </div>
               <div className="flex gap-1 flex-wrap">
                 {order.acceptedPaymentMethods.map((m) => (
                   <span key={m} className="font-sans text-xs bg-[#f2f2f2] text-[#666] px-2 py-0.5 rounded-full">{m}</span>
@@ -389,6 +399,11 @@ export default function MarketplacePage() {
                       </span>
                     )}
                   </div>
+                  {order.partialAllowed && order.minTradeSize && (
+                    <p className="font-sans text-xs text-[#aaa]">
+                      Min: {parseFloat(order.minTradeSize).toFixed(2)} {order.asset}
+                    </p>
+                  )}
                   <p className="font-mono text-sm text-[#888]">₹{parseFloat(order.pricePerUnit).toFixed(2)} / unit</p>
                 </div>
                 {isGuest ? (
