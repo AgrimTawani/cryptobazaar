@@ -15,16 +15,18 @@ contract EscrowTest is Test {
     CryptoBazaarEscrow escrow;
     MockUSDC           usdc;
 
-    address admin  = address(this);
-    address seller = makeAddr("seller");
-    address buyer  = makeAddr("buyer");
+    address admin    = address(this);
+    address seller   = makeAddr("seller");
+    address buyer    = makeAddr("buyer");
+    address treasury = makeAddr("treasury");
 
-    uint128 constant AMOUNT = 10e6;  // 10 USDC
-    uint96  constant PRICE  = 9500;  // ₹95.00
+    uint128 constant AMOUNT   = 10e6;  // 10 USDC
+    uint128 constant FLAT_FEE = 1e6;   // 1 USDC flat fee
+    uint96  constant PRICE    = 9500;  // ₹95.00
 
     function setUp() public {
         usdc   = new MockUSDC();
-        escrow = new CryptoBazaarEscrow(admin, address(usdc));
+        escrow = new CryptoBazaarEscrow(treasury, address(usdc));
 
         usdc.mint(seller, AMOUNT);
         vm.prank(seller);
@@ -36,7 +38,7 @@ contract EscrowTest is Test {
         escrow.createOrder(address(usdc), AMOUNT, PRICE);
 
         vm.prank(buyer);
-        escrow.lockOrder(0);
+        escrow.lockOrder(0, AMOUNT);
 
         vm.prank(buyer);
         escrow.markPaid(0);
@@ -44,10 +46,32 @@ contract EscrowTest is Test {
         vm.prank(seller);
         escrow.confirmPayment(0);
 
-        uint128 fee    = uint128((uint256(AMOUNT) * 75) / 10000);
-        uint128 payout = AMOUNT - fee;
+        uint128 payout = AMOUNT - FLAT_FEE;
         assertEq(usdc.balanceOf(buyer), payout);
-        assertEq(usdc.balanceOf(admin), fee);
+        assertEq(usdc.balanceOf(treasury), FLAT_FEE);
+    }
+
+    function test_PartialFill() public {
+        vm.prank(seller);
+        escrow.createOrder(address(usdc), AMOUNT, PRICE);
+
+        // First buyer locks half
+        uint128 half = AMOUNT / 2;
+        vm.prank(buyer);
+        escrow.lockOrder(0, half);
+
+        vm.prank(buyer);
+        escrow.markPaid(0);
+
+        vm.prank(seller);
+        escrow.confirmPayment(0);
+
+        // Order should reset to OPEN with remaining half
+        (,,,,,, , uint128 remaining,) = escrow.orders(0);
+        assertEq(remaining, AMOUNT - half);
+
+        // Buyer got payout minus flat fee
+        assertEq(usdc.balanceOf(buyer), half - FLAT_FEE);
     }
 
     function test_SellerCancel() public {
@@ -65,14 +89,16 @@ contract EscrowTest is Test {
         escrow.createOrder(address(usdc), AMOUNT, PRICE);
 
         vm.prank(buyer);
-        escrow.lockOrder(0);
+        escrow.lockOrder(0, AMOUNT);
 
         vm.warp(block.timestamp + 31 minutes);
 
         vm.prank(seller);
         escrow.timeoutCancel(0);
 
-        assertEq(usdc.balanceOf(seller), AMOUNT);
+        // Order is reset to OPEN (funds stay in contract), not cancelled
+        (,,, , CryptoBazaarEscrow.Status status,,,,) = escrow.orders(0);
+        assertEq(uint8(status), uint8(CryptoBazaarEscrow.Status.OPEN));
     }
 
     function test_DisputeBuyerWins() public {
@@ -80,7 +106,7 @@ contract EscrowTest is Test {
         escrow.createOrder(address(usdc), AMOUNT, PRICE);
 
         vm.prank(buyer);
-        escrow.lockOrder(0);
+        escrow.lockOrder(0, AMOUNT);
 
         vm.prank(buyer);
         escrow.markPaid(0);
@@ -97,7 +123,7 @@ contract EscrowTest is Test {
         escrow.createOrder(address(usdc), AMOUNT, PRICE);
 
         vm.prank(buyer);
-        escrow.lockOrder(0);
+        escrow.lockOrder(0, AMOUNT);
 
         vm.prank(buyer);
         escrow.markPaid(0);
@@ -105,6 +131,7 @@ contract EscrowTest is Test {
         vm.prank(buyer);
         escrow.raiseDispute(0);
 
+        // Seller wins — gets the lockedAmount (AMOUNT), remaining becomes 0
         escrow.resolveDispute(0, seller);
         assertEq(usdc.balanceOf(seller), AMOUNT);
     }
@@ -115,7 +142,7 @@ contract EscrowTest is Test {
 
         vm.prank(seller);
         vm.expectRevert(CryptoBazaarEscrow.Unauthorized.selector);
-        escrow.lockOrder(0);
+        escrow.lockOrder(0, AMOUNT);
     }
 
     function test_NonWhitelistedTokenRejected() public {

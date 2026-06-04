@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/// @title CryptoBazaar P2P Escrow — flat 1 USDT fee per completed trade
+/// @title CryptoBazaar P2P Escrow — partial fills supported
 contract CryptoBazaarEscrow {
     using SafeERC20 for IERC20;
 
@@ -15,34 +15,35 @@ contract CryptoBazaarEscrow {
     error TimeoutNotReached();
     error ZeroAmount();
     error InvalidAddress();
-    error AmountTooSmall();   // amount must exceed flatFee
+    error AmountTooSmall();
 
     enum Status { OPEN, LOCKED, PAID, DISPUTED, COMPLETED, CANCELLED }
 
-    // Tightly packed struct — 4 storage slots
+    // 4 storage slots
     struct Order {
-        address seller;    // slot 1 (20 bytes)
-        uint96  priceInr;  // slot 1 (12 bytes)
-        address buyer;     // slot 2 (20 bytes)
-        uint64  lockedAt;  // slot 2 (8 bytes)
-        address token;     // slot 3 (20 bytes)
-        uint64  paidAt;    // slot 3 (8 bytes)
-        uint128 amount;    // slot 4 (16 bytes)
-        Status  status;    // slot 4 (1 byte)
+        address seller;       // slot 1 (20 bytes)
+        uint96  priceInr;     // slot 1 (+12 = 32) ✓
+        address buyer;        // slot 2 (20 bytes)
+        uint64  lockedAt;     // slot 2 (+8 = 28)
+        Status  status;       // slot 2 (+1 = 29, 3 bytes padding)
+        address token;        // slot 3 (20 bytes)
+        uint64  paidAt;       // slot 3 (+8 = 28, 4 bytes padding)
+        uint128 amount;       // slot 4 (16 bytes) — remaining in escrow
+        uint128 lockedAmount; // slot 4 (+16 = 32) ✓ — what current buyer locked
     }
 
     address public admin;
     address public treasury;
-    uint128 public flatFee = 1_000_000; // 1 USDT / USDC (6 decimals)
+    uint128 public flatFee = 1_000_000;
     uint256 public nextOrderId;
 
     mapping(uint256 => Order) public orders;
     mapping(address => bool)  public whitelisted;
 
     event OrderCreated   (uint256 indexed id, address indexed seller, address token, uint128 amount, uint96 priceInr);
-    event OrderLocked    (uint256 indexed id, address indexed buyer);
+    event OrderLocked    (uint256 indexed id, address indexed buyer, uint128 lockedAmount);
     event PaymentMarked  (uint256 indexed id);
-    event OrderCompleted (uint256 indexed id, address indexed buyer, uint128 payout, uint128 fee);
+    event OrderCompleted (uint256 indexed id, address indexed buyer, uint128 payout, uint128 fee, uint128 remaining);
     event DisputeRaised  (uint256 indexed id, address indexed raisedBy);
     event DisputeResolved(uint256 indexed id, address indexed winner);
     event OrderCancelled (uint256 indexed id);
@@ -60,22 +61,16 @@ contract CryptoBazaarEscrow {
         if (_initialToken != address(0)) whitelisted[_initialToken] = true;
     }
 
-    // ─── Admin ─────────────────────────────────────────────────────────────────
-
-    function setWhitelist(address token, bool status) external onlyAdmin {
-        whitelisted[token] = status;
+    function setWhitelist(address token, bool _status) external onlyAdmin {
+        whitelisted[token] = _status;
     }
-
     function setTreasury(address _treasury) external onlyAdmin {
         if (_treasury == address(0)) revert InvalidAddress();
         treasury = _treasury;
     }
-
     function setFlatFee(uint128 _flatFee) external onlyAdmin {
         flatFee = _flatFee;
     }
-
-    // ─── Seller ────────────────────────────────────────────────────────────────
 
     function createOrder(address token, uint128 amount, uint96 priceInr) external {
         if (!whitelisted[token]) revert InvalidToken();
@@ -99,8 +94,10 @@ contract CryptoBazaarEscrow {
         if (o.status != Status.OPEN) revert InvalidState();
         if (msg.sender != o.seller)  revert Unauthorized();
 
+        uint128 refund = o.amount;
         o.status = Status.CANCELLED;
-        IERC20(o.token).safeTransfer(o.seller, o.amount);
+        o.amount = 0;
+        IERC20(o.token).safeTransfer(o.seller, refund);
         emit OrderCancelled(id);
     }
 
@@ -110,40 +107,55 @@ contract CryptoBazaarEscrow {
         if (msg.sender != o.seller)                    revert Unauthorized();
         if (block.timestamp < o.lockedAt + 30 minutes) revert TimeoutNotReached();
 
-        o.status = Status.CANCELLED;
-        IERC20(o.token).safeTransfer(o.seller, o.amount);
+        o.status       = Status.OPEN;
+        o.buyer        = address(0);
+        o.lockedAt     = 0;
+        o.lockedAmount = 0;
         emit OrderTimedOut(id);
     }
 
-    // State updated BEFORE transfers (checks-effects-interactions)
     function confirmPayment(uint256 id) external {
         Order storage o = orders[id];
-        if (o.status != Status.PAID)  revert InvalidState();
-        if (msg.sender != o.seller)   revert Unauthorized();
+        if (o.status != Status.PAID) revert InvalidState();
+        if (msg.sender != o.seller)  revert Unauthorized();
 
-        uint128 fee    = flatFee;
-        uint128 payout = o.amount - fee;
-        address buyer  = o.buyer;
-        address token  = o.token;
+        uint128 fee          = flatFee;
+        uint128 locked       = o.lockedAmount;
+        uint128 payout       = locked - fee;
+        uint128 newRemaining = o.amount - locked;
+        address buyer        = o.buyer;
+        address token        = o.token;
 
-        o.status = Status.COMPLETED;
+        o.amount       = newRemaining;
+        o.lockedAmount = 0;
+        o.buyer        = address(0);
+        o.lockedAt     = 0;
+        o.paidAt       = 0;
+
+        if (newRemaining > 0) {
+            o.status = Status.OPEN;
+        } else {
+            o.status = Status.COMPLETED;
+        }
 
         IERC20(token).safeTransfer(treasury, fee);
         IERC20(token).safeTransfer(buyer, payout);
-        emit OrderCompleted(id, buyer, payout, fee);
+        emit OrderCompleted(id, buyer, payout, fee, newRemaining);
     }
 
-    // ─── Buyer ─────────────────────────────────────────────────────────────────
-
-    function lockOrder(uint256 id) external {
+    function lockOrder(uint256 id, uint128 buyAmount) external {
         Order storage o = orders[id];
-        if (o.status != Status.OPEN)  revert InvalidState();
-        if (msg.sender == o.seller)   revert Unauthorized();
+        if (o.status != Status.OPEN)       revert InvalidState();
+        if (msg.sender == o.seller)        revert Unauthorized();
+        if (buyAmount == 0)                revert ZeroAmount();
+        if (buyAmount > o.amount)          revert AmountTooSmall();
+        if (buyAmount <= flatFee)          revert AmountTooSmall();
 
-        o.buyer    = msg.sender;
-        o.status   = Status.LOCKED;
-        o.lockedAt = uint64(block.timestamp);
-        emit OrderLocked(id, msg.sender);
+        o.buyer        = msg.sender;
+        o.lockedAmount = buyAmount;
+        o.status       = Status.LOCKED;
+        o.lockedAt     = uint64(block.timestamp);
+        emit OrderLocked(id, msg.sender, buyAmount);
     }
 
     function markPaid(uint256 id) external {
@@ -155,8 +167,6 @@ contract CryptoBazaarEscrow {
         o.paidAt = uint64(block.timestamp);
         emit PaymentMarked(id);
     }
-
-    // ─── Dispute ───────────────────────────────────────────────────────────────
 
     function raiseDispute(uint256 id) external {
         Order storage o = orders[id];
@@ -172,8 +182,18 @@ contract CryptoBazaarEscrow {
         if (o.status != Status.DISPUTED)             revert InvalidState();
         if (winner != o.buyer && winner != o.seller) revert NotParty();
 
-        o.status = Status.COMPLETED;
-        IERC20(o.token).safeTransfer(winner, o.amount);
+        uint128 locked       = o.lockedAmount;
+        uint128 newRemaining = o.amount - locked;
+        address token        = o.token;
+
+        o.amount       = newRemaining;
+        o.lockedAmount = 0;
+        o.buyer        = address(0);
+        o.lockedAt     = 0;
+        o.paidAt       = 0;
+        o.status       = newRemaining > 0 ? Status.OPEN : Status.COMPLETED;
+
+        IERC20(token).safeTransfer(winner, locked);
         emit DisputeResolved(id, winner);
     }
 }
