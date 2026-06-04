@@ -327,6 +327,451 @@ Notices to us must be sent in writing to the legal email above. Notices to you w
 
 const ARTICLES_DATA: Article[] = [
   {
+    id: "freelancers-usdt-usdc",
+    title: "How Freelancers Use USDT and USDC for International Payments",
+    shortDesc: "A guide for Indian freelancers to receive and cash out foreign income efficiently.",
+    sections: [
+      {
+        id: "receiving-payments",
+        title: "1. Receiving Payments",
+        content: `Indian freelancers working in IT, design, or Web3 often have clients based in the US, Europe, or the Middle East. Instead of providing complex SWIFT details, freelancers can simply provide their Web3 wallet address (like MetaMask or Trust Wallet).
+        
+The client sends USDT or USDC directly over networks like Polygon or Tron, allowing the freelancer to receive the exact dollar-equivalent amount within seconds.`
+      },
+      {
+        id: "conversion-to-inr",
+        title: "2. Conversion to INR",
+        content: `Once the stablecoins hit the freelancer's wallet, they can use CryptoBazaar to convert them to Indian Rupees (INR). 
+
+The freelancer creates a "Sell" order. A verified buyer on the platform agrees to the trade, sends the INR directly to the freelancer's bank account via IMPS/UPI, and once confirmed, the freelancer releases the stablecoins from escrow. The entire process takes less than 10 minutes.`
+      },
+      {
+        id: "benefits-over-traditional",
+        title: "3. Benefits Over Traditional Methods",
+        content: `**Traditional Platforms (PayPal, Payoneer, Upwork):**
+- Take a 2% to 5% flat fee on the transfer.
+- Apply a hidden 2% to 3% Forex markup (giving you a terrible USD to INR exchange rate).
+- Take 3 to 5 business days to settle into your Indian bank account.
+
+**Stablecoins via CryptoBazaar:**
+- Receiving USDT/USDC costs pennies in gas fees.
+- You get the true open-market P2P exchange rate (often higher than standard forex rates).
+- Settlement to your bank account is instant.`
+      },
+      {
+        id: "best-practices-freelancers",
+        title: "4. Best Practices",
+        content: `**Keep Records:** Always maintain invoices and contracts for your foreign clients. When you sell crypto on CryptoBazaar, keep a log of the trades for your Chartered Accountant.
+**Use Polygon:** Request clients to send funds via the Polygon network to ensure you don't lose money on high Ethereum gas fees when moving the funds to the escrow contract.`
+      }
+    ]
+  },
+  {
+    id: "cross-border-payments",
+    title: "Using Stablecoins for Cross-Border Payments",
+    shortDesc: "How crypto is revolutionizing global money transfers.",
+    sections: [
+      {
+        id: "traditional-challenges",
+        title: "1. Traditional Remittance Challenges",
+        content: `Sending money across borders using the legacy banking system (SWIFT) or remittance services like Western Union is slow and expensive. 
+
+Transactions often take 3 to 5 business days to clear correspondent banks. Furthermore, users are hit with flat transfer fees plus a "spread" on the exchange rate, often resulting in a total loss of 3% to 7% of the total transfer value.`
+      },
+      {
+        id: "stablecoin-advantages",
+        title: "2. Stablecoin Advantages",
+        content: `Stablecoins completely bypass the legacy correspondent banking network.
+- **Speed:** A transfer from New York to Mumbai settles on the blockchain in under 3 seconds.
+- **24/7 Availability:** Blockchains don't have banking hours or holidays. You can send money on a Sunday at 3 AM.
+- **Transparency:** Both the sender and receiver can track the exact status of the funds on public blockchain explorers.`
+      },
+      {
+        id: "transfer-process",
+        title: "3. Transfer Process",
+        content: `The modern remittance flow using P2P looks like this:
+1. **Sender:** Buys USDT using their local currency (e.g., USD or AED) on a local exchange.
+2. **Transfer:** Sender withdraws the USDT to the receiver's crypto wallet in India via the Tron or Polygon network.
+3. **Receiver:** The receiver logs into CryptoBazaar, sells the USDT, and receives INR directly into their bank account from a verified local buyer.`
+      },
+      {
+        id: "cost-comparison",
+        title: "4. Cost Comparison",
+        content: `Sending $10,000 internationally:
+- **Traditional Bank:** $30 wire fee + 2% forex spread ($200) = Total Cost: ~$230.
+- **Stablecoin (Polygon):** Network fee of $0.01 + P2P market spread (often negligible or even favorable) = Total Cost: ~$0.01 to $5.00.`
+      }
+    ]
+  },
+  {
+    id: "high-value-trades",
+    title: "Best Practices for High-Value P2P Trades",
+    shortDesc: "Essential guidelines for trading large volumes securely.",
+    sections: [
+      {
+        id: "liquidity-management",
+        title: "1. Liquidity Management",
+        content: `When dealing with high-value trades (e.g., ₹5,00,000 and above), liquidity becomes a primary concern. 
+Instead of trying to execute one massive order which might take hours to fill, consider splitting your order into smaller chunks (e.g., five ₹1,00,000 trades). This attracts more buyers/sellers and ensures faster execution.`
+      },
+      {
+        id: "risk-mitigation",
+        title: "2. Risk Mitigation",
+        content: `High-value trades attract sophisticated scammers. 
+- **The Test Transfer:** Before sending ₹5 Lakhs, ask the buyer to send a test transfer of ₹100 from their verified account. Once you confirm the name matches exactly, authorize the rest.
+- **Strict adherence to rules:** Under no circumstances should you accept a third-party payment on a high-value trade. The risk of a bank freeze is too severe.`
+      },
+      {
+        id: "identity-verification-strict",
+        title: "3. Identity Verification",
+        content: `While CryptoBazaar verifies all users, for large trades, you should only transact with highly reputable counterparties. 
+
+Check their profile for:
+- Account age older than 6 months.
+- Over 500 completed trades.
+- A completion rate of 98% or higher.
+Do not execute high-value trades with brand new accounts.`
+      },
+      {
+        id: "record-keeping",
+        title: "4. Record Keeping",
+        content: `When handling significant volumes, tax and regulatory compliance is vital. 
+- Download the official PDF bank statement for every large trade immediately.
+- Keep a dedicated spreadsheet mapping the CryptoBazaar Order ID to the Bank UTR.
+- Maintain separate business and personal bank accounts to ensure clean accounting for your CA (Chartered Accountant).`
+      }
+    ]
+  },
+  {
+    id: "why-kyc-important",
+    title: "Why KYC Is Important for P2P Trading",
+    shortDesc: "Understanding the necessity of identity verification for safe transactions.",
+    sections: [
+      {
+        id: "identity-verification",
+        title: "1. Identity Verification",
+        content: `Know Your Customer (KYC) is the foundational layer of trust on CryptoBazaar. By requiring every user to verify their identity through government-issued documents like Aadhaar and PAN, along with biometric liveness checks, we ensure that every participant on the platform is a verified, real individual.
+
+This completely eliminates anonymous trading, which is the primary vector for P2P scams.`
+      },
+      {
+        id: "fraud-prevention",
+        title: "2. Fraud Prevention",
+        content: `When users are verified, the incentive to commit fraud drops dramatically. Bad actors know that their real identity is tied to their CryptoBazaar account. If they attempt a chargeback scam, a third-party payment scam, or an escrow bypass, their real-world identity is already logged, making them highly vulnerable to legal action and permanent blacklisting.`
+      },
+      {
+        id: "user-protection",
+        title: "3. User Protection",
+        content: `KYC protects *you*. When you send INR to a seller, or release USDT to a buyer, you have the absolute certainty that the person on the other end has been vetted. 
+
+Furthermore, our strict rule requiring the bank account name to perfectly match the KYC verified name ensures that you never accidentally accept "tainted" funds from a compromised third-party account.`
+      },
+      {
+        id: "regulatory-considerations",
+        title: "4. Regulatory Considerations",
+        content: `As the digital asset space matures in India, compliance with Anti-Money Laundering (AML) and Combating the Financing of Terrorism (CFT) laws is non-negotiable. 
+
+By enforcing strict KYC, CryptoBazaar complies with directives from the Financial Intelligence Unit (FIU-IND), ensuring the platform remains legally robust and that your trading activity occurs in a fully compliant environment.`
+      }
+    ]
+  },
+  {
+    id: "how-escrow-protects",
+    title: "How Escrow Protects Buyers and Sellers",
+    shortDesc: "The smart contract technology that guarantees secure trades.",
+    sections: [
+      {
+        id: "what-is-escrow",
+        title: "1. What is Escrow?",
+        content: `Escrow is a financial arrangement where a neutral third party temporarily holds the assets involved in a transaction until all conditions of the trade are met. 
+
+On CryptoBazaar, this "third party" is an autonomous smart contract on the blockchain. It holds the seller's cryptocurrency securely, ensuring neither the buyer nor the seller can run away with both the crypto and the fiat.`
+      },
+      {
+        id: "trade-lifecycle",
+        title: "2. Trade Lifecycle",
+        content: `1. **Locking:** The seller creates an order, and the crypto is locked into the smart contract.
+2. **Payment:** The buyer sends INR directly to the seller's bank account. During this time, the seller cannot withdraw the crypto.
+3. **Verification:** The seller verifies the INR has arrived in their bank account.
+4. **Release:** The seller clicks 'Confirm Release', and the smart contract immediately transfers the crypto to the buyer's wallet.`
+      },
+      {
+        id: "dispute-handling-escrow",
+        title: "3. Dispute Handling",
+        content: `If a disagreement occurs—for instance, the buyer claims they paid but the seller says the money never arrived—either party can raise a dispute. 
+
+When a dispute is triggered, the escrow smart contract "freezes." The crypto remains locked securely on-chain until the CryptoBazaar compliance team reviews the bank evidence (UTRs, statements) and issues a cryptographic signature to route the funds to the rightful owner.`
+      },
+      {
+        id: "examples-of-protection",
+        title: "4. Examples of Protection",
+        content: `**Protecting the Buyer:** If you pay the seller but they refuse to release the crypto, they cannot steal it. The crypto is locked in escrow. You provide proof of payment via dispute, and we release the crypto to you.
+
+**Protecting the Seller:** If the buyer clicks "I Have Paid" but never actually sent the money, they cannot access your crypto. You provide your bank statement showing no incoming funds, and the crypto is returned to your wallet.`
+      }
+    ]
+  },
+  {
+    id: "security-checklist",
+    title: "Security Checklist for Every P2P Trade",
+    shortDesc: "Five critical steps to follow before clicking 'Release'.",
+    sections: [
+      {
+        id: "verify-account-details",
+        title: "1. Verify Account Details",
+        content: `Before initiating a trade, always check the counterparty's profile. Look at their overall rating, the total number of trades they have completed, and their account age. 
+
+A user with 100+ trades and a 4.9 rating is significantly safer than a brand new account with 0 trades.`
+      },
+      {
+        id: "check-payment-confirmation",
+        title: "2. Check Payment Confirmation",
+        content: `If you are selling, **never** rely on SMS alerts, email notifications, or screenshots sent by the buyer. 
+
+Always open your official banking application or UPI app and verify that the exact INR amount has been credited, and that the UTR matches what the buyer provided on the platform.`
+      },
+      {
+        id: "avoid-off-platform",
+        title: "3. Avoid Off-Platform Communication",
+        content: `Keep 100% of your communication inside the CryptoBazaar trade chat. 
+
+If a counterparty asks you to move to Telegram, WhatsApp, or phone calls to "sort things out faster," they are likely trying to scam you by removing evidence that our compliance team can review during a dispute.`
+      },
+      {
+        id: "enable-2fa",
+        title: "4. Enable 2FA",
+        content: `Protect your CryptoBazaar account (and the Google account linked to it) with Two-Factor Authentication (2FA). 
+
+Using an authenticator app (like Google Authenticator or Authy) ensures that even if someone discovers your password, they cannot access your account to manipulate your active listings or initiate trades.`
+      },
+      {
+        id: "review-trade-history",
+        title: "5. Review Trade History",
+        content: `Maintain your own records. While CryptoBazaar logs your trade history, it is best practice to keep a spreadsheet of your trades, UTRs, and counterparties for your own tax filing and security purposes.`
+      }
+    ]
+  },
+  {
+    id: "how-we-handle-disputes",
+    title: "How We Handle Disputes",
+    shortDesc: "A transparent look at our conflict resolution process.",
+    sections: [
+      {
+        id: "when-disputes-occur",
+        title: "1. When Disputes Occur",
+        content: `Disputes typically occur in three scenarios:
+- A buyer marks the trade as "Paid," but the seller claims the funds never arrived.
+- A buyer sends funds using a third-party bank account (name mismatch).
+- A seller goes offline and fails to release the crypto after a valid payment.`
+      },
+      {
+        id: "evidence-requirements",
+        title: "2. Evidence Requirements",
+        content: `To resolve a dispute, CryptoBazaar requires hard evidence. 
+
+We do **not** accept screenshots, as they are easily forged. We require official PDF bank statements generated directly from your bank's portal, covering the specific date and time of the trade. In some complex cases, we may require a continuous video screen recording of you logging into your bank to verify the transaction.`
+      },
+      {
+        id: "review-process",
+        title: "3. Review Process",
+        content: `Once evidence is submitted by both parties, our compliance team steps in. 
+We cross-reference the buyer's debit UTR with the seller's credit UTR. We analyze the PDF metadata to ensure the statement has not been tampered with. If a third-party payment is detected, the review process is immediately halted and ruled against the offending party.`
+      },
+      {
+        id: "resolution-outcomes",
+        title: "4. Resolution Outcomes",
+        content: `Based on the evidence, the compliance team issues a ruling:
+
+- **If the buyer successfully paid:** The escrow contract is overridden, and the crypto is released to the buyer.
+- **If the buyer did not pay (or paid via third-party):** The escrow contract is overridden, and the crypto is returned to the seller.
+
+Users found guilty of intentional fraud, submitting forged documents, or violating third-party payment rules are permanently banned from the platform.`
+      }
+    ]
+  },
+  {
+    id: "tron-vs-polygon-vs-bnb",
+    title: "Tron vs Polygon vs BNB Chain for USDT Transfers",
+    shortDesc: "A complete comparison to help you choose the best network for your trades.",
+    sections: [
+      {
+        id: "overview",
+        title: "1. Overview of Each Network",
+        content: `When trading USDT on CryptoBazaar, you must select a blockchain network to facilitate the transfer. The three supported networks are:
+
+**Tron (TRC-20):** A highly popular blockchain in Asia specifically known for its massive USDT liquidity. 
+**Polygon (ERC-20/Layer 2):** A scaling solution for Ethereum that offers incredibly fast and cheap transactions while benefiting from Ethereum's robust ecosystem.
+**BNB Chain (BEP-20):** Binance's proprietary blockchain (formerly Binance Smart Chain), widely used globally for its low fees and high throughput.`
+      },
+      {
+        id: "transaction-speed",
+        title: "2. Transaction Speed",
+        content: `All three networks offer fast settlement, which is crucial for P2P trading:
+- **Polygon:** Averages 2 to 3 seconds per block. Transactions are virtually instant.
+- **Tron:** Averages 3 seconds per block. Very reliable confirmation times.
+- **BNB Chain:** Averages 3 seconds per block.
+
+For the purpose of releasing escrow on CryptoBazaar, all three networks perform exceptionally well and will clear the smart contract in under 10 seconds.`
+      },
+      {
+        id: "network-fees",
+        title: "3. Network Fees (Gas)",
+        content: `Gas fees are what you pay the blockchain validators to process your transaction. These are paid in the network's native coin, not in USDT.
+- **Polygon:** Requires MATIC (or POL). Fees are incredibly low, often less than ₹1 per transaction.
+- **BNB Chain:** Requires BNB. Fees are moderate, typically around ₹2 to ₹5 per transaction.
+- **Tron:** Requires TRX. Tron uses an "Energy and Bandwidth" model. If you don't stake TRX for energy, a standard USDT transfer burns about 13.4 to 27 TRX (roughly ₹100 to ₹250), making it the most expensive of the three unless properly optimized.`
+      },
+      {
+        id: "reliability",
+        title: "4. Reliability",
+        content: `**Polygon:** Occasionally experiences brief periods of congestion during massive NFT mints or DeFi spikes, but is generally highly stable.
+**Tron:** Extremely reliable for stablecoin transfers. It rarely experiences congestion that affects USDT movement.
+**BNB Chain:** Highly reliable, backed by a massive validator network, though heavily centralized compared to Ethereum.`
+      },
+      {
+        id: "best-use-cases",
+        title: "5. Best Use Cases",
+        content: `**Tron:** Best if you are sending USDT to traditional centralized exchanges (like Binance or KuCoin) or dealing with overseas merchants, as TRC-20 is the global standard for cross-border USDT payments.
+**Polygon:** Best for everyday P2P trading, DeFi participation, and users who want the absolute lowest gas fees. It is the most cost-effective network for frequent traders.
+**BNB Chain:** Best if you are already heavily invested in the Binance ecosystem or use Trust Wallet extensively.`
+      },
+      {
+        id: "which-to-choose",
+        title: "6. Which Network Should Traders Choose?",
+        content: `For the majority of Indian P2P traders on CryptoBazaar, **Polygon is our top recommendation.** 
+
+The combination of instant settlement, deep USDT liquidity on our platform, and sub-rupee gas fees makes it the most efficient network. If you must use Tron due to counterparty requirements, ensure you understand how Tron's energy system works to avoid high TRX burn fees.`
+      }
+    ]
+  },
+  {
+    id: "send-usdt-tron",
+    title: "How to Send USDT on Tron (TRC20)",
+    shortDesc: "A step-by-step guide to navigating the Tron network safely.",
+    sections: [
+      {
+        id: "wallet-setup",
+        title: "1. Wallet Setup",
+        content: `To interact with the Tron network, you need a compatible Web3 wallet. 
+The most popular and reliable options are **TronLink** (available as a Chrome extension and mobile app) and **Trust Wallet**. 
+
+Unlike MetaMask, which only supports EVM (Ethereum Virtual Machine) chains, Tron uses a completely different architecture. You cannot add the Tron network to MetaMask.`
+      },
+      {
+        id: "network-selection",
+        title: "2. Network Selection",
+        content: `Tron addresses always begin with a capital "**T**" (e.g., *TX9Q...*). 
+
+When withdrawing from an exchange or sending to a counterparty, you must explicitly select the **TRC-20** network. If the receiving address starts with a "T", it is a Tron address.`
+      },
+      {
+        id: "common-mistakes-tron",
+        title: "3. Common Mistakes",
+        content: `The most common mistake on Tron is attempting a transfer with a zero TRX balance. 
+
+To send USDT, the smart contract must be executed. This requires Tron network resources (Energy and Bandwidth). If you only hold USDT in your wallet and no TRX, the transaction will immediately fail.`
+      },
+      {
+        id: "fee-requirements",
+        title: "4. Fee Requirements (Energy and Bandwidth)",
+        content: `Tron charges for transactions by consuming Bandwidth and Energy. 
+- You get some free Bandwidth daily, but interacting with the USDT smart contract requires Energy.
+- If you don't have enough Energy, the network burns your TRX instead. A standard USDT transfer burns between 13.4 and 27 TRX.
+
+**Pro Tip:** Always keep at least 50 TRX in your Tron wallet to cover fees, or rent Energy from platforms like TokenGoodies to drastically reduce transaction costs.`
+      },
+      {
+        id: "transfer-verification",
+        title: "5. Transfer Verification",
+        content: `To verify a transaction, copy the transaction hash (TxID) and paste it into **Tronscan.org**. 
+A successful transfer will show a "CONFIRMED" status with a green checkmark. If it says "FAILED - OUT OF ENERGY", you must deposit more TRX into your wallet and try again.`
+      }
+    ]
+  },
+  {
+    id: "send-usdt-polygon",
+    title: "How to Send USDT on Polygon",
+    shortDesc: "Mastering cheap and fast stablecoin transfers on Polygon.",
+    sections: [
+      {
+        id: "supported-wallets-polygon",
+        title: "1. Supported Wallets",
+        content: `Polygon is fully EVM-compatible, meaning it works seamlessly with the world's most popular crypto wallets, including **MetaMask**, **Trust Wallet**, and **Rabby**. 
+
+To get started with MetaMask, you simply need to add the Polygon Mainnet to your network list (which can often be done automatically via sites like Chainlist.org).`
+      },
+      {
+        id: "gas-fees-polygon",
+        title: "2. Gas Fees",
+        content: `To send USDT on Polygon, you must pay gas fees in the network's native token: **MATIC** (currently transitioning to the ticker **POL**).
+
+Polygon fees are incredibly low. A typical USDT transfer costs between 0.01 and 0.05 MATIC (less than ₹1 to ₹3). However, you *must* have a small fraction of MATIC in your wallet; otherwise, the transaction cannot be submitted to the blockchain.`
+      },
+      {
+        id: "transaction-process-polygon",
+        title: "3. Transaction Process",
+        content: `When you interact with a smart contract (like CryptoBazaar's escrow) for the first time, you must perform two steps:
+1. **Approve:** You sign a transaction giving the escrow contract permission to move a specific amount of your USDT.
+2. **Transfer:** You sign a second transaction to actually move the funds into the escrow.
+
+Both transactions require a tiny amount of MATIC gas.`
+      },
+      {
+        id: "security-tips-polygon",
+        title: "4. Security Tips",
+        content: `Because Polygon is so cheap, scammers often airdrop fake, malicious tokens to random wallets. 
+- Never interact with or try to swap unknown tokens that magically appear in your wallet.
+- Regularly review your token approvals using tools like Revoke.cash. If you granted an "infinite approval" to a decentralized app you no longer use, revoke it to protect your USDT.`
+      }
+    ]
+  },
+  {
+    id: "wrong-network-prevention",
+    title: "How to Avoid Sending USDT to the Wrong Network",
+    shortDesc: "Crucial steps to prevent permanent loss of funds during transfers.",
+    sections: [
+      {
+        id: "understanding-compatibility",
+        title: "1. Understanding Network Compatibility",
+        content: `USDT exists on many different blockchains, but these blockchains do not talk to each other directly. 
+
+Sending USDT from the Polygon network to a Tron network address is like trying to send an email to a phone number. The transaction will fail, or worse, process into a void.
+
+- **EVM Chains** (Polygon, Ethereum, BNB Chain, Arbitrum) all use the same address format starting with **0x**.
+- **Tron (TRC-20)** uses an address format starting with **T**.`
+      },
+      {
+        id: "common-mistakes-network",
+        title: "2. Common Mistakes",
+        content: `The most devastating mistake traders make is selecting the wrong network when withdrawing from an exchange. 
+For example, a user wants to send USDT to their Polygon MetaMask wallet (0x...), but they select the BNB Chain (BEP-20) from the exchange dropdown because the fees looked cheaper. 
+
+The exchange processes the withdrawal on the BNB Chain, sending it to the 0x address. Since the user wanted it on Polygon, they won't see the funds there.`
+      },
+      {
+        id: "recovery-possibilities",
+        title: "3. Recovery Possibilities",
+        content: `**If you send between EVM chains (e.g., Polygon to BNB Chain):** 
+You are in luck. Because EVM chains use the same private keys, you can simply switch your MetaMask network to the BNB Chain, and your USDT will be sitting there.
+
+**If you send from an exchange to Tron using an EVM address:** 
+The exchange will usually catch the error and block the withdrawal because a "0x" address is invalid on Tron.
+
+**If you send to a centralized exchange using the wrong network:**
+For example, sending Polygon USDT to a Binance deposit address that only supports Ethereum USDT. The funds are likely lost unless the exchange's customer support is willing to manually recover them (which often takes months and incurs heavy fees).`
+      },
+      {
+        id: "prevention-checklist",
+        title: "4. Prevention Checklist",
+        content: `Always follow this checklist before hitting send:
+1. **Verify the Network:** Ensure the sender's network explicitly matches the receiver's requested network (e.g., Polygon to Polygon).
+2. **Check the Prefix:** EVM addresses start with '0x'. Tron addresses start with 'T'.
+3. **Verify the Ends:** Visually confirm the first 4 and last 4 characters of the wallet address match perfectly.
+4. **The Test Transaction:** If you are sending a large amount (e.g., $1,000+), send a $1 test transaction first. Once confirmed, send the rest.`
+      }
+    ]
+  },
+  {
     id: "what-is-usdt",
     title: "What Is USDT?",
     shortDesc: "An introduction to Tether (USDT), the world's most traded stablecoin.",
