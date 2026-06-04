@@ -23,7 +23,7 @@ export async function GET(
           select: {
             id: true, name: true, avatarUrl: true,
             avgSellerRating: true, avgSellerSpeedRating: true, avgSellerPoliteness: true,
-            sellerRatingCount: true, totalTradeCount: true,
+            sellerRatingCount: true, totalTradeCount: true, avgSellerConfirmTimeSecs: true,
           },
         },
         buyer:   { select: { id: true, name: true, avatarUrl: true } },
@@ -69,6 +69,7 @@ export async function GET(
       sellerAvgRating: order.seller.avgSellerRating?.toNumber() ?? null,
       sellerAvgSpeed: order.seller.avgSellerSpeedRating?.toNumber() ?? null,
       sellerAvgPoliteness: order.seller.avgSellerPoliteness?.toNumber() ?? null,
+      sellerAvgConfirmTimeSecs: order.seller.avgSellerConfirmTimeSecs ?? null,
       sellerReviews: filteredReviews.map((r) => ({
         overallRating: r.overallRating,
         speedRating: r.speedRating,

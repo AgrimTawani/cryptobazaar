@@ -54,6 +54,7 @@ interface OrderDetail {
   sellerAvgRating: number | null;
   sellerAvgSpeed: number | null;
   sellerAvgPoliteness: number | null;
+  sellerAvgConfirmTimeSecs: number | null;
   sellerReviews: SellerReview[];
   buyerName: string | null;
   buyerAvatar: string | null;
@@ -107,15 +108,37 @@ function Stars({ value, size = "sm" }: { value: number; size?: "sm" | "lg" }) {
   );
 }
 
+function fmtReleaseSecs(secs: number | null): string | null {
+  if (!secs || secs <= 0) return null;
+  if (secs < 60) return `~${secs}s`;
+  return `~${Math.round(secs / 60)}m`;
+}
+
 function SellerReviewsCard({ order }: { order: OrderDetail }) {
   const reviews = order.sellerReviews.filter((r) => r.comment);
-  if (reviews.length === 0) return null;
+  const hasStats = order.sellerAvgRating != null;
+  const releaseTime = fmtReleaseSecs(order.sellerAvgConfirmTimeSecs);
+  if (!hasStats && reviews.length === 0) return null;
   return (
     <div className="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
       <div className="px-5 py-3 border-b border-[#f0f0f0]">
         <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Seller Reviews</p>
       </div>
-      <div className="divide-y divide-[#f5f5f5]">
+      {hasStats && (
+        <div className="px-5 py-3 flex items-center gap-4 border-b border-[#f5f5f5]">
+          <div className="flex items-center gap-1.5">
+            <Stars value={order.sellerAvgRating!} size="sm" />
+            <span className="font-sans text-xs font-semibold text-[#333]">
+              {order.sellerAvgRating!.toFixed(1)}
+            </span>
+            <span className="font-sans text-xs text-[#aaa]">({order.sellerRatingCount})</span>
+          </div>
+          {releaseTime && (
+            <span className="font-sans text-xs text-[#666]">⚡ {releaseTime} avg release</span>
+          )}
+        </div>
+      )}
+      {reviews.length > 0 && <div className="divide-y divide-[#f5f5f5]">
         {reviews.map((review, i) => (
           <div key={i} className="px-5 py-3.5">
             <div className="flex items-center justify-between gap-2 mb-1">
@@ -135,7 +158,7 @@ function SellerReviewsCard({ order }: { order: OrderDetail }) {
             <p className="font-sans text-xs text-[#666] leading-relaxed ml-7">{review.comment}</p>
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
