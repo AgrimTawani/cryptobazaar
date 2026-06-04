@@ -144,10 +144,9 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Wallet — WalletBalanceCard already has Polygon/BNB chain + USDT/USDC switcher */}
-        {dbStatus?.walletAddress && dbStatus?.walletChain && (
+        {dbStatus?.walletAddress && (
           <div className="mb-4">
-            <WalletBalanceCard walletAddress={dbStatus.walletAddress} walletChain={dbStatus.walletChain} />
+            <WalletBalanceCard walletAddress={dbStatus.walletAddress} />
           </div>
         )}
 

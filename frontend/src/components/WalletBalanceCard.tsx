@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useActiveWalletChain } from "thirdweb/react";
 
 const CHAIN_META: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   POLYGON: { label: "Polygon",      color: "#7b3fe4", bg: "#f5f0ff", border: "#c4b5fd", icon: "⬡" },
@@ -10,76 +11,70 @@ const CHAIN_META: Record<string, { label: string; color: string; bg: string; bor
   BSC:     { label: "BNB Chain",    color: "#b45309", bg: "#fffbeb", border: "#fcd34d", icon: "⬡" },
 };
 
-const EVM_CHAINS = [
-  { key: "POLYGON", label: "Polygon" },
-  { key: "BSC",     label: "BNB Chain" },
-];
+// ThirdWeb chain ID → our chain key
+const CHAIN_ID_TO_KEY: Record<number, "POLYGON" | "BSC"> = {
+  137: "POLYGON",
+  80002: "POLYGON", // Amoy testnet
+  56: "BSC",
+  97: "BSC",        // BSC testnet
+};
 
 const EVM_TOKENS = ["USDT", "USDC"] as const;
 type TokenPref = typeof EVM_TOKENS[number];
 
-// Solana is USDC-only; TRON supports both but we surface the switcher
 const CHAIN_FIXED_TOKEN: Record<string, TokenPref | null> = {
   SOLANA: "USDC",
 };
 
-interface Props {
-  walletAddress: string;
-  walletChain: string;
+function detectAddressType(address: string): "EVM" | "TRON" | "SOLANA" {
+  if (address.startsWith("0x")) return "EVM";
+  if (address.startsWith("T") && address.length === 34) return "TRON";
+  return "SOLANA";
 }
 
-export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: Props) {
+interface Props {
+  walletAddress: string;
+}
+
+export function WalletBalanceCard({ walletAddress }: Props) {
   const router = useRouter();
-  const [chain, setChain]           = useState(initialChain);
-  const [token, setToken]           = useState<TokenPref>("USDC");
-  const [balance, setBalance]       = useState<string | null>(null);
-  const [symbol, setSymbol]         = useState<string | null>(null);
-  const [loading, setLoading]       = useState(true);
-  const [switching, setSwitching]   = useState(false);
-  const [copied, setCopied]         = useState(false);
-  const [unlinking, setUnlinking]   = useState(false);
+  const activeWalletChain = useActiveWalletChain();
+
+  const addressType = detectAddressType(walletAddress);
+  const evmChainKey: "POLYGON" | "BSC" =
+    CHAIN_ID_TO_KEY[activeWalletChain?.id ?? 0] ?? "POLYGON";
+  const chainKey =
+    addressType === "EVM" ? evmChainKey :
+    addressType === "TRON" ? "TRON" : "SOLANA";
+
+  const [token, setToken]         = useState<TokenPref>("USDC");
+  const [balance, setBalance]     = useState<string | null>(null);
+  const [symbol, setSymbol]       = useState<string | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [copied, setCopied]       = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
   const [confirmUnlink, setConfirmUnlink] = useState(false);
 
-  const meta    = CHAIN_META[chain] ?? CHAIN_META.POLYGON;
-  const isEvm   = chain === "POLYGON" || chain === "BSC";
-  const fixedToken = CHAIN_FIXED_TOKEN[chain] ?? null;
+  const meta      = CHAIN_META[chainKey] ?? CHAIN_META.POLYGON;
+  const fixedToken = CHAIN_FIXED_TOKEN[chainKey] ?? null;
 
   const fetchBalance = useCallback(() => {
     setLoading(true);
     const t = fixedToken ?? token;
-    fetch(`/api/wallet/balance?token=${t}`)
+    const chainParam = addressType === "EVM" ? `&chain=${evmChainKey}` : "";
+    fetch(`/api/wallet/balance?token=${t}${chainParam}`)
       .then((r) => r.json())
       .then((d) => { setBalance(d.balance ?? "-"); setSymbol(d.symbol ?? ""); })
       .catch(() => setBalance("-"))
       .finally(() => setLoading(false));
-  }, [token, fixedToken]);
+  }, [token, fixedToken, addressType, evmChainKey]);
 
-  useEffect(() => { (async () => { await fetchBalance(); })(); }, [fetchBalance]);
-
-  const switchChain = async (newChain: string) => {
-    if (newChain === chain || switching) return;
-    setSwitching(true);
-    try {
-      const res = await fetch("/api/wallet/chain", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletChain: newChain }),
-      });
-      if (res.ok) {
-        setChain(newChain);
-        setBalance(null);
-        setLoading(true);
-        setTimeout(fetchBalance, 400);
-      }
-    } finally {
-      setSwitching(false);
-    }
-  };
+  // Refetch when token changes or when MetaMask switches chain (evmChainKey changes)
+  useEffect(() => { fetchBalance(); }, [fetchBalance]);
 
   const switchToken = (newToken: TokenPref) => {
     if (newToken === token) return;
     setToken(newToken);
-    // fetchBalance fires automatically via useEffect dep on token
   };
 
   const truncate = (addr: string) =>
@@ -120,35 +115,14 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* EVM chain switcher */}
-          {isEvm && (
-            <div className="flex items-center gap-[2px] bg-white border border-[#e0e0e0] rounded-full p-[3px]">
-              {EVM_CHAINS.map((c) => (
-                <button
-                  key={c.key}
-                  onClick={() => switchChain(c.key)}
-                  disabled={switching}
-                  className="font-sans text-[0.65rem] font-semibold px-[8px] py-[3px] rounded-full cursor-pointer transition-all disabled:opacity-50"
-                  style={
-                    chain === c.key
-                      ? { background: meta.color, color: "#fff" }
-                      : { background: "transparent", color: "#888" }
-                  }
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Token switcher - EVM and TRON; hidden for Solana (USDC-only) */}
+          {/* Token switcher — EVM and TRON; hidden for Solana (USDC-only) */}
           {!fixedToken && (
-            <div className="flex items-center gap-[2px] bg-white border border-[#e0e0e0] rounded-full p-[3px]">
+            <div className="flex items-center gap-0.5 bg-white border border-[#e0e0e0] rounded-full p-0.75">
               {EVM_TOKENS.map((t) => (
                 <button
                   key={t}
                   onClick={() => switchToken(t)}
-                  className="font-sans text-[0.65rem] font-semibold px-[8px] py-[3px] rounded-full cursor-pointer transition-all"
+                  className="font-sans text-[0.65rem] font-semibold px-2 py-0.75 rounded-full cursor-pointer transition-all"
                   style={
                     token === t
                       ? { background: meta.color, color: "#fff" }
@@ -162,7 +136,7 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
           )}
 
           <span
-            className="font-sans text-[0.68rem] font-semibold px-[10px] py-[3px] rounded-full"
+            className="font-sans text-[0.68rem] font-semibold px-2.5 py-0.75 rounded-full"
             style={{ background: meta.color + "1a", color: meta.color, border: `1px solid ${meta.color}33` }}
           >
             Connected
@@ -197,19 +171,19 @@ export function WalletBalanceCard({ walletAddress, walletChain: initialChain }: 
 
       {/* Balance */}
       <div>
-        <p className="font-sans text-[0.68rem] text-[#999] uppercase tracking-[1.2px] mb-[6px]">
+        <p className="font-sans text-[0.68rem] text-[#999] uppercase tracking-[1.2px] mb-1.5">
           Token Balance
         </p>
         {loading ? (
-          <div className="flex items-center gap-[10px]">
+          <div className="flex items-center gap-2.5">
             <span
-              className="w-[18px] h-[18px] rounded-full border-[2.5px] animate-spin"
+              className="w-4.5 h-4.5 rounded-full border-[2.5px] animate-spin"
               style={{ borderColor: `${meta.color}40`, borderTopColor: meta.color }}
             />
             <span className="font-sans text-[0.8rem] text-[#999]">Fetching balance…</span>
           </div>
         ) : (
-          <div className="flex items-baseline gap-[8px]">
+          <div className="flex items-baseline gap-2">
             <span
               className="font-condensed text-[2.8rem] tracking-[0.5px] leading-none"
               style={{ color: meta.color }}

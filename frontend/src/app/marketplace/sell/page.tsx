@@ -68,7 +68,7 @@ export default function SellPage() {
     return wallet;
   });
 
-  const [walletInfo, setWalletInfo] = useState<{ address: string; chain: string } | null>(null);
+  const [walletInfo, setWalletInfo] = useState<{ address: string } | null>(null);
   const [profilePayment, setProfilePayment] = useState<{
     upiId: string | null;
     bankAccount: string | null;
@@ -87,7 +87,7 @@ export default function SellPage() {
       fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
       new Promise((resolve) => setTimeout(resolve, 1500)),
     ]).then(([d]) => {
-      if (d.walletAddress && d.walletChain) setWalletInfo({ address: d.walletAddress, chain: d.walletChain });
+      if (d.walletAddress) setWalletInfo({ address: d.walletAddress });
       setProfilePayment({ upiId: d.upiId ?? null, bankAccount: d.bankAccount ?? null, ifscCode: d.ifscCode ?? null });
       if (!d.upiId) setPaymentMethods((prev) => prev.filter((m) => m !== "UPI"));
       setIsLoadingDb(false);
@@ -179,12 +179,15 @@ export default function SellPage() {
 
   if (isLoadingDb) return <LoadingSpinner />;
 
-  if (walletInfo && walletInfo.chain !== "POLYGON") {
+  const isNonEvmWallet = walletInfo && !walletInfo.address.startsWith("0x");
+  if (isNonEvmWallet) {
+    const chainLabel = walletInfo.address.startsWith("T") && walletInfo.address.length === 34
+      ? "TRON" : "Solana";
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center px-6 text-center">
         <h2 className="font-condensed text-2xl mb-2">Only available on Polygon</h2>
         <p className="font-sans text-sm text-[#666] max-w-xs leading-relaxed">
-          Your wallet is on {walletInfo.chain}. Sell orders are currently only supported on Polygon.
+          Your wallet is on {chainLabel}. Sell orders are currently only supported on Polygon.
         </p>
         <Link href="/marketplace" className="mt-6 font-sans text-sm text-[#7b3fe4] underline">← Back to marketplace</Link>
       </div>

@@ -15,7 +15,6 @@ const isAmoy = CHAIN_ID === 80002;
 const amoyChain = defineChain(80002);
 const polygonChain = isAmoy ? amoyChain : polygon;
 
-// Token addresses per chain per asset
 const EVM_TOKENS = {
   POLYGON: {
     USDT: { address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", chain: polygonChain, decimals: 6 },
@@ -45,12 +44,8 @@ async function evmBalance(
     method: "function balanceOf(address account) view returns (uint256)",
     params: [walletAddress as `0x${string}`],
   });
-  // Use Number division — safe up to ~10^9 tokens (well within USDT/USDC range)
   const adjusted = Number(raw) / 10 ** token.decimals;
-  return {
-    balance: adjusted.toString(),
-    symbol: tokenKey,
-  };
+  return { balance: adjusted.toString(), symbol: tokenKey };
 }
 
 async function solanaBalance(walletAddress: string) {
@@ -89,31 +84,48 @@ async function tronBalance(walletAddress: string, tokenKey: "USDT" | "USDC") {
   return { balance: (raw / 1e6).toString(), symbol: tokenKey };
 }
 
+// Derive chain from address format — EVM is ambiguous (needs client chain param)
+function detectNonEvmChain(addr: string): "TRON" | "SOLANA" | null {
+  if (addr.startsWith("T") && addr.length === 34) return "TRON";
+  if (!addr.startsWith("0x")) return "SOLANA";
+  return null; // EVM — caller must provide chain param
+}
+
 export async function GET(request: Request) {
   try {
     const { userId: clerkId } = await auth();
     if (!clerkId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const user = await db.user.findUnique({ where: { clerkId } });
-    if (!user?.walletAddress || !user?.walletChain) {
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { walletAddress: true, walletChain: true },
+    });
+    if (!user?.walletAddress)
       return NextResponse.json({ balance: null, symbol: null });
-    }
 
     const { searchParams } = new URL(request.url);
     const tokenPref = (searchParams.get("token") ?? "USDT") as "USDT" | "USDC";
 
-    const { walletAddress, walletChain } = user;
+    const { walletAddress } = user;
+
+    // Non-EVM chains are unambiguous from address format
+    const nonEvmChain = detectNonEvmChain(walletAddress);
+
     let result: { balance: string; symbol: string };
 
-    if (walletChain === "POLYGON" || walletChain === "BSC") {
-      result = await evmBalance(walletAddress, walletChain, tokenPref);
-    } else if (walletChain === "SOLANA") {
+    if (nonEvmChain === "SOLANA") {
       result = await solanaBalance(walletAddress);
-    } else if (walletChain === "TRON") {
+    } else if (nonEvmChain === "TRON") {
       result = await tronBalance(walletAddress, tokenPref);
     } else {
-      result = { balance: "-", symbol: "" };
+      // EVM — client passes ?chain=POLYGON|BSC; fall back to stored walletChain
+      const chainParam = searchParams.get("chain") as "POLYGON" | "BSC" | null;
+      const evmChain: "POLYGON" | "BSC" =
+        (chainParam === "POLYGON" || chainParam === "BSC")
+          ? chainParam
+          : (user.walletChain === "BSC" ? "BSC" : "POLYGON");
+      result = await evmBalance(walletAddress, evmChain, tokenPref);
     }
 
     return NextResponse.json(result);
