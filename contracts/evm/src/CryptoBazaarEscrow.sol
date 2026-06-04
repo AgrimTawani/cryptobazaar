@@ -72,6 +72,19 @@ contract CryptoBazaarEscrow {
         flatFee = _flatFee;
     }
 
+    address public pendingAdmin;
+
+    function proposeAdmin(address _admin) external onlyAdmin {
+        if (_admin == address(0)) revert InvalidAddress();
+        pendingAdmin = _admin;
+    }
+
+    function acceptAdmin() external {
+        if (msg.sender != pendingAdmin) revert Unauthorized();
+        admin = pendingAdmin;
+        pendingAdmin = address(0);
+    }
+
     function createOrder(address token, uint128 amount, uint96 priceInr) external {
         if (!whitelisted[token]) revert InvalidToken();
         if (amount == 0) revert ZeroAmount();
@@ -119,8 +132,8 @@ contract CryptoBazaarEscrow {
         if (o.status != Status.PAID) revert InvalidState();
         if (msg.sender != o.seller)  revert Unauthorized();
 
-        uint128 fee          = flatFee;
         uint128 locked       = o.lockedAmount;
+        uint128 fee          = locked < flatFee ? locked : flatFee;
         uint128 payout       = locked - fee;
         uint128 newRemaining = o.amount - locked;
         address buyer        = o.buyer;
