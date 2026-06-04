@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
@@ -58,11 +59,50 @@ const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
   DISPUTED:      { color: "#991b1b", bg: "#fef2f2" },
 };
 
+function ChainConfirmPopup({ order, onConfirm, onCancel }: {
+  order: OrderRow;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const badge = CHAIN_BADGE[order.chain];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.35)" }}>
+      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Network Required</p>
+        <p className="font-sans text-sm text-[#333] leading-relaxed mb-4">
+          This order settles on{" "}
+          {badge && (
+            <span className="font-semibold px-1.5 py-0.5 rounded-full text-xs mx-0.5"
+              style={{ color: badge.color, background: badge.bg }}>
+              {badge.label}
+            </span>
+          )}
+          . Make sure your wallet is connected to <strong>{badge?.label ?? order.chain}</strong> before proceeding.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={onCancel}
+            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl border border-[#e5e5e5] text-[#666] cursor-pointer bg-white hover:bg-[#f5f5f5] transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-colors">
+            Continue →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MarketplacePage() {
   const { user, isSignedIn } = useUser();
+  const router = useRouter();
   const isGuest = !isSignedIn;
   const [assetFilter, setAssetFilter] = useState("All");
   const [chainFilter, setChainFilter] = useState("All Chains");
+  const [pendingOrder, setPendingOrder] = useState<OrderRow | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [myOrders, setMyOrders] = useState<OrderRow[]>([]);
@@ -107,6 +147,13 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {pendingOrder && (
+        <ChainConfirmPopup
+          order={pendingOrder}
+          onConfirm={() => { router.push(`/marketplace/${pendingOrder.id}`); setPendingOrder(null); }}
+          onCancel={() => setPendingOrder(null)}
+        />
+      )}
       {/* Header */}
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-14 flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
@@ -278,19 +325,20 @@ export default function MarketplacePage() {
               <div className="flex flex-col items-start gap-1">
                 {isGuest ? (
                   <Link href="/login"
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-[8px] text-center no-underline hover:bg-[#333] transition-colors">
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg text-center no-underline hover:bg-[#333] transition-colors">
                     Sign In
                   </Link>
                 ) : order.isMine ? (
                   <Link href={`/marketplace/${order.id}`}
-                    className="font-sans text-sm font-semibold text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-[8px] text-center no-underline hover:bg-[#ede9fe] transition-colors">
+                    className="font-sans text-sm font-semibold text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-lg text-center no-underline hover:bg-[#ede9fe] transition-colors">
                     Yours →
                   </Link>
                 ) : (
-                  <Link href={`/marketplace/${order.id}`}
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-[8px] text-center no-underline hover:bg-[#333] transition-colors">
+                  <button
+                    onClick={() => setPendingOrder(order)}
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
                     Buy
-                  </Link>
+                  </button>
                 )}
                 {order.escrowTxHash && (
                   <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
@@ -345,15 +393,19 @@ export default function MarketplacePage() {
                 </div>
                 {isGuest ? (
                   <Link href="/login"
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-[8px] no-underline hover:bg-[#333] transition-colors">
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg no-underline hover:bg-[#333] transition-colors">
                     Sign In
                   </Link>
-                ) : (
-                  <span className={`font-sans text-sm font-semibold py-1.5 px-4 rounded-[8px] ${
-                    order.isMine ? "text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]" : "text-white bg-black"
-                  }`}>
-                    {order.isMine ? "Yours →" : "Buy"}
+                ) : order.isMine ? (
+                  <span className="font-sans text-sm font-semibold py-1.5 px-4 rounded-lg text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]">
+                    Yours →
                   </span>
+                ) : (
+                  <button
+                    onClick={(e) => { e.preventDefault(); setPendingOrder(order); }}
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
+                    Buy
+                  </button>
                 )}
               </div>
             </Link>
