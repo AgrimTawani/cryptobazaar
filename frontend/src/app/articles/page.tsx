@@ -327,6 +327,490 @@ Notices to us must be sent in writing to the legal email above. Notices to you w
 
 const ARTICLES_DATA: Article[] = [
   {
+    id: "how-p2p-works",
+    title: "How Our P2P Trading Platform Works",
+    shortDesc: "A complete walkthrough of CryptoBazaar — from sign-up to settlement.",
+    sections: [
+      {
+        id: "what-is-p2p",
+        title: "1. What is P2P Crypto Trading?",
+        content: `Peer-to-peer (P2P) crypto trading is a method of buying and selling cryptocurrency directly between two people, without a centralised exchange acting as the middleman.
+
+On CryptoBazaar, the buyer sends Indian Rupees (INR) directly to the seller's bank account via UPI, IMPS, or NEFT. In return, the seller's cryptocurrency is released to the buyer from a smart contract escrow. CryptoBazaar facilitates the connection and holds the crypto in escrow — but we never touch your INR or take custody of your crypto.`
+      },
+      {
+        id: "why-p2p",
+        title: "2. Why P2P Instead of Centralised Exchanges?",
+        content: `Centralised exchanges in India face regulatory uncertainty. Several have shut down, frozen withdrawals, or been investigated. When you deposit crypto into an exchange, you hand over custody — if the exchange fails, your funds may be lost.
+
+P2P eliminates custodial risk entirely:
+- Your crypto sits in an on-chain smart contract, not in our wallets.
+- Your INR moves bank-to-bank between you and your counterparty.
+- CryptoBazaar cannot access, redirect, or freeze your funds at any point.
+- Every transaction is verifiable on a public blockchain.
+
+The trade-off is that P2P requires more trust between parties — which is exactly why CryptoBazaar exists. We vet every member rigorously so you don't have to worry about who's on the other side.`
+      },
+      {
+        id: "supported-assets",
+        title: "3. Supported Assets",
+        content: `CryptoBazaar currently supports two stablecoins — digital currencies pegged 1:1 to the US Dollar:
+
+USDT (Tether): The world's most traded stablecoin by volume. Widely used by Indian P2P traders, especially on the Tron network due to low gas fees. Available on CryptoBazaar across Polygon, BNB Chain (BSC), and Tron (TRC-20).
+
+USDC (USD Coin): Issued by Circle and considered more transparent than USDT due to regular reserve attestations. Available on Polygon and BNB Chain.
+
+We do not support volatile assets like Bitcoin or Ethereum. Stablecoins are the safest asset class for P2P because their value doesn't swing while a trade is in progress.`
+      },
+      {
+        id: "supported-networks",
+        title: "4. Supported Networks",
+        content: `Every crypto asset exists on a blockchain network. The network you choose affects transaction speed and gas fees:
+
+Polygon: An Ethereum Layer 2 with very low fees (typically under ₹1 per transaction) and fast confirmations. Supports both USDT and USDC. Recommended for most traders.
+
+BNB Chain (BSC): Binance's EVM-compatible chain. Moderate fees, widely supported by Indian wallets. Supports USDT and USDC.
+
+Tron (TRC-20): Extremely popular among Indian USDT traders due to near-zero fees. Supports USDT only. If you're trading USDT specifically, Tron is the most cost-effective option.
+
+Important: Both buyer and seller must be on the same network for a trade. You cannot buy USDT on Polygon from a seller who listed on Tron.`
+      },
+      {
+        id: "creating-account",
+        title: "5. Creating an Account",
+        content: `Getting started on CryptoBazaar takes under 2 minutes:
+
+Step 1: Visit cryptobazaar.co.in and click 'Get Started'.
+Step 2: Sign in with your Google account. We use Google OAuth — no passwords to remember or manage.
+Step 3: You're in. Your account is created immediately.
+
+At this point you can browse the live marketplace and see all active listings. But to actually buy or sell, you must complete our 3-layer verification process. This is non-negotiable — it's what keeps every trader on the platform safe.`
+      },
+      {
+        id: "kyc-verification",
+        title: "6. KYC Verification (3 Layers)",
+        content: `CryptoBazaar uses the most rigorous verification process in Indian P2P trading. Every member must pass all three layers before placing a single trade:
+
+Layer 1 — Identity (KYC):
+Submit your Aadhaar number and PAN card. Complete a quick liveness selfie to prove you're a real person and that the documents belong to you. Processed by our partner Didit. Takes under 5 minutes. CryptoBazaar never stores your raw identity documents.
+
+Layer 2 — Enhanced Due Diligence (EDD):
+Upload 6 months of bank statements (PDF format). Our ML system scans for red flags: sudden large deposits, mule-account patterns, dormant accounts with recent crypto activity, and mismatched names. The PDFs are processed in-memory and permanently deleted after scoring. No human reads them unless a dispute arises.
+
+Layer 3 — AI Questionnaire:
+Answer 10 questions about your trading background, income source, and intended use of the platform. Scored by AI in about 5 minutes. This layer catches social engineering attempts and profiles that don't match the financial data from Layer 2.
+
+Once all three layers pass, you receive Verified Member status and a cryptographic credential bound to your Decentralised Identifier (DID). This credential expires after 6 months and must be renewed.`
+      },
+      {
+        id: "finding-counterparty",
+        title: "7. Finding a Buyer or Seller",
+        content: `Once verified, head to the Marketplace. You'll see a live table of all active sell orders with:
+- Seller name, rating, and average release time
+- Asset (USDT or USDC) and network (Polygon, BSC, Tron)
+- Price per unit in INR
+- Available amount
+- Accepted payment methods (UPI, IMPS, NEFT)
+
+You can filter by asset and chain. Click 'Buy' on any listing to start a trade.
+
+To sell, click 'Post Order' in the top right. Set your asset, amount, price per unit, and accepted payment methods. Your crypto will be locked into escrow the moment the order is created.`
+      },
+      {
+        id: "escrow-explained",
+        title: "8. Escrow Protection Explained",
+        content: `Every trade on CryptoBazaar is protected by a non-custodial escrow smart contract deployed on the public blockchain.
+
+Here's what happens step by step:
+1. The seller creates a sell order. Their crypto is deposited into the escrow contract on-chain.
+2. A buyer clicks 'Buy' and locks the order. A 30-minute payment timer begins.
+3. The buyer sends INR directly to the seller's bank account via UPI/IMPS/NEFT.
+4. The buyer clicks 'I Have Paid' and enters the UTR number.
+5. The seller verifies the payment landed in their bank account.
+6. The seller clicks 'Confirm Release'. The smart contract automatically transfers the crypto to the buyer's wallet.
+
+At no point does CryptoBazaar hold custody of the crypto or the INR. The smart contract is autonomous — once deployed, even we cannot override it. The code controls the funds, not us.`
+      },
+      {
+        id: "payment-confirmation",
+        title: "9. Payment Confirmation Process",
+        content: `After the buyer clicks 'I Have Paid':
+
+The seller has 15 minutes to respond. During this window, the seller must:
+(a) Check their bank account for the incoming credit matching the exact trade amount.
+(b) Verify that the sender name matches the buyer's verified identity on CryptoBazaar.
+(c) Confirm the UTR number provided by the buyer corresponds to the actual transaction.
+
+If the payment checks out, the seller clicks 'Payment Received' and the smart contract releases the crypto.
+
+If the seller doesn't respond within 15 minutes, the trade automatically escalates to dispute resolution. This protects buyers against sellers who stall or ghost after receiving payment.`
+      },
+      {
+        id: "releasing-crypto",
+        title: "10. Releasing Crypto Safely",
+        content: `Golden rules for sellers before releasing:
+
+Never release based on a screenshot. Always verify the payment in your actual bank account or UPI app. Screenshots are trivially easy to forge.
+
+Check the exact amount. If the trade is for ₹50,000, confirm ₹50,000 landed — not ₹49,999 or ₹50,001. Partial payments are not acceptable.
+
+Check the sender name. The name on the incoming transfer must match the buyer's verified name on CryptoBazaar. If a third-party name appears, do not release — raise a dispute immediately.
+
+Once you click 'Confirm Release', the action is irreversible. The smart contract will transfer the crypto to the buyer's wallet within seconds. There is no undo.`
+      },
+      {
+        id: "dispute-process",
+        title: "11. Dispute Resolution Process",
+        content: `Disputes are triggered when:
+- The seller raises a dispute after the buyer marks payment.
+- The seller fails to respond within the 15-minute confirmation window.
+- Either party files a formal complaint within 24 hours.
+
+Both parties have 24 hours to submit evidence — primarily PDF bank statements. Screenshots are supplementary only. All PDFs are forensically analysed for tampering (metadata validation, digital signature verification, anomaly detection).
+
+Our compliance team cross-references the buyer's debit against the seller's credit using UTR numbers. The outcome is almost always clear from bank data alone.
+
+Ruling: If payment is confirmed, crypto is released to the buyer. If not, crypto is returned to the seller. Dispute rulings are final, with a 7-day appeal window for written appeals to disputes@cryptobazaar.co.in.
+
+A second dispute loss within 12 months results in permanent suspension.`
+      },
+      {
+        id: "trading-fees",
+        title: "12. Trading Fees",
+        content: `CryptoBazaar charges a flat fee of 1 unit of the traded asset per completed trade. For example, if you sell 100 USDT, the buyer receives 99 USDT and 1 USDT goes to CryptoBazaar as the platform fee.
+
+Additionally, 0.75% of every completed trade is automatically sent to the Member Protection Fund smart contract. This is not a fee you pay separately — it is deducted from the escrow at settlement.
+
+There are no hidden fees, no withdrawal fees, and no deposit fees. Gas fees for on-chain transactions (escrow deposit, release) are paid by the party initiating the transaction, as standard on any blockchain.
+
+You also need an active Membership Plan to trade:
+- Starter: ₹200/month, ₹5,00,000 monthly volume cap
+- Trader: ₹500/month, ₹20,00,000 monthly volume cap
+- Pro: ₹1,000/month, unlimited volume`
+      }
+    ]
+  },
+  {
+    id: "how-to-buy-usdt",
+    title: "How to Buy USDT in India Using P2P",
+    shortDesc: "Step-by-step guide to purchasing USDT safely with INR.",
+    sections: [
+      {
+        id: "buy-prerequisites",
+        title: "1. What You Need Before Starting",
+        content: `Before you can buy USDT on CryptoBazaar, make sure you have:
+
+A CryptoBazaar account: Sign in with Google at cryptobazaar.co.in.
+
+Verified Member status: You must have passed all 3 verification layers (KYC, bank statement review, AI questionnaire). This typically takes 15–30 minutes on first sign-up.
+
+A connected Web3 wallet: You need a cryptocurrency wallet like MetaMask (for Polygon/BSC) or a Tron-compatible wallet (for TRC-20 USDT). Your wallet address is permanently bound to your account.
+
+An active Membership Plan: Choose Starter (₹200/mo), Trader (₹500/mo), or Pro (₹1,000/mo) depending on your expected monthly volume.
+
+A bank account in your name: The account you use to send INR must exactly match the name on your Aadhaar and PAN. Third-party payments are strictly blocked and will result in a dispute ruling against you.`
+      },
+      {
+        id: "bank-transfer-requirements",
+        title: "2. Bank Transfer Requirements",
+        content: `CryptoBazaar supports three INR payment methods:
+
+UPI: Fastest option. Transactions settle in seconds. Recommended for trades under ₹1,00,000. Make sure your UPI app shows the full UTR (Unique Transaction Reference) number after payment — you'll need to enter this on the platform.
+
+IMPS (Immediate Payment Service): Available 24/7. Settles within seconds to minutes. Works for amounts up to ₹5,00,000 per transaction (bank-dependent). Ideal for mid-size trades.
+
+NEFT (National Electronic Funds Transfer): Processed in batches during banking hours. Can take 30 minutes to 2 hours. Best for very large trades where speed is less important than reliability.
+
+Critical: Always use a bank account registered in your own verified name. Payments from family members, friends, or business accounts will be flagged, and you will lose the dispute.`
+      },
+      {
+        id: "choosing-seller",
+        title: "3. Choosing the Right Seller",
+        content: `Not all sellers are equal. Here's what to look for on the Marketplace:
+
+Rating and trade count: Prefer sellers with a 4.0+ star rating and at least 10 completed trades. A seller with 50+ trades and a 4.5+ rating is a safe bet.
+
+Average release time: This tells you how quickly the seller typically releases crypto after you pay. Under 5 minutes is excellent. Over 15 minutes means the seller may be slow to respond — not ideal if you're in a hurry.
+
+Price per unit: Sellers set their own rates. Compare across listings. A ₹0.50 difference on 1,000 USDT is ₹500 — it adds up. But don't chase the absolute cheapest price at the expense of a reputable seller.
+
+Accepted payment methods: Make sure the seller accepts your preferred payment method (UPI, IMPS, or NEFT).
+
+Network: Confirm the seller's listing matches the network your wallet supports. If your MetaMask is set to Polygon, only buy from Polygon listings.`
+      },
+      {
+        id: "understanding-rates",
+        title: "4. Understanding Exchange Rates",
+        content: `USDT and USDC are pegged to the US Dollar, but the INR price you see on CryptoBazaar is set by individual sellers — not by a central order book.
+
+The price typically tracks the USD/INR exchange rate plus a small premium (1–3%) that compensates the seller for:
+- The risk of holding stablecoins
+- The inconvenience of managing bank transfers
+- Market liquidity conditions
+
+During high-demand periods (crypto bull runs, regulatory news), premiums can spike to 5%+. During low-demand periods, you may find rates very close to the spot USD/INR rate.
+
+Tip: Don't obsess over getting the absolute best rate. A trustworthy seller with a slightly higher price is almost always better than an unknown seller offering a suspiciously low rate.`
+      },
+      {
+        id: "completing-payment",
+        title: "5. Completing Payment",
+        content: `Once you click 'Buy' on a listing, the order is locked and a 30-minute payment timer starts. Here's the process:
+
+Step 1: The seller's payment details appear on your screen (UPI ID, bank account number, IFSC code). Copy them carefully.
+
+Step 2: Open your banking app and initiate a transfer for the exact INR amount shown. Do not round up or down. Send the exact amount.
+
+Step 3: After the transfer completes, note the UTR number from your banking app's transaction confirmation.
+
+Step 4: Upload a screenshot of the payment confirmation on CryptoBazaar (for reference purposes).
+
+Step 5: Enter the UTR number in the provided field.
+
+Step 6: Click 'I Have Paid'. The seller is now notified and has 15 minutes to verify and release.
+
+If you fail to complete payment within 30 minutes, the trade is automatically cancelled and the crypto is returned to the seller. Repeated cancellations may affect your account standing.`
+      },
+      {
+        id: "escrow-protection-buyer",
+        title: "6. How Escrow Protects You as a Buyer",
+        content: `The moment you lock a trade, the seller's crypto is already sitting in the escrow smart contract. It was deposited when they created the listing. This means:
+
+The seller cannot withdraw it while the trade is active.
+The seller cannot cancel the trade after you've marked payment.
+If the seller doesn't respond within 15 minutes, the trade auto-escalates to dispute resolution.
+
+Your only risk as a buyer is sending INR to the wrong account. Always double-check the payment details shown on screen match the seller's verified information. If something looks off — wrong name, different bank — do not pay. Raise a dispute instead.`
+      },
+      {
+        id: "receiving-usdt",
+        title: "7. Receiving Your USDT",
+        content: `Once the seller clicks 'Payment Received', the escrow smart contract automatically transfers the USDT to your connected wallet address. This happens on-chain and typically completes within:
+
+Polygon: 2–5 seconds
+BSC: 3–5 seconds
+Tron: 3–10 seconds
+
+You'll see the USDT appear in your wallet immediately. The on-chain transaction hash is recorded and visible on the trade page — you can verify it on Polygonscan, BscScan, or Tronscan.
+
+A platform fee of 1 USDT is deducted at settlement. So if you bought 100 USDT, you receive 99 USDT in your wallet.
+
+Congratulations — you've just completed a fully non-custodial P2P trade with escrow protection. Your USDT is now yours, in your own wallet, under your own control.`
+      }
+    ]
+  },
+  {
+    id: "how-to-sell-usdt",
+    title: "How to Sell USDT Safely in India",
+    shortDesc: "Best practices for selling crypto and receiving INR securely.",
+    sections: [
+      {
+        id: "creating-sell-order",
+        title: "1. Creating a Sell Order",
+        content: `To sell USDT or USDC on CryptoBazaar:
+
+Step 1: Go to the Marketplace and click 'Post Order'.
+Step 2: Select the asset (USDT or USDC) and the network (Polygon, BSC, or Tron).
+Step 3: Enter the amount you want to sell.
+Step 4: Set your price per unit in INR. You can check current listings to gauge the market rate.
+Step 5: Select which payment methods you accept (UPI, IMPS, NEFT).
+Step 6: Confirm the order. Your wallet will prompt you to approve a transaction that deposits the crypto into the escrow smart contract.
+
+Once confirmed, your listing is live on the Marketplace. Your crypto is now locked in escrow — you cannot withdraw it until the trade completes or you cancel the order (only possible before a buyer locks it).
+
+Tip: Price competitively. If the market rate is ₹93.50 and you list at ₹95.00, buyers will skip your listing. Check what other sellers are offering and price within a reasonable range.`
+      },
+      {
+        id: "verifying-buyer-payments",
+        title: "2. Verifying Buyer Payments",
+        content: `This is the most critical step in selling. When a buyer clicks 'I Have Paid':
+
+Step 1: Open your bank account or UPI app. Do NOT rely on the buyer's screenshot — check your actual account balance and transaction history.
+
+Step 2: Look for an incoming credit matching the exact trade amount (to the rupee).
+
+Step 3: Verify the sender's name. It must match the buyer's verified name on CryptoBazaar. If you see a different name (family member, business account, third party), do not release. Raise a dispute immediately.
+
+Step 4: Cross-reference the UTR number. The UTR provided by the buyer should appear in your bank's transaction details.
+
+Only after confirming all three checks (amount, name, UTR) should you click 'Payment Received' to release the crypto.
+
+Remember: Once released, the action is irreversible. The smart contract will transfer the crypto to the buyer's wallet instantly. There is no undo, no reversal, no admin override.`
+      },
+      {
+        id: "common-seller-mistakes",
+        title: "3. Common Seller Mistakes",
+        content: `Mistake 1: Releasing based on a screenshot.
+Buyers can forge UPI payment screenshots in minutes using free tools. Never release crypto based on a screenshot alone. Always verify in your actual bank account.
+
+Mistake 2: Releasing before the payment clears.
+Some payment methods (especially NEFT) can take time to settle. If the buyer says they've paid but nothing has appeared in your account, wait. Do not release until the money is actually credited.
+
+Mistake 3: Accepting partial payments.
+If the trade is for ₹50,000 and the buyer sends ₹45,000, do not release. The full amount must be received. Raise a dispute for the shortfall.
+
+Mistake 4: Ignoring name mismatches.
+If the incoming payment comes from 'Rahul Sharma' but the buyer's verified name is 'Priya Mehta', this is a red flag. It could be a third-party payment using stolen funds. Raise a dispute.
+
+Mistake 5: Not responding within 15 minutes.
+If you don't respond after the buyer marks payment, the trade auto-escalates to dispute resolution. This wastes time for everyone. If you're going to be away from your phone, cancel your listing first.`
+      },
+      {
+        id: "when-not-to-release",
+        title: "4. When NOT to Release Escrow",
+        content: `Do not release crypto in any of these situations:
+
+- Payment has not appeared in your bank account, regardless of what the buyer claims.
+- The payment amount does not match the trade amount exactly.
+- The sender name on the bank credit does not match the buyer's verified identity.
+- The buyer pressures you to release before you've verified (e.g., 'I'm in a hurry', 'it will come through soon').
+- You receive multiple small payments instead of one lump sum (potential structuring).
+- The buyer asks you to release to a different wallet address than the one on record.
+
+In any of these cases, do not release. Click 'Dispute' and let the compliance team investigate. Your crypto remains safe in escrow during the entire dispute process.`
+      },
+      {
+        id: "payment-reversals",
+        title: "5. Handling Payment Reversals",
+        content: `A payment reversal (or chargeback) occurs when the buyer's bank reverses the INR transfer after you've already released the crypto. This is one of the biggest risks in unprotected P2P trading.
+
+CryptoBazaar mitigates this through:
+
+1. Mandatory identity verification: Every buyer is Aadhaar-linked. Fraudulent chargebacks can be traced to a real person and reported to law enforcement.
+
+2. UTR-based evidence: All trades are recorded with UTR numbers. If a reversal occurs and is fraudulent, the on-chain trade record and UTR provide indisputable evidence for a police complaint.
+
+3. Bank statement forensics: If a dispute arises, our compliance team analyses both parties' actual bank data — not screenshots.
+
+4. Member Protection Fund: If a payment reversal causes your account to be frozen due to a failure in our vetting process, you may be eligible for a disbursement from the MPF.
+
+If you experience a reversal after releasing crypto, contact support@cryptobazaar.co.in immediately with the trade ID and your bank freeze documentation.`
+      },
+      {
+        id: "large-trade-practices",
+        title: "6. Best Practices for Large Trades",
+        content: `For trades above ₹1,00,000:
+
+Use IMPS or NEFT instead of UPI. UPI has daily transaction limits (typically ₹1,00,000 per transaction) that may require the buyer to make multiple payments. IMPS/NEFT handle larger amounts in a single transfer, reducing complexity.
+
+Wait for full settlement before releasing. Large NEFT transfers can take up to 2 hours during banking hours. Do not rush.
+
+Verify the buyer's profile carefully. Check their rating, trade count, and account age. For very large trades (₹5,00,000+), prefer buyers with Pro-tier memberships and 20+ completed trades.
+
+Consider splitting into multiple trades. Instead of one ₹10,00,000 trade, consider two ₹5,00,000 trades. This reduces your exposure per transaction.
+
+Keep records. Save all UTRs, bank statements, and trade IDs for your own tax and compliance records. CryptoBazaar provides full trade history in your Dashboard, but maintaining your own copies is good practice.`
+      }
+    ]
+  },
+  {
+    id: "usdt-vs-usdc",
+    title: "USDT vs USDC: Which Stablecoin Should You Choose?",
+    shortDesc: "A detailed comparison to help you pick the right stablecoin for P2P trading.",
+    sections: [
+      {
+        id: "what-is-usdt",
+        title: "1. What is USDT?",
+        content: `USDT (Tether) is the world's largest stablecoin by market capitalisation and daily trading volume. Issued by Tether Limited, it is pegged 1:1 to the US Dollar — meaning 1 USDT is designed to always be worth approximately $1.
+
+USDT was launched in 2014, making it the oldest stablecoin in existence. It is available on virtually every blockchain, including Ethereum, Tron, Polygon, BNB Chain, Solana, Avalanche, and more.
+
+On CryptoBazaar, USDT is available on Polygon, BNB Chain (BSC), and Tron (TRC-20). It is by far the most popular asset traded on the platform, accounting for the majority of all listings.
+
+Key facts:
+- Market cap: Over $140 billion (as of 2025)
+- Daily trading volume: Highest of any cryptocurrency, including Bitcoin
+- Issuer: Tether Limited (registered in the British Virgin Islands)
+- Reserve backing: Claims 1:1 backing with a mix of cash, cash equivalents, US Treasuries, and other assets`
+      },
+      {
+        id: "what-is-usdc",
+        title: "2. What is USDC?",
+        content: `USDC (USD Coin) is the second-largest stablecoin by market capitalisation. It is issued by Circle, a US-based financial technology company, in partnership with Coinbase.
+
+USDC launched in 2018 and has positioned itself as the 'regulated' alternative to USDT. Circle is a registered Money Services Business in the US and publishes monthly attestation reports from Deloitte verifying that USDC reserves match the number of tokens in circulation.
+
+On CryptoBazaar, USDC is available on Polygon and BNB Chain (BSC).
+
+Key facts:
+- Market cap: Over $55 billion (as of 2025)
+- Daily trading volume: Significantly lower than USDT, but growing
+- Issuer: Circle (US-based, registered as a Money Services Business)
+- Reserve backing: 100% backed by cash and short-dated US Treasury securities. Monthly attestation by Deloitte.`
+      },
+      {
+        id: "key-differences",
+        title: "3. Key Differences",
+        content: `While both USDT and USDC are dollar-pegged stablecoins, they differ in important ways:
+
+Issuer and jurisdiction: USDT is issued by Tether Limited (BVI). USDC is issued by Circle (USA). Circle operates under significantly more regulatory oversight.
+
+Reserve transparency: USDC publishes monthly third-party attestation reports from Deloitte. Tether publishes quarterly reports but has historically faced criticism for opaque reserve composition — including loans and commercial paper.
+
+Regulatory compliance: Circle proactively works with US regulators and has applied for a banking charter. Tether has faced enforcement actions from the New York Attorney General and the CFTC, resulting in settlements totalling $60M+.
+
+Availability on CryptoBazaar: USDT is available on 3 networks (Polygon, BSC, Tron). USDC is available on 2 networks (Polygon, BSC). If you want to trade on Tron, USDT is your only option.
+
+De-peg risk: Both have briefly de-pegged from $1 during extreme market stress. USDC notably dropped to $0.87 during the Silicon Valley Bank crisis in March 2023 (Circle held $3.3B in reserves at SVB). It recovered within days. USDT has experienced smaller de-pegs but has always recovered.`
+      },
+      {
+        id: "liquidity-comparison",
+        title: "4. Liquidity Comparison",
+        content: `Liquidity refers to how easily you can buy or sell an asset without significantly affecting its price. In the context of CryptoBazaar's P2P marketplace:
+
+USDT has dramatically higher liquidity. On any given day, you will find more USDT listings, more sellers, and tighter spreads (smaller gap between buy and sell prices). This is because USDT dominates Indian P2P markets — most traders, OTC desks, and arbitrageurs default to USDT.
+
+USDC has growing but lower liquidity. You may find fewer listings and slightly wider spreads. For large trades (₹5,00,000+), finding a USDC seller at a competitive rate can take longer.
+
+If you need to trade quickly and at the best available rate, USDT is the pragmatic choice. If you're willing to wait for the right listing, USDC is perfectly viable.`
+      },
+      {
+        id: "transparency-comparison",
+        title: "5. Transparency Comparison",
+        content: `This is where the two stablecoins diverge most sharply:
+
+USDC: Circle publishes monthly attestation reports conducted by Deloitte. These reports confirm that the total USDC in circulation is fully backed by cash and short-dated US Treasuries held in regulated financial institutions. The reserves are held at BlackRock (through the Circle Reserve Fund) and various US banks. This is as transparent as stablecoins get.
+
+USDT: Tether publishes quarterly 'Reserves Report' (not a full audit). Historically, Tether's reserves included commercial paper, secured loans, and other less-liquid assets in addition to cash. In recent years, Tether has shifted heavily towards US Treasuries and reduced commercial paper to near-zero. However, Tether has never undergone a full independent audit — only attestations.
+
+Bottom line: If reserve transparency and regulatory compliance are important to you, USDC has a clear edge. If you care more about liquidity and market depth, USDT wins.`
+      },
+      {
+        id: "use-cases",
+        title: "6. Use Cases",
+        content: `When USDT makes more sense:
+- You're an active trader who needs maximum liquidity and the fastest execution.
+- You want to trade on the Tron network (TRC-20) for minimal gas fees.
+- You're doing high-frequency or high-volume trading where spreads matter.
+- You need the widest selection of sellers on CryptoBazaar's marketplace.
+
+When USDC makes more sense:
+- You're holding stablecoins for longer periods and want the highest reserve transparency.
+- You care about the regulatory standing of the issuer.
+- You're using DeFi protocols that require or incentivise USDC (many Aave and Compound pools offer better USDC rates).
+- You want to avoid any association with Tether's regulatory controversies.
+
+For many Indian P2P traders, the honest answer is: both work fine. The practical differences in day-to-day P2P trading are minimal.`
+      },
+      {
+        id: "which-is-better-p2p",
+        title: "7. Which is Better for P2P on CryptoBazaar?",
+        content: `For most CryptoBazaar users, USDT is the better choice for P2P trading purely because of liquidity. More sellers, more listings, faster execution, and tighter spreads. If you're new to P2P, start with USDT on Polygon — it's the most beginner-friendly combination (low fees, fast settlement, good MetaMask support).
+
+If you're a more experienced trader who values transparency and plans to hold stablecoins for weeks or months between trades, USDC on Polygon is an excellent alternative.
+
+Our recommendation by profile:
+- New trader, small amounts: USDT on Polygon
+- Cost-conscious trader: USDT on Tron (lowest gas fees)
+- Transparency-focused holder: USDC on Polygon
+- High-volume trader: USDT on any network (best liquidity)
+- DeFi user who also P2P trades: USDC on Polygon (best DeFi compatibility)
+
+Remember: CryptoBazaar's escrow protection works identically regardless of which stablecoin or network you choose. Your security is the same either way.`
+      }
+    ]
+  },
+  {
     id: "terms",
     title: "Terms of Use",
     shortDesc: "The core legal contract between you and CryptoBazaar.",
@@ -451,7 +935,7 @@ Even if you are an innocent seller, if a buyer pays you using money from a compr
 ];
 
 export default function ArticlesPage() {
-  const [activeArticleId, setActiveArticleId] = useState<string>("terms");
+  const [activeArticleId, setActiveArticleId] = useState<string>("how-p2p-works");
   const [activeSectionId, setActiveSectionId] = useState<string>("");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { isSignedIn, user } = useUser();
