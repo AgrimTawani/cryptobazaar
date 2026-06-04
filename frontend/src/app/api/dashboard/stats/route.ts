@@ -20,7 +20,10 @@ export async function GET() {
     if (!clerkId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const user = await db.user.findUnique({ where: { clerkId } });
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true, avgSellerRating: true, sellerRatingCount: true },
+    });
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -68,7 +71,13 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ totalTrades, totalVolumeInr, activity });
+    return NextResponse.json({
+      totalTrades,
+      totalVolumeInr,
+      activity,
+      avgSellerRating: user.avgSellerRating?.toNumber() ?? null,
+      sellerRatingCount: user.sellerRatingCount,
+    });
   } catch (err) {
     console.error("[dashboard/stats GET]", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });

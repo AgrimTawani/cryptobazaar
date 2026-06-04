@@ -24,6 +24,8 @@ interface DashboardStats {
   totalTrades: number;
   totalVolumeInr: number;
   activity: ActivityRow[];
+  avgSellerRating: number | null;
+  sellerRatingCount: number;
 }
 
 interface OnboardingStatus {
@@ -128,7 +130,12 @@ export default function DashboardPage() {
           {[
             { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
             { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
-            { label: "Rating", value: "—" },
+            {
+              label: "Rating",
+              value: stats?.avgSellerRating != null
+                ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
+                : "—",
+            },
           ].map((s) => (
             <div key={s.label} className="bg-white border border-[#e8e8e8] rounded-xl py-4 px-5">
               <div className="font-condensed text-[2rem] tracking-[0.5px] mb-1">{s.value}</div>
