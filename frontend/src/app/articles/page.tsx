@@ -9,1783 +9,51 @@ import { useUser } from "@clerk/nextjs";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
 
 // ── DATA FOR ARTICLES ──
-
-interface ArticleSection {
-  id: string;
-  title: string;
-  content: string;
-}
-
-interface Article {
-  id: string;
-  title: string;
-  shortDesc: string;
-  sections: ArticleSection[];
-}
-
-const TERMS_SECTIONS: ArticleSection[] = [
-  {
-    id: "agreement",
-    title: "1. Agreement to Terms",
-    content: `By accessing or using CryptoBazaar ("the Platform", "we", "us", "our"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree, you must not use the Platform.
-
-These Terms form a legally binding agreement between you and CryptoBazaar. By completing registration, you confirm that you have read, understood, and accepted these Terms in full.
-
-We reserve the right to update these Terms at any time. Continued use of the Platform after changes are published constitutes acceptance of the revised Terms. We will notify active members of material changes via email or an in-app notice.`
-  },
-  {
-    id: "definitions",
-    title: "2. Definitions",
-    content: `"Verified Member" - A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored questionnaire.
-
-"Trade" - A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.
-
-"Escrow Contract" - A self-executing smart contract deployed on a public blockchain that holds the seller's crypto until the trade is confirmed or resolved.
-
-"Member Protection Fund" ("the Fund") - A voluntary, discretionary benefit pool funded by 0.75% of every completed trade, held in a separate on-chain contract. Not an insurance product.
-
-"Membership Plan" - A monthly subscription (Starter, Trader, or Pro) that grants trading access and defines monthly volume limits.
-
-"UTR" - Unique Transaction Reference number issued by NPCI for every UPI, IMPS, or NEFT payment.
-
-"DID" - Decentralised Identifier created via Hyperledger Identus on behalf of each Verified Member to hold their verifiable credentials.`
-  },
-  {
-    id: "eligibility",
-    title: "3. Eligibility",
-    content: `You may use CryptoBazaar only if all of the following are true:
-
-(a) You are a resident of India.
-(b) You are 18 years of age or older and have the legal capacity to enter into binding contracts.
-(c) You are not a politically exposed person (PEP) as defined under PMLA 2002, or if you are, you have disclosed this during verification.
-(d) You are not subject to any sanction, restriction, or prohibition under Indian law or any applicable international framework.
-(e) You are trading on your own behalf and not as an agent, nominee, or representative of any other person or entity.
-(f) Your use of the Platform does not violate any law or regulation applicable to you.
-
-Verification of eligibility is ongoing. If your circumstances change such that you no longer meet these criteria, you must immediately cease trading and notify us at support@cryptobazaar.co.in.`
-  },
-  {
-    id: "account",
-    title: "4. Account Registration and Verification",
-    content: `4.1 Registration
-You must sign in via Google OAuth to create an account. You are responsible for all activity under your account. You must not share your account credentials or access with any other person.
-
-4.2 Three-Layer Verification
-Before trading, you must complete:
-- Layer 1 (KYC): Identity verification via Didit using Aadhaar, PAN, and a liveness check.
-- Layer 2 (EDD): Upload of 6 months of bank statements, analysed by our ML system for red flags.
-- Layer 3 (AI Questionnaire): A 10-question online interview scored by AI.
-
-All three layers must pass for Verified Member status to be granted.
-
-4.3 Wallet Binding
-You must connect a cryptocurrency wallet. This wallet address is permanently bound to your account. If you change your wallet, all verification credentials are invalidated and you must restart the full verification process. This policy exists because wallet history is a key component of risk assessment.
-
-4.4 Credential Validity
-Verification credentials expire after 6 months. You must renew all three layers to continue trading. Failure to renew results in trading access being suspended until renewal is complete.
-
-4.5 Accuracy of Information
-You represent that all information provided during registration and verification is true, accurate, and complete. Providing false, misleading, or fraudulent information is a serious breach of these Terms and may result in permanent suspension and reporting to relevant authorities.`
-  },
-  {
-    id: "membership",
-    title: "5. Membership Plans",
-    content: `5.1 Plan Tiers
-Access to trading requires an active Membership Plan:
-- Starter: ₹200/month, ₹5,00,000 monthly trade cap
-- Trader: ₹500/month, ₹20,00,000 monthly trade cap
-- Pro: ₹1,000/month, no trade cap
-
-5.2 Payment
-Membership fees are currently collected via UPI transfer to our registered business account. Payment instructions are provided after verification is complete. Plans are month-to-month. No automatic renewals occur without your explicit confirmation and payment.
-
-5.3 Cap Enforcement
-Your cumulative INR trade volume within a billing month is tracked. When you approach your cap, you will be notified. If you reach it, new trades are blocked until the next billing cycle or you upgrade your plan.
-
-5.4 Refunds
-Membership fees are non-refundable once a billing period has begun, unless we are unable to provide access to the Platform for more than 72 consecutive hours due to a fault on our side. Any refund requests must be submitted to support@cryptobazaar.co.in within 7 days of the fee being paid.
-
-5.5 Member Protection Fund Eligibility
-An active Membership Plan at the time of a trade is a prerequisite for eligibility to request a disbursement from the Member Protection Fund. A lapsed subscription at the time of the relevant trade disqualifies a claim.`
-  },
-  {
-    id: "trading",
-    title: "6. Trade Rules and Escrow",
-    content: `6.1 Pre-Trade Checks
-Before any trade begins, the Platform verifies:
-(a) Both parties are Verified Members with valid, unexpired credentials.
-(b) Both parties have active Membership Plans.
-(c) Both wallet addresses pass Nominis on-chain screening (checked against known mixers, hacked wallets, darknet markets, and sanctioned addresses).
-
-If any check fails, the trade is blocked. The reason is shown to the affected party.
-
-6.2 Escrow Mechanics
-When a trade is initiated:
-(a) A smart contract is deployed on the relevant blockchain.
-(b) The seller deposits crypto into the escrow contract.
-(c) From this point, neither party can cancel the trade without going through the Platform's resolution process.
-(d) The buyer sends INR directly to the seller's bank account via UPI, IMPS, or NEFT.
-
-6.3 Payment Window
-The buyer has 30 minutes from trade initiation to submit payment and enter the UTR number. If this window expires without payment being marked, the trade is cancelled automatically and the crypto is returned to the seller.
-
-6.4 Confirmation Window
-Once the buyer marks "I have paid", the seller has 15 minutes to:
-(a) Confirm receipt - the smart contract releases crypto to the buyer, and 0.75% is sent to the Member Protection Fund contract; or
-(b) Raise a dispute - the trade enters dispute resolution.
-
-If the seller does not respond within 15 minutes, the trade automatically escalates to dispute resolution.
-
-6.5 Irreversibility
-Once the buyer has marked payment, the seller cannot cancel the trade. This is a deliberate design choice to protect buyers against the most common P2P fraud - a seller cancelling after receiving funds.
-
-6.6 Platform Role
-CryptoBazaar is a technology facilitator. We do not process, hold, or control INR payments between parties. We do not hold custody of crypto at any point during a trade. The smart contract operates independently on the public blockchain.`
-  },
-  {
-    id: "disputes",
-    title: "7. Dispute Resolution",
-    content: `7.1 When a Dispute Arises
-A dispute is triggered when:
-(a) The seller raises a dispute after the buyer marks payment.
-(b) The seller fails to respond within the 15-minute confirmation window.
-(c) Either party raises a formal complaint within 24 hours of a trade expiring.
-
-7.2 Evidence Submission
-Both parties are given 24 hours to submit evidence:
-- Bank statements covering the date of the trade (PDF).
-- Any additional context.
-
-Screenshots are accepted as supplementary context only. Bank statements are the primary evidence.
-
-7.3 Tampering Detection
-All submitted PDFs are run through Perfios/Authbridge for:
-- PDF metadata validation.
-- Digital signature verification.
-- Anomaly detection (font inconsistencies, image layers over text, known manipulation patterns).
-
-Submitting a tampered or forged document results in immediate ruling against that party, permanent suspension, and may result in a criminal complaint being filed. All users are Aadhaar-linked and fully identified.
-
-7.4 Cross-Reference Analysis
-A genuine payment appears on both parties' bank statements. The Platform's compliance team cross-references the buyer's debit against the seller's credit. The UTR provides an additional reference point. The outcome is almost always unambiguous from bank data alone.
-
-7.5 Ruling and Execution
-The compliance team issues a ruling:
-- Payment confirmed: crypto released to buyer via smart contract.
-- Payment not confirmed: crypto returned to seller via smart contract.
-
-The losing party's account is flagged. A second dispute loss within 12 months results in permanent suspension.
-
-7.6 Finality
-Dispute rulings are final. If you believe a ruling was made in error, you may appeal in writing to disputes@cryptobazaar.co.in within 7 days. Appeals are reviewed by a senior compliance officer. The appeal decision is final.`
-  },
-  {
-    id: "fund",
-    title: "8. Member Protection Fund",
-    content: `8.1 Nature of the Fund
-The Member Protection Fund ("the Fund") is a voluntary, discretionary benefit available to eligible Verified Members.
-
-THE FUND IS NOT AN INSURANCE PRODUCT. IT IS NOT REGULATED AS ONE. IT DOES NOT CONSTITUTE A FINANCIAL GUARANTEE, POLICY, OR CONTRACT OF INDEMNITY. PAYOUTS FROM THE FUND ARE NOT GUARANTEED.
-
-8.2 Fund Construction
-0.75% of the value of every completed trade is automatically transferred from the escrow contract to the Fund contract at settlement. The Fund is held on-chain. CryptoBazaar cannot spend it without multisig approval from a minimum of 3 of 5 designated signatories.
-
-8.3 Nature of Disbursements
-Disbursements from the Fund are a contractual service remedy under the Indian Contract Act, 1872 (Sections 73–74) for CryptoBazaar's failure to deliver the service it promised - namely, that every counterparty on the Platform has been adequately screened. A disbursement is compensation for our screening failure, not a payment for an external risk event. The Fund does not operate as an insurance pool.
-
-8.4 Eligibility to Request a Disbursement
-All five conditions must be satisfied:
-(a) You had an active Membership Plan at the time of the trade that caused the freeze.
-(b) You had valid (unexpired) EDD and KYC credentials at the time of the trade.
-(c) The trade was executed through CryptoBazaar's escrow smart contract - on-chain verifiable.
-(d) The bank freeze is directly and demonstrably attributable to that specific CryptoBazaar trade, evidenced by a police notice or official bank freeze letter citing the transaction.
-(e) The freeze is attributable to a failure in CryptoBazaar's vetting process - specifically, that the counterparty to your trade was admitted to the Platform despite posing an identifiable risk that our screening should have caught. Freezes resulting from events unrelated to our screening failure are not eligible.
-
-8.5 Disbursement Tiers
-Subject to fund availability and approval:
-- Emergency: Up to ₹10,000 within 24 hours. Requires: freeze notice + FIR/complaint number.
-- Standard: Up to ₹1,00,000 within 7 days. Requires: above + proof of legal representation.
-- Full: Up to ₹5,00,000 within 30 days. Requires: above + account unfrozen or NOC issued.
-
-Disbursement amounts are subject to the Fund's available balance at the time of approval. If the Fund cannot cover the full approved amount, a partial disbursement may be made.
-
-8.6 Anti-Abuse Rules
-- Maximum 2 disbursement requests per member per 12-month period.
-- A 90-day waiting period applies from the date of becoming a Verified Member before a first request may be submitted. This prevents "join-and-claim" abuse.
-- All requests are cross-checked against on-chain trade records. No on-chain trade record means no disbursement.
-- Fraudulent disbursement requests (fabricated freeze notices, false information) result in permanent suspension and may result in criminal complaint.
-
-8.7 Scope Limitations
-The Fund does not cover:
-- Losses from cryptocurrency price movements.
-- Bank freezes caused by transactions unrelated to CryptoBazaar.
-- Bank freezes where CryptoBazaar's vetting process functioned correctly and the risk was undetectable by reasonable screening methods.
-- Losses from your own negligence (e.g., sharing private keys, trading outside the Platform).
-- Tax liabilities arising from your trading activity.
-- Events of force majeure.
-
-8.8 No Fiduciary Duty
-CryptoBazaar's administration of the Fund does not create a fiduciary duty, trust relationship, or any other special duty of care beyond what is expressly set out in these Terms.`
-  },
-  {
-    id: "prohibited",
-    title: "9. Prohibited Activities",
-    content: `You must not use CryptoBazaar for any of the following:
-
-(a) Money laundering or any activity that violates the Prevention of Money Laundering Act (PMLA) 2002 or any successor legislation.
-(b) Tax evasion or concealment of taxable income or assets.
-(c) Financing of terrorism or any activities prohibited under the Unlawful Activities (Prevention) Act.
-(d) Trading on behalf of sanctioned individuals, entities, or jurisdictions.
-(e) Using another person's identity, bank account, or wallet without their knowledge and consent.
-(f) Manipulating trade outcomes - including submitting false UTRs, fabricating bank statements, or coordinating with a counterparty to deceive the Platform.
-(g) Circumventing verification checks through technical means or third-party services.
-(h) Posting listings for assets other than those supported by the Platform.
-(i) Any other activity that is illegal under Indian law or any law applicable to you.
-
-Violation of any of the above results in immediate suspension, forfeiture of any funds held in active escrow contracts to the relevant authorities, and reporting to law enforcement where required.`
-  },
-  {
-    id: "ip",
-    title: "10. Intellectual Property",
-    content: `All content, design, code, trade marks, and intellectual property on CryptoBazaar are owned by or licensed to us. You may not copy, reproduce, distribute, or create derivative works from any part of the Platform without our prior written consent.
-
-You retain ownership of any data you provide (e.g., bank statements, trade history). By providing this data, you grant us a limited licence to process it for the purposes described in our Privacy Policy.`
-  },
-  {
-    id: "privacy",
-    title: "11. Privacy and Data",
-    content: `We collect and process only the data necessary to operate the Platform. Key principles:
-
-- KYC data (Aadhaar, PAN, biometric liveness) is processed via Didit and is never stored on CryptoBazaar servers. Only the resulting cryptographic credential is stored, on your DID.
-- Bank statement PDFs are processed in-flight for ML scoring and discarded. We do not retain your statement.
-- We store: your Google account identifier, wallet address, DID, onboarding status, trade history (on-chain), and subscription status.
-- We do not sell your data to third parties.
-
-A full Privacy Policy is available at cryptobazaar.co.in/privacy. By using the Platform you consent to the data practices described therein.`
-  },
-  {
-    id: "liability",
-    title: "12. Disclaimers and Liability",
-    content: `12.1 Platform Provided "As-Is"
-CryptoBazaar is provided without warranties of any kind, express or implied. We do not warrant that the Platform will be uninterrupted, error-free, or free from security vulnerabilities.
-
-12.2 No Investment Advice
-Nothing on the Platform constitutes financial, investment, legal, or tax advice. Cryptocurrency prices are volatile. You trade at your own risk.
-
-12.3 Smart Contract Risk
-While our escrow contracts are audited, blockchain software may contain bugs. We are not liable for losses caused by smart contract vulnerabilities that are not attributable to gross negligence on our part.
-
-12.4 Liability Cap
-To the maximum extent permitted by applicable law, our total liability to you for any claim arising from or related to these Terms or the Platform is limited to the membership fees paid by you in the 12 months preceding the event giving rise to the claim.
-
-12.5 Consequential Losses
-We are not liable for any indirect, incidental, special, or consequential losses, including loss of profit, loss of data, or loss of opportunity, even if we have been advised of the possibility of such losses.`
-  },
-  {
-    id: "termination",
-    title: "13. Termination",
-    content: `13.1 By You
-You may close your account at any time by contacting support@cryptobazaar.co.in. Outstanding active trades must be completed or resolved before closure. Membership fees for the current period are non-refundable.
-
-13.2 By Us
-We may suspend or permanently terminate your access if:
-(a) You breach any of these Terms.
-(b) Your verification credentials expire and are not renewed.
-(c) We are required to do so by applicable law or regulatory authority.
-(d) Your continued use presents a legal or reputational risk to the Platform.
-
-Where termination is for breach, we are not required to give advance notice.
-
-13.3 Effect of Termination
-On termination, your right to use the Platform ceases immediately. Any pending disbursement requests from the Fund that were submitted before termination will continue to be processed. Your on-chain trade history is immutable and remains on the blockchain regardless of account status.`
-  },
-  {
-    id: "governing",
-    title: "14. Governing Law and Disputes",
-    content: `These Terms are governed by and construed in accordance with the laws of India, without regard to its conflict of law principles.
-
-Any dispute, controversy, or claim arising from or relating to these Terms or the Platform shall first be attempted to be resolved through good-faith negotiation. If negotiation fails within 30 days, the matter shall be submitted to binding arbitration in accordance with the Arbitration and Conciliation Act, 1996. The seat of arbitration shall be [City], India. Arbitration proceedings shall be conducted in English.
-
-Nothing in this clause prevents either party from seeking urgent injunctive relief from a competent court.`
-  },
-  {
-    id: "contact",
-    title: "15. Contact and Notices",
-    content: `For general support: support@cryptobazaar.co.in
-For dispute appeals: disputes@cryptobazaar.co.in
-For legal notices: legal@cryptobazaar.co.in
-
-CryptoBazaar
-[Registered Address]
-India
-
-Udyam Registration: [Number]
-
-Notices to us must be sent in writing to the legal email above. Notices to you will be sent to the email address linked to your Google account.`
-  }
-];
-
-const ARTICLES_DATA: Article[] = [
-  {
-    id: "freelancers-usdt-usdc",
-    title: "How Freelancers Use USDT and USDC for International Payments",
-    shortDesc: "A guide for Indian freelancers to receive and cash out foreign income efficiently.",
-    sections: [
-      {
-        id: "receiving-payments",
-        title: "1. Receiving Payments",
-        content: `Indian freelancers working in IT, design, or Web3 often have clients based in the US, Europe, or the Middle East. Instead of providing complex SWIFT details, freelancers can simply provide their Web3 wallet address (like MetaMask or Trust Wallet).
-        
-The client sends USDT or USDC directly over networks like Polygon or Tron, allowing the freelancer to receive the exact dollar-equivalent amount within seconds.`
-      },
-      {
-        id: "conversion-to-inr",
-        title: "2. Conversion to INR",
-        content: `Once the stablecoins hit the freelancer's wallet, they can use CryptoBazaar to convert them to Indian Rupees (INR). 
-
-The freelancer creates a "Sell" order. A verified buyer on the platform agrees to the trade, sends the INR directly to the freelancer's bank account via IMPS/UPI, and once confirmed, the freelancer releases the stablecoins from escrow. The entire process takes less than 10 minutes.`
-      },
-      {
-        id: "benefits-over-traditional",
-        title: "3. Benefits Over Traditional Methods",
-        content: `**Traditional Platforms (PayPal, Payoneer, Upwork):**
-- Take a 2% to 5% flat fee on the transfer.
-- Apply a hidden 2% to 3% Forex markup (giving you a terrible USD to INR exchange rate).
-- Take 3 to 5 business days to settle into your Indian bank account.
-
-**Stablecoins via CryptoBazaar:**
-- Receiving USDT/USDC costs pennies in gas fees.
-- You get the true open-market P2P exchange rate (often higher than standard forex rates).
-- Settlement to your bank account is instant.`
-      },
-      {
-        id: "best-practices-freelancers",
-        title: "4. Best Practices",
-        content: `**Keep Records:** Always maintain invoices and contracts for your foreign clients. When you sell crypto on CryptoBazaar, keep a log of the trades for your Chartered Accountant.
-**Use Polygon:** Request clients to send funds via the Polygon network to ensure you don't lose money on high Ethereum gas fees when moving the funds to the escrow contract.`
-      }
-    ]
-  },
-  {
-    id: "cross-border-payments",
-    title: "Using Stablecoins for Cross-Border Payments",
-    shortDesc: "How crypto is revolutionizing global money transfers.",
-    sections: [
-      {
-        id: "traditional-challenges",
-        title: "1. Traditional Remittance Challenges",
-        content: `Sending money across borders using the legacy banking system (SWIFT) or remittance services like Western Union is slow and expensive. 
-
-Transactions often take 3 to 5 business days to clear correspondent banks. Furthermore, users are hit with flat transfer fees plus a "spread" on the exchange rate, often resulting in a total loss of 3% to 7% of the total transfer value.`
-      },
-      {
-        id: "stablecoin-advantages",
-        title: "2. Stablecoin Advantages",
-        content: `Stablecoins completely bypass the legacy correspondent banking network.
-- **Speed:** A transfer from New York to Mumbai settles on the blockchain in under 3 seconds.
-- **24/7 Availability:** Blockchains don't have banking hours or holidays. You can send money on a Sunday at 3 AM.
-- **Transparency:** Both the sender and receiver can track the exact status of the funds on public blockchain explorers.`
-      },
-      {
-        id: "transfer-process",
-        title: "3. Transfer Process",
-        content: `The modern remittance flow using P2P looks like this:
-1. **Sender:** Buys USDT using their local currency (e.g., USD or AED) on a local exchange.
-2. **Transfer:** Sender withdraws the USDT to the receiver's crypto wallet in India via the Tron or Polygon network.
-3. **Receiver:** The receiver logs into CryptoBazaar, sells the USDT, and receives INR directly into their bank account from a verified local buyer.`
-      },
-      {
-        id: "cost-comparison",
-        title: "4. Cost Comparison",
-        content: `Sending $10,000 internationally:
-- **Traditional Bank:** $30 wire fee + 2% forex spread ($200) = Total Cost: ~$230.
-- **Stablecoin (Polygon):** Network fee of $0.01 + P2P market spread (often negligible or even favorable) = Total Cost: ~$0.01 to $5.00.`
-      }
-    ]
-  },
-  {
-    id: "high-value-trades",
-    title: "Best Practices for High-Value P2P Trades",
-    shortDesc: "Essential guidelines for trading large volumes securely.",
-    sections: [
-      {
-        id: "liquidity-management",
-        title: "1. Liquidity Management",
-        content: `When dealing with high-value trades (e.g., ₹5,00,000 and above), liquidity becomes a primary concern. 
-Instead of trying to execute one massive order which might take hours to fill, consider splitting your order into smaller chunks (e.g., five ₹1,00,000 trades). This attracts more buyers/sellers and ensures faster execution.`
-      },
-      {
-        id: "risk-mitigation",
-        title: "2. Risk Mitigation",
-        content: `High-value trades attract sophisticated scammers. 
-- **The Test Transfer:** Before sending ₹5 Lakhs, ask the buyer to send a test transfer of ₹100 from their verified account. Once you confirm the name matches exactly, authorize the rest.
-- **Strict adherence to rules:** Under no circumstances should you accept a third-party payment on a high-value trade. The risk of a bank freeze is too severe.`
-      },
-      {
-        id: "identity-verification-strict",
-        title: "3. Identity Verification",
-        content: `While CryptoBazaar verifies all users, for large trades, you should only transact with highly reputable counterparties. 
-
-Check their profile for:
-- Account age older than 6 months.
-- Over 500 completed trades.
-- A completion rate of 98% or higher.
-Do not execute high-value trades with brand new accounts.`
-      },
-      {
-        id: "record-keeping",
-        title: "4. Record Keeping",
-        content: `When handling significant volumes, tax and regulatory compliance is vital. 
-- Download the official PDF bank statement for every large trade immediately.
-- Keep a dedicated spreadsheet mapping the CryptoBazaar Order ID to the Bank UTR.
-- Maintain separate business and personal bank accounts to ensure clean accounting for your CA (Chartered Accountant).`
-      }
-    ]
-  },
-  {
-    id: "why-kyc-important",
-    title: "Why KYC Is Important for P2P Trading",
-    shortDesc: "Understanding the necessity of identity verification for safe transactions.",
-    sections: [
-      {
-        id: "identity-verification",
-        title: "1. Identity Verification",
-        content: `Know Your Customer (KYC) is the foundational layer of trust on CryptoBazaar. By requiring every user to verify their identity through government-issued documents like Aadhaar and PAN, along with biometric liveness checks, we ensure that every participant on the platform is a verified, real individual.
-
-This completely eliminates anonymous trading, which is the primary vector for P2P scams.`
-      },
-      {
-        id: "fraud-prevention",
-        title: "2. Fraud Prevention",
-        content: `When users are verified, the incentive to commit fraud drops dramatically. Bad actors know that their real identity is tied to their CryptoBazaar account. If they attempt a chargeback scam, a third-party payment scam, or an escrow bypass, their real-world identity is already logged, making them highly vulnerable to legal action and permanent blacklisting.`
-      },
-      {
-        id: "user-protection",
-        title: "3. User Protection",
-        content: `KYC protects *you*. When you send INR to a seller, or release USDT to a buyer, you have the absolute certainty that the person on the other end has been vetted. 
-
-Furthermore, our strict rule requiring the bank account name to perfectly match the KYC verified name ensures that you never accidentally accept "tainted" funds from a compromised third-party account.`
-      },
-      {
-        id: "regulatory-considerations",
-        title: "4. Regulatory Considerations",
-        content: `As the digital asset space matures in India, compliance with Anti-Money Laundering (AML) and Combating the Financing of Terrorism (CFT) laws is non-negotiable. 
-
-By enforcing strict KYC, CryptoBazaar complies with directives from the Financial Intelligence Unit (FIU-IND), ensuring the platform remains legally robust and that your trading activity occurs in a fully compliant environment.`
-      }
-    ]
-  },
-  {
-    id: "how-escrow-protects",
-    title: "How Escrow Protects Buyers and Sellers",
-    shortDesc: "The smart contract technology that guarantees secure trades.",
-    sections: [
-      {
-        id: "what-is-escrow",
-        title: "1. What is Escrow?",
-        content: `Escrow is a financial arrangement where a neutral third party temporarily holds the assets involved in a transaction until all conditions of the trade are met. 
-
-On CryptoBazaar, this "third party" is an autonomous smart contract on the blockchain. It holds the seller's cryptocurrency securely, ensuring neither the buyer nor the seller can run away with both the crypto and the fiat.`
-      },
-      {
-        id: "trade-lifecycle",
-        title: "2. Trade Lifecycle",
-        content: `1. **Locking:** The seller creates an order, and the crypto is locked into the smart contract.
-2. **Payment:** The buyer sends INR directly to the seller's bank account. During this time, the seller cannot withdraw the crypto.
-3. **Verification:** The seller verifies the INR has arrived in their bank account.
-4. **Release:** The seller clicks 'Confirm Release', and the smart contract immediately transfers the crypto to the buyer's wallet.`
-      },
-      {
-        id: "dispute-handling-escrow",
-        title: "3. Dispute Handling",
-        content: `If a disagreement occurs—for instance, the buyer claims they paid but the seller says the money never arrived—either party can raise a dispute. 
-
-When a dispute is triggered, the escrow smart contract "freezes." The crypto remains locked securely on-chain until the CryptoBazaar compliance team reviews the bank evidence (UTRs, statements) and issues a cryptographic signature to route the funds to the rightful owner.`
-      },
-      {
-        id: "examples-of-protection",
-        title: "4. Examples of Protection",
-        content: `**Protecting the Buyer:** If you pay the seller but they refuse to release the crypto, they cannot steal it. The crypto is locked in escrow. You provide proof of payment via dispute, and we release the crypto to you.
-
-**Protecting the Seller:** If the buyer clicks "I Have Paid" but never actually sent the money, they cannot access your crypto. You provide your bank statement showing no incoming funds, and the crypto is returned to your wallet.`
-      }
-    ]
-  },
-  {
-    id: "security-checklist",
-    title: "Security Checklist for Every P2P Trade",
-    shortDesc: "Five critical steps to follow before clicking 'Release'.",
-    sections: [
-      {
-        id: "verify-account-details",
-        title: "1. Verify Account Details",
-        content: `Before initiating a trade, always check the counterparty's profile. Look at their overall rating, the total number of trades they have completed, and their account age. 
-
-A user with 100+ trades and a 4.9 rating is significantly safer than a brand new account with 0 trades.`
-      },
-      {
-        id: "check-payment-confirmation",
-        title: "2. Check Payment Confirmation",
-        content: `If you are selling, **never** rely on SMS alerts, email notifications, or screenshots sent by the buyer. 
-
-Always open your official banking application or UPI app and verify that the exact INR amount has been credited, and that the UTR matches what the buyer provided on the platform.`
-      },
-      {
-        id: "avoid-off-platform",
-        title: "3. Avoid Off-Platform Communication",
-        content: `Keep 100% of your communication inside the CryptoBazaar trade chat. 
-
-If a counterparty asks you to move to Telegram, WhatsApp, or phone calls to "sort things out faster," they are likely trying to scam you by removing evidence that our compliance team can review during a dispute.`
-      },
-      {
-        id: "enable-2fa",
-        title: "4. Enable 2FA",
-        content: `Protect your CryptoBazaar account (and the Google account linked to it) with Two-Factor Authentication (2FA). 
-
-Using an authenticator app (like Google Authenticator or Authy) ensures that even if someone discovers your password, they cannot access your account to manipulate your active listings or initiate trades.`
-      },
-      {
-        id: "review-trade-history",
-        title: "5. Review Trade History",
-        content: `Maintain your own records. While CryptoBazaar logs your trade history, it is best practice to keep a spreadsheet of your trades, UTRs, and counterparties for your own tax filing and security purposes.`
-      }
-    ]
-  },
-  {
-    id: "how-we-handle-disputes",
-    title: "How We Handle Disputes",
-    shortDesc: "A transparent look at our conflict resolution process.",
-    sections: [
-      {
-        id: "when-disputes-occur",
-        title: "1. When Disputes Occur",
-        content: `Disputes typically occur in three scenarios:
-- A buyer marks the trade as "Paid," but the seller claims the funds never arrived.
-- A buyer sends funds using a third-party bank account (name mismatch).
-- A seller goes offline and fails to release the crypto after a valid payment.`
-      },
-      {
-        id: "evidence-requirements",
-        title: "2. Evidence Requirements",
-        content: `To resolve a dispute, CryptoBazaar requires hard evidence. 
-
-We do **not** accept screenshots, as they are easily forged. We require official PDF bank statements generated directly from your bank's portal, covering the specific date and time of the trade. In some complex cases, we may require a continuous video screen recording of you logging into your bank to verify the transaction.`
-      },
-      {
-        id: "review-process",
-        title: "3. Review Process",
-        content: `Once evidence is submitted by both parties, our compliance team steps in. 
-We cross-reference the buyer's debit UTR with the seller's credit UTR. We analyze the PDF metadata to ensure the statement has not been tampered with. If a third-party payment is detected, the review process is immediately halted and ruled against the offending party.`
-      },
-      {
-        id: "resolution-outcomes",
-        title: "4. Resolution Outcomes",
-        content: `Based on the evidence, the compliance team issues a ruling:
-
-- **If the buyer successfully paid:** The escrow contract is overridden, and the crypto is released to the buyer.
-- **If the buyer did not pay (or paid via third-party):** The escrow contract is overridden, and the crypto is returned to the seller.
-
-Users found guilty of intentional fraud, submitting forged documents, or violating third-party payment rules are permanently banned from the platform.`
-      }
-    ]
-  },
-  {
-    id: "tron-vs-polygon-vs-bnb",
-    title: "Tron vs Polygon vs BNB Chain for USDT Transfers",
-    shortDesc: "A complete comparison to help you choose the best network for your trades.",
-    sections: [
-      {
-        id: "overview",
-        title: "1. Overview of Each Network",
-        content: `When trading USDT on CryptoBazaar, you must select a blockchain network to facilitate the transfer. The three supported networks are:
-
-**Tron (TRC-20):** A highly popular blockchain in Asia specifically known for its massive USDT liquidity. 
-**Polygon (ERC-20/Layer 2):** A scaling solution for Ethereum that offers incredibly fast and cheap transactions while benefiting from Ethereum's robust ecosystem.
-**BNB Chain (BEP-20):** Binance's proprietary blockchain (formerly Binance Smart Chain), widely used globally for its low fees and high throughput.`
-      },
-      {
-        id: "transaction-speed",
-        title: "2. Transaction Speed",
-        content: `All three networks offer fast settlement, which is crucial for P2P trading:
-- **Polygon:** Averages 2 to 3 seconds per block. Transactions are virtually instant.
-- **Tron:** Averages 3 seconds per block. Very reliable confirmation times.
-- **BNB Chain:** Averages 3 seconds per block.
-
-For the purpose of releasing escrow on CryptoBazaar, all three networks perform exceptionally well and will clear the smart contract in under 10 seconds.`
-      },
-      {
-        id: "network-fees",
-        title: "3. Network Fees (Gas)",
-        content: `Gas fees are what you pay the blockchain validators to process your transaction. These are paid in the network's native coin, not in USDT.
-- **Polygon:** Requires MATIC (or POL). Fees are incredibly low, often less than ₹1 per transaction.
-- **BNB Chain:** Requires BNB. Fees are moderate, typically around ₹2 to ₹5 per transaction.
-- **Tron:** Requires TRX. Tron uses an "Energy and Bandwidth" model. If you don't stake TRX for energy, a standard USDT transfer burns about 13.4 to 27 TRX (roughly ₹100 to ₹250), making it the most expensive of the three unless properly optimized.`
-      },
-      {
-        id: "reliability",
-        title: "4. Reliability",
-        content: `**Polygon:** Occasionally experiences brief periods of congestion during massive NFT mints or DeFi spikes, but is generally highly stable.
-**Tron:** Extremely reliable for stablecoin transfers. It rarely experiences congestion that affects USDT movement.
-**BNB Chain:** Highly reliable, backed by a massive validator network, though heavily centralized compared to Ethereum.`
-      },
-      {
-        id: "best-use-cases",
-        title: "5. Best Use Cases",
-        content: `**Tron:** Best if you are sending USDT to traditional centralized exchanges (like Binance or KuCoin) or dealing with overseas merchants, as TRC-20 is the global standard for cross-border USDT payments.
-**Polygon:** Best for everyday P2P trading, DeFi participation, and users who want the absolute lowest gas fees. It is the most cost-effective network for frequent traders.
-**BNB Chain:** Best if you are already heavily invested in the Binance ecosystem or use Trust Wallet extensively.`
-      },
-      {
-        id: "which-to-choose",
-        title: "6. Which Network Should Traders Choose?",
-        content: `For the majority of Indian P2P traders on CryptoBazaar, **Polygon is our top recommendation.** 
-
-The combination of instant settlement, deep USDT liquidity on our platform, and sub-rupee gas fees makes it the most efficient network. If you must use Tron due to counterparty requirements, ensure you understand how Tron's energy system works to avoid high TRX burn fees.`
-      }
-    ]
-  },
-  {
-    id: "send-usdt-tron",
-    title: "How to Send USDT on Tron (TRC20)",
-    shortDesc: "A step-by-step guide to navigating the Tron network safely.",
-    sections: [
-      {
-        id: "wallet-setup",
-        title: "1. Wallet Setup",
-        content: `To interact with the Tron network, you need a compatible Web3 wallet. 
-The most popular and reliable options are **TronLink** (available as a Chrome extension and mobile app) and **Trust Wallet**. 
-
-Unlike MetaMask, which only supports EVM (Ethereum Virtual Machine) chains, Tron uses a completely different architecture. You cannot add the Tron network to MetaMask.`
-      },
-      {
-        id: "network-selection",
-        title: "2. Network Selection",
-        content: `Tron addresses always begin with a capital "**T**" (e.g., *TX9Q...*). 
-
-When withdrawing from an exchange or sending to a counterparty, you must explicitly select the **TRC-20** network. If the receiving address starts with a "T", it is a Tron address.`
-      },
-      {
-        id: "common-mistakes-tron",
-        title: "3. Common Mistakes",
-        content: `The most common mistake on Tron is attempting a transfer with a zero TRX balance. 
-
-To send USDT, the smart contract must be executed. This requires Tron network resources (Energy and Bandwidth). If you only hold USDT in your wallet and no TRX, the transaction will immediately fail.`
-      },
-      {
-        id: "fee-requirements",
-        title: "4. Fee Requirements (Energy and Bandwidth)",
-        content: `Tron charges for transactions by consuming Bandwidth and Energy. 
-- You get some free Bandwidth daily, but interacting with the USDT smart contract requires Energy.
-- If you don't have enough Energy, the network burns your TRX instead. A standard USDT transfer burns between 13.4 and 27 TRX.
-
-**Pro Tip:** Always keep at least 50 TRX in your Tron wallet to cover fees, or rent Energy from platforms like TokenGoodies to drastically reduce transaction costs.`
-      },
-      {
-        id: "transfer-verification",
-        title: "5. Transfer Verification",
-        content: `To verify a transaction, copy the transaction hash (TxID) and paste it into **Tronscan.org**. 
-A successful transfer will show a "CONFIRMED" status with a green checkmark. If it says "FAILED - OUT OF ENERGY", you must deposit more TRX into your wallet and try again.`
-      }
-    ]
-  },
-  {
-    id: "send-usdt-polygon",
-    title: "How to Send USDT on Polygon",
-    shortDesc: "Mastering cheap and fast stablecoin transfers on Polygon.",
-    sections: [
-      {
-        id: "supported-wallets-polygon",
-        title: "1. Supported Wallets",
-        content: `Polygon is fully EVM-compatible, meaning it works seamlessly with the world's most popular crypto wallets, including **MetaMask**, **Trust Wallet**, and **Rabby**. 
-
-To get started with MetaMask, you simply need to add the Polygon Mainnet to your network list (which can often be done automatically via sites like Chainlist.org).`
-      },
-      {
-        id: "gas-fees-polygon",
-        title: "2. Gas Fees",
-        content: `To send USDT on Polygon, you must pay gas fees in the network's native token: **MATIC** (currently transitioning to the ticker **POL**).
-
-Polygon fees are incredibly low. A typical USDT transfer costs between 0.01 and 0.05 MATIC (less than ₹1 to ₹3). However, you *must* have a small fraction of MATIC in your wallet; otherwise, the transaction cannot be submitted to the blockchain.`
-      },
-      {
-        id: "transaction-process-polygon",
-        title: "3. Transaction Process",
-        content: `When you interact with a smart contract (like CryptoBazaar's escrow) for the first time, you must perform two steps:
-1. **Approve:** You sign a transaction giving the escrow contract permission to move a specific amount of your USDT.
-2. **Transfer:** You sign a second transaction to actually move the funds into the escrow.
-
-Both transactions require a tiny amount of MATIC gas.`
-      },
-      {
-        id: "security-tips-polygon",
-        title: "4. Security Tips",
-        content: `Because Polygon is so cheap, scammers often airdrop fake, malicious tokens to random wallets. 
-- Never interact with or try to swap unknown tokens that magically appear in your wallet.
-- Regularly review your token approvals using tools like Revoke.cash. If you granted an "infinite approval" to a decentralized app you no longer use, revoke it to protect your USDT.`
-      }
-    ]
-  },
-  {
-    id: "wrong-network-prevention",
-    title: "How to Avoid Sending USDT to the Wrong Network",
-    shortDesc: "Crucial steps to prevent permanent loss of funds during transfers.",
-    sections: [
-      {
-        id: "understanding-compatibility",
-        title: "1. Understanding Network Compatibility",
-        content: `USDT exists on many different blockchains, but these blockchains do not talk to each other directly. 
-
-Sending USDT from the Polygon network to a Tron network address is like trying to send an email to a phone number. The transaction will fail, or worse, process into a void.
-
-- **EVM Chains** (Polygon, Ethereum, BNB Chain, Arbitrum) all use the same address format starting with **0x**.
-- **Tron (TRC-20)** uses an address format starting with **T**.`
-      },
-      {
-        id: "common-mistakes-network",
-        title: "2. Common Mistakes",
-        content: `The most devastating mistake traders make is selecting the wrong network when withdrawing from an exchange. 
-For example, a user wants to send USDT to their Polygon MetaMask wallet (0x...), but they select the BNB Chain (BEP-20) from the exchange dropdown because the fees looked cheaper. 
-
-The exchange processes the withdrawal on the BNB Chain, sending it to the 0x address. Since the user wanted it on Polygon, they won't see the funds there.`
-      },
-      {
-        id: "recovery-possibilities",
-        title: "3. Recovery Possibilities",
-        content: `**If you send between EVM chains (e.g., Polygon to BNB Chain):** 
-You are in luck. Because EVM chains use the same private keys, you can simply switch your MetaMask network to the BNB Chain, and your USDT will be sitting there.
-
-**If you send from an exchange to Tron using an EVM address:** 
-The exchange will usually catch the error and block the withdrawal because a "0x" address is invalid on Tron.
-
-**If you send to a centralized exchange using the wrong network:**
-For example, sending Polygon USDT to a Binance deposit address that only supports Ethereum USDT. The funds are likely lost unless the exchange's customer support is willing to manually recover them (which often takes months and incurs heavy fees).`
-      },
-      {
-        id: "prevention-checklist",
-        title: "4. Prevention Checklist",
-        content: `Always follow this checklist before hitting send:
-1. **Verify the Network:** Ensure the sender's network explicitly matches the receiver's requested network (e.g., Polygon to Polygon).
-2. **Check the Prefix:** EVM addresses start with '0x'. Tron addresses start with 'T'.
-3. **Verify the Ends:** Visually confirm the first 4 and last 4 characters of the wallet address match perfectly.
-4. **The Test Transaction:** If you are sending a large amount (e.g., $1,000+), send a $1 test transaction first. Once confirmed, send the rest.`
-      }
-    ]
-  },
-  {
-    id: "what-is-usdt",
-    title: "What Is USDT?",
-    shortDesc: "An introduction to Tether (USDT), the world's most traded stablecoin.",
-    sections: [
-      {
-        id: "stablecoin-basics",
-        title: "1. Stablecoin Basics",
-        content: `A stablecoin is a type of cryptocurrency designed to maintain a stable value relative to a specific asset, usually the US Dollar. 
-
-USDT (Tether) is the original and most widely used stablecoin. It bridges the gap between traditional fiat currencies (like INR or USD) and the cryptocurrency market, allowing traders to hold a digital asset that doesn't suffer from the extreme price volatility of Bitcoin or Ethereum.`
-      },
-      {
-        id: "how-usdt-maintains-value",
-        title: "2. How USDT Maintains Its Value",
-        content: `USDT maintains its 1:1 peg to the US Dollar because its issuing company, Tether Limited, claims to hold equivalent reserves for every USDT token in circulation. 
-
-These reserves consist of cash, cash equivalents (like short-term US Treasury bills), corporate bonds, and other assets. Theoretically, anyone with a direct account with Tether can redeem 1 USDT for $1 at any time, which keeps the price anchored in the open market.`
-      },
-      {
-        id: "use-cases",
-        title: "3. Use Cases",
-        content: `USDT is the backbone of the crypto economy. Its primary use cases include:
-- **Trading Pairs:** Most crypto assets on global exchanges are priced and traded against USDT (e.g., BTC/USDT).
-- **P2P Trading:** It is the primary asset used in the Indian P2P market to enter or exit the crypto ecosystem.
-- **DeFi:** USDT is widely used for lending, borrowing, and providing liquidity in Decentralized Finance protocols.`
-      },
-      {
-        id: "advantages",
-        title: "4. Advantages",
-        content: `The biggest advantage of USDT is its **unmatched liquidity**. 
-
-It has the highest trading volume of any cryptocurrency. Because it is so ubiquitous, you will almost always find a buyer or seller for USDT instantly on CryptoBazaar. It is also supported across dozens of blockchains, making it incredibly versatile for moving funds cheaply across networks like Tron (TRC-20) and Polygon.`
-      },
-      {
-        id: "risks",
-        title: "5. Risks",
-        content: `While USDT is stable, it carries counterparty risk:
-- **Reserve Transparency:** Tether has faced regulatory scrutiny over the exact composition of its reserves, as they are not fully audited by a Big Four accounting firm (they provide "attestations" instead).
-- **Centralization:** Tether Limited has the technical ability to freeze USDT in any wallet address upon request from law enforcement.`
-      }
-    ]
-  },
-  {
-    id: "what-is-usdc",
-    title: "What Is USDC?",
-    shortDesc: "Everything you need to know about USD Coin (USDC), the regulated stablecoin.",
-    sections: [
-      {
-        id: "overview",
-        title: "1. Overview",
-        content: `USDC (USD Coin) is a stablecoin pegged to the US Dollar. It was launched in 2018 by Centre (a consortium originally founded by Circle and Coinbase) and is now solely issued by Circle, a US-based financial technology company.
-
-USDC was created as a transparent, regulated alternative to USDT, focusing heavily on compliance with US financial laws.`
-      },
-      {
-        id: "backing-and-reserves",
-        title: "2. Backing and Reserves",
-        content: `USDC is backed 100% by cash and short-dated US Treasury securities. 
-
-The reserves are held in custody by regulated US financial institutions, including BlackRock and BNY Mellon. This strict reserve composition ensures that USDC is fully backed by highly liquid, risk-free assets, meaning redemptions can be processed quickly even during market panics.`
-      },
-      {
-        id: "regulatory-position",
-        title: "3. Regulatory Position",
-        content: `Circle is a licensed Money Services Business (MSB) in the United States and holds money transmitter licenses across numerous US states. 
-
-They publish monthly attestation reports conducted by Deloitte (a Big Four accounting firm) to prove that the exact amount of USDC in circulation matches the US Dollars held in their reserve bank accounts. This makes USDC the standard for institutional compliance.`
-      },
-      {
-        id: "advantages",
-        title: "4. Advantages",
-        content: `The primary advantage of USDC is **trust and transparency**. 
-
-For users who hold large amounts of stablecoins for long periods, USDC provides peace of mind due to its regulated nature and audited reserves. It is also the preferred stablecoin for many major Decentralized Finance (DeFi) protocols and institutional investors.`
-      },
-      {
-        id: "risks",
-        title: "5. Risks",
-        content: `Like USDT, USDC is centralized, meaning Circle can blacklist addresses and freeze funds at the behest of US law enforcement. 
-
-Additionally, for retail P2P traders in India, USDC has **lower liquidity** compared to USDT. You may find fewer listings and slightly wider spreads when buying or selling USDC on CryptoBazaar, although this gap is shrinking as USDC grows in popularity.`
-      }
-    ]
-  },
-  {
-    id: "why-stablecoins-popular",
-    title: "Why Stablecoins Are Popular in India",
-    shortDesc: "Exploring the massive adoption of USDT and USDC among Indian users.",
-    sections: [
-      {
-        id: "protection-against-volatility",
-        title: "1. Protection Against Volatility",
-        content: `Cryptocurrencies like Bitcoin and Ethereum can swing 10% to 20% in a single day. For the average Indian investor looking to preserve capital while staying within the crypto ecosystem, this volatility is unacceptable.
-
-Stablecoins offer a safe harbor. By converting volatile crypto profits into USDT or USDC, Indian traders can lock in their gains without having to withdraw to a traditional bank account (which triggers taxable events and banking fees).`
-      },
-      {
-        id: "cross-border-transfers",
-        title: "2. Cross-Border Transfers",
-        content: `Sending money internationally via traditional banking (SWIFT) can take 3 to 5 business days and incur fees of 3% to 5% due to forex markups and intermediary bank charges.
-
-Stablecoins allow Indian users to send or receive US Dollar-equivalent value anywhere in the world in seconds. A transfer on the Polygon or Tron network costs mere cents and settles instantly, making it vastly superior to traditional fiat rails.`
-      },
-      {
-        id: "freelance-payments",
-        title: "3. Freelance Payments",
-        content: `India is a global hub for IT and Web3 freelancers. Many developers, designers, and marketers working for international clients or decentralized autonomous organizations (DAOs) prefer to be paid in stablecoins.
-
-Getting paid in USDT/USDC bypasses the delays and high currency conversion fees of platforms like PayPal or Upwork. Freelancers can then cash out their stablecoins for INR locally on platforms like CryptoBazaar.`
-      },
-      {
-        id: "merchant-settlements",
-        title: "4. Merchant Settlements",
-        content: `Small and medium-sized businesses (SMEs) engaged in import/export face massive friction in B2B cross-border payments. 
-
-While operating in a regulatory grey area, some merchants use stablecoins as an efficient settlement layer with their international suppliers to avoid the delays and steep forex spreads imposed by traditional banking channels.`
-      },
-      {
-        id: "remittances",
-        title: "5. Remittances",
-        content: `India is the largest recipient of remittances in the world. NRIs (Non-Resident Indians) are increasingly exploring stablecoins as a way to send money home to their families. By buying USDT abroad and having their families sell it via P2P in India, they can often achieve a better effective exchange rate than traditional remittance services.`
-      }
-    ]
-  },
-  {
-    id: "how-stablecoins-work",
-    title: "How Stablecoins Work Behind the Scenes",
-    shortDesc: "The technical mechanics of how fiat-pegged tokens operate on the blockchain.",
-    sections: [
-      {
-        id: "blockchain-basics",
-        title: "1. Blockchain Basics",
-        content: `Unlike Bitcoin, which has its own dedicated blockchain, stablecoins like USDT and USDC are issued as "tokens" on existing blockchains. 
-
-For example, USDT operates as an ERC-20 token on the Ethereum network, a TRC-20 token on the Tron network, and similarly on Polygon, Solana, and others. The underlying blockchain handles the security, consensus, and transfer mechanics, while the stablecoin issuer simply manages the smart contract that tracks who owns what.`
-      },
-      {
-        id: "reserve-backing",
-        title: "2. Reserve Backing",
-        content: `The core mechanism that gives a fiat-backed stablecoin its value is the reserve. 
-
-For every 1 digital token that exists on the blockchain, the issuing company (Tether or Circle) must hold $1 worth of real-world assets (cash, treasury bonds, commercial paper) in a traditional bank account or custodian. This ensures the digital token is fully collateralized by real-world value.`
-      },
-      {
-        id: "minting-and-redemption",
-        title: "3. Minting and Redemption",
-        content: `When an institutional client (like a major crypto exchange) deposits $10 Million in fiat currency into Circle's bank account, Circle "mints" (creates) 10 Million new USDC tokens on the blockchain and sends them to the client's crypto wallet. This increases the total supply of USDC.
-
-Conversely, when a client wants to cash out, they send 10 Million USDC back to Circle's smart contract. Circle "burns" (destroys) those digital tokens and wires $10 Million in real fiat from their bank to the client's bank. This decreases the total supply.`
-      },
-      {
-        id: "on-chain-transfers",
-        title: "4. On-Chain Transfers",
-        content: `Once minted, stablecoins trade freely between individuals without the issuer's involvement. 
-
-When you send USDT to a friend, you sign a digital transaction with your private key. The blockchain validators process this transaction, updating the smart contract ledger to deduct the balance from your address and add it to your friend's address. The issuer (Tether) does not process or approve this transfer—the decentralized blockchain does.`
-      },
-      {
-        id: "security-considerations",
-        title: "5. Security Considerations",
-        content: `While on-chain transfers are highly secure, stablecoins introduce specific risks:
-
-**Smart Contract Risk:** The code governing the stablecoin could theoretically contain bugs, though USDT and USDC have been heavily audited and battle-tested for years.
-**Centralization Risk:** Both Tether and Circle maintain admin keys to their smart contracts. This allows them to freeze addresses involved in hacks, scams, or illegal activities by adding them to a blocklist on the blockchain.`
-      }
-    ]
-  },
-  {
-    id: "common-p2p-scams",
-    title: "Common P2P Crypto Scams in India",
-    shortDesc: "Learn how to spot and avoid the most prevalent frauds in the P2P market.",
-    sections: [
-      {
-        id: "fake-payment-screenshot",
-        title: "1. Fake Payment Screenshot Scam",
-        content: `Scammers often use modified APKs or photo-editing software to create realistic-looking payment confirmation screens from popular UPI apps like PhonePe, GPay, or Paytm. 
-        
-They will send you this screenshot and pressure you to release the crypto quickly, claiming the bank servers are delayed.
-
-**How to avoid it:** Never release crypto based on a screenshot. Always log into your own banking app and verify that the exact amount has been credited to your account.`
-      },
-      {
-        id: "utr-manipulation",
-        title: "2. UTR Manipulation Scam",
-        content: `In this scam, the buyer clicks "I Have Paid" but enters a random or recycled UTR (Unique Transaction Reference) number from a previous, unrelated transaction.
-
-If you don't check your bank statement carefully, you might see the UTR format looks correct and accidentally release the funds.
-
-**How to avoid it:** Cross-reference the UTR provided on the platform with the exact UTR shown in your bank statement for that specific incoming credit.`
-      },
-      {
-        id: "third-party-payment",
-        title: "3. Third-Party Payment Scam",
-        content: `The scammer pays you from a bank account that does not belong to them. The name on the incoming bank transfer will not match their verified name on CryptoBazaar.
-
-This is extremely dangerous. The funds could be stolen or linked to cybercrime. When the real owner of the bank account files a police complaint, your bank account will be frozen.
-
-**How to avoid it:** Always verify that the sender's name in your bank app exactly matches the buyer's verified name on CryptoBazaar. If it doesn't, do not release the crypto. Raise a dispute immediately.`
-      },
-      {
-        id: "chargeback-scams",
-        title: "4. Chargeback Scams",
-        content: `After a successful trade where you received the INR and released the crypto, the buyer contacts their bank and claims the transaction was unauthorized or fraudulent. The bank may then freeze your account or reverse the transaction (chargeback).
-
-**How to avoid it:** This is mitigated on CryptoBazaar through our strict 3-layer KYC. However, if a chargeback happens, immediately provide the CryptoBazaar trade history, chat logs, and the buyer's verified details to your bank and the Cyber Cell to prove it was a legitimate transaction.`
-      },
-      {
-        id: "identity-impersonation",
-        title: "5. Identity Impersonation",
-        content: `Scammers may try to impersonate CryptoBazaar support staff, or pretend to be highly-rated sellers by creating visually similar usernames.
-
-**How to avoid it:** CryptoBazaar support will never contact you via Telegram or WhatsApp, and will never ask you to release crypto manually or send funds to a "safe wallet". All trades must stay within the platform's escrow.`
-      },
-      {
-        id: "telegram-whatsapp",
-        title: "6. Telegram/WhatsApp Fraud",
-        content: `A buyer or seller will ask you to move the conversation to Telegram or WhatsApp, usually promising a better rate or zero fees. Once off-platform, you have no escrow protection, and they will steal your funds.
-
-**How to avoid it:** Never communicate or trade off-platform. If someone asks for your WhatsApp number, refuse and report them.`
-      },
-      {
-        id: "escrow-bypass",
-        title: "7. Escrow Bypass Scams",
-        content: `The scammer tries to convince you to release the crypto before the payment arrives, often citing a "medical emergency" or claiming that the smart contract requires you to release first to "unlock" the fiat payment.
-
-**How to avoid it:** The escrow smart contract NEVER holds fiat (INR). It only holds crypto. Never release the escrow until the INR is fully cleared in your bank account.`
-      },
-      {
-        id: "fake-support",
-        title: "8. Fake Customer Support Scams",
-        content: `You receive an email or SMS claiming your CryptoBazaar account is locked, or that a large deposit is pending, with a link to a fake login page designed to steal your credentials.
-
-**How to avoid it:** Only log in via the official cryptobazaar.co.in website. We use Google OAuth, so you should never be entering a password directly on our site.`
-      },
-      {
-        id: "how-to-stay-protected",
-        title: "9. How to Stay Protected",
-        content: `The golden rules of P2P safety:
-1. Trade only with verified users.
-2. Never trust screenshots; always check your bank app.
-3. Reject third-party payments instantly.
-4. Keep all communication on the platform.
-5. Take your time. Never let a counterparty rush you.`
-      }
-    ]
-  },
-  {
-    id: "red-flags-usdt",
-    title: "10 Red Flags Before Releasing Your USDT",
-    shortDesc: "A quick checklist to ensure every trade is safe before you click release.",
-    sections: [
-      {
-        id: "payment-not-reflecting",
-        title: "1. Payment Not Reflecting in Bank Account",
-        content: `The buyer clicked "Paid" but your bank balance hasn't increased. Never rely on SMS alerts (they can be spoofed) or the buyer's screenshots. Open your banking app and verify the final balance and transaction history.`
-      },
-      {
-        id: "mismatched-sender",
-        title: "2. Mismatched Sender Name",
-        content: `The name on the incoming IMPS/UPI transfer is different from the buyer's verified name on CryptoBazaar. This is the #1 cause of bank freezes. Do not release the crypto.`
-      },
-      {
-        id: "outside-platform",
-        title: "3. Requests to Communicate Outside Platform",
-        content: `The counterparty asks you to call them or chat on Telegram/WhatsApp to "sort out an issue." Scammers do this to remove evidence from the platform. Keep everything in the trade chat.`
-      },
-      {
-        id: "urgent-pressure",
-        title: "4. Urgent Pressure Tactics",
-        content: `Messages like "Bro please release fast, it's an emergency," or "Release now or I will report you." Scammers create false urgency so you panic and skip verifying the payment properly.`
-      },
-      {
-        id: "split-payments",
-        title: "5. Split Payments",
-        content: `The trade is for ₹1,00,000, but the buyer sends ₹40,000 from one account, ₹50,000 from another, and ₹10,000 from a third. This is called structuring and is a massive AML red flag. All payments must come from the single, verified bank account of the user.`
-      },
-      {
-        id: "suspicious-references",
-        title: "6. Suspicious Payment References",
-        content: `The buyer adds remarks like "Crypto", "USDT Buy", or "Binance" to the bank transfer. This can trigger automated bank risk systems to freeze your account. Always advise buyers to leave remarks blank or use simple terms like "Freelance" or "Gift".`
-      },
-      {
-        id: "new-account",
-        title: "7. New Account Warning Signs",
-        content: `Be cautious if a brand new account (created today) with zero previous trades immediately tries to open a massive ₹5,00,000 buy order. While CryptoBazaar's KYC catches most bad actors, high-value trades with fresh accounts carry inherently higher risk.`
-      }
-    ]
-  },
-  {
-    id: "what-to-do-scammed",
-    title: "What to Do If You Are Scammed in a P2P Trade",
-    shortDesc: "A step-by-step action plan if a trade goes wrong.",
-    sections: [
-      {
-        id: "immediate-steps",
-        title: "1. Immediate Steps",
-        content: `If you realize you are being scammed (e.g., the buyer sent a fake screenshot, or you accidentally sent funds to the wrong person):
-- **Do NOT release the escrow.** If you hold the crypto, your funds are safe as long as they are in the smart contract.
-- **Click 'Dispute'.** Immediately escalate the trade to our compliance team. This freezes the escrow contract until an investigation is complete.`
-      },
-      {
-        id: "collecting-evidence",
-        title: "2. Collecting Evidence",
-        content: `Gather everything required to prove your case:
-- Download your official PDF bank statements showing the transaction (or lack thereof).
-- Take screenshots of the trade details, UTR numbers, and chat history.
-- If a third-party payment occurred, get a statement proving the sender's name.`
-      },
-      {
-        id: "reporting-user",
-        title: "3. Reporting the User",
-        content: `Use the 'Report' button on the user's profile. This alerts our risk engine. If multiple users report the same account, our automated systems will temporarily suspend their trading privileges pending review.`
-      },
-      {
-        id: "cybercrime-complaint",
-        title: "4. Filing a Cybercrime Complaint",
-        content: `If you have lost funds (e.g., you released crypto and the fiat was reversed, or you paid fiat and the seller absconded via an off-platform scam):
-- Go to the National Cyber Crime Reporting Portal (cybercrime.gov.in).
-- File an official complaint detailing the UTR, the scammer's bank details, and the timeline.
-- Keep the acknowledgment number (FIR equivalent) handy.`
-      },
-      {
-        id: "contacting-bank",
-        title: "5. Contacting Your Bank",
-        content: `Call your bank's fraud department immediately. Provide them with the cybercrime acknowledgment number. If you sent money to a scammer, ask the bank to attempt a "lien" or freeze on the beneficiary's account to stop the funds from moving further.`
-      },
-      {
-        id: "preventive-measures",
-        title: "6. Preventive Measures",
-        content: `To avoid future issues:
-- Never trade off-platform.
-- Never accept third-party payments.
-- Only trade with users who have high completion rates and good reviews.`
-      }
-    ]
-  },
-  {
-    id: "third-party-payments",
-    title: "Third-Party Payments Explained: Why They Are Risky",
-    shortDesc: "Understanding the biggest cause of bank freezes in Indian P2P.",
-    sections: [
-      {
-        id: "what-are-they",
-        title: "1. What are Third-Party Payments?",
-        content: `A third-party payment occurs when the person sending the fiat currency (INR) uses a bank account that does not belong to them. 
-
-For example: The CryptoBazaar account is verified under the name "Rahul Sharma". However, the bank transfer you receive comes from an account named "Priya Enterprises" or "Amit Kumar".`
-      },
-      {
-        id: "why-scammers-use",
-        title: "2. Why Scammers Use Them",
-        content: `Scammers use third-party payments to launder stolen money. 
-They compromise a victim's bank account (via phishing or a separate scam), then use those stolen funds to buy crypto from you. 
-
-When the original victim realizes their money is gone, they file a police complaint. The police trace the money to *your* bank account, and the cyber cell orders your bank to freeze your account because you received "tainted" funds.`
-      },
-      {
-        id: "regulatory-concerns",
-        title: "3. Regulatory Concerns",
-        content: `Allowing third-party payments violates basic Anti-Money Laundering (AML) laws. The Financial Intelligence Unit (FIU-IND) requires platforms to ensure that the fiat rails match the verified identity of the crypto trader. Failing to do so facilitates money laundering and terrorist financing.`
-      },
-      {
-        id: "platform-policies",
-        title: "4. Platform Policies",
-        content: `CryptoBazaar maintains a strict **Zero-Tolerance Policy** for third-party payments.
-
-If you are a buyer: You MUST pay from a bank account where the name perfectly matches your verified Aadhaar/PAN. If you use a friend's, spouse's, or company's account, you will lose the dispute, lose your funds, and be banned.
-
-If you are a seller: You MUST reject any third-party payment. Do not release the crypto. Raise a dispute immediately. If you accept a third-party payment, you forfeit your right to any protection under the Member Protection Fund.`
-      },
-      {
-        id: "safer-alternatives",
-        title: "5. Safer Alternatives",
-        content: `If your primary bank account is hitting its UPI limits, the safe alternative is to:
-1. Use NEFT or IMPS from your own verified account for larger limits.
-2. Link a second bank account to your CryptoBazaar profile (provided it is also in your exact name).
-3. Upgrade your banking tier with your institution.
-
-Never resort to using someone else's account just for convenience.`
-      }
-    ]
-  },
-  {
-    id: "how-p2p-works",
-    title: "How Our P2P Trading Platform Works",
-    shortDesc: "A complete walkthrough of CryptoBazaar — from sign-up to settlement.",
-    sections: [
-      {
-        id: "what-is-p2p",
-        title: "1. What is P2P Crypto Trading?",
-        content: `Peer-to-peer (P2P) crypto trading is a method of buying and selling cryptocurrency directly between two people, without a centralised exchange acting as the middleman.
-
-On CryptoBazaar, the buyer sends Indian Rupees (INR) directly to the seller's bank account via UPI, IMPS, or NEFT. In return, the seller's cryptocurrency is released to the buyer from a smart contract escrow. CryptoBazaar facilitates the connection and holds the crypto in escrow — but we never touch your INR or take custody of your crypto.`
-      },
-      {
-        id: "why-p2p",
-        title: "2. Why P2P Instead of Centralised Exchanges?",
-        content: `Centralised exchanges in India face regulatory uncertainty. Several have shut down, frozen withdrawals, or been investigated. When you deposit crypto into an exchange, you hand over custody — if the exchange fails, your funds may be lost.
-
-P2P eliminates custodial risk entirely:
-- Your crypto sits in an on-chain smart contract, not in our wallets.
-- Your INR moves bank-to-bank between you and your counterparty.
-- CryptoBazaar cannot access, redirect, or freeze your funds at any point.
-- Every transaction is verifiable on a public blockchain.
-
-The trade-off is that P2P requires more trust between parties — which is exactly why CryptoBazaar exists. We vet every member rigorously so you don't have to worry about who's on the other side.`
-      },
-      {
-        id: "supported-assets",
-        title: "3. Supported Assets",
-        content: `CryptoBazaar currently supports two stablecoins — digital currencies pegged 1:1 to the US Dollar:
-
-USDT (Tether): The world's most traded stablecoin by volume. Widely used by Indian P2P traders, especially on the Tron network due to low gas fees. Available on CryptoBazaar across Polygon, BNB Chain (BSC), and Tron (TRC-20).
-
-USDC (USD Coin): Issued by Circle and considered more transparent than USDT due to regular reserve attestations. Available on Polygon and BNB Chain.
-
-We do not support volatile assets like Bitcoin or Ethereum. Stablecoins are the safest asset class for P2P because their value doesn't swing while a trade is in progress.`
-      },
-      {
-        id: "supported-networks",
-        title: "4. Supported Networks",
-        content: `Every crypto asset exists on a blockchain network. The network you choose affects transaction speed and gas fees:
-
-Polygon: An Ethereum Layer 2 with very low fees (typically under ₹1 per transaction) and fast confirmations. Supports both USDT and USDC. Recommended for most traders.
-
-BNB Chain (BSC): Binance's EVM-compatible chain. Moderate fees, widely supported by Indian wallets. Supports USDT and USDC.
-
-Tron (TRC-20): Extremely popular among Indian USDT traders due to near-zero fees. Supports USDT only. If you're trading USDT specifically, Tron is the most cost-effective option.
-
-Important: Both buyer and seller must be on the same network for a trade. You cannot buy USDT on Polygon from a seller who listed on Tron.`
-      },
-      {
-        id: "creating-account",
-        title: "5. Creating an Account",
-        content: `Getting started on CryptoBazaar takes under 2 minutes:
-
-Step 1: Visit cryptobazaar.co.in and click 'Get Started'.
-Step 2: Sign in with your Google account. We use Google OAuth — no passwords to remember or manage.
-Step 3: You're in. Your account is created immediately.
-
-At this point you can browse the live marketplace and see all active listings. But to actually buy or sell, you must complete our 3-layer verification process. This is non-negotiable — it's what keeps every trader on the platform safe.`
-      },
-      {
-        id: "kyc-verification",
-        title: "6. KYC Verification (3 Layers)",
-        content: `CryptoBazaar uses the most rigorous verification process in Indian P2P trading. Every member must pass all three layers before placing a single trade:
-
-Layer 1 — Identity (KYC):
-Submit your Aadhaar number and PAN card. Complete a quick liveness selfie to prove you're a real person and that the documents belong to you. Processed by our partner Didit. Takes under 5 minutes. CryptoBazaar never stores your raw identity documents.
-
-Layer 2 — Enhanced Due Diligence (EDD):
-Upload 6 months of bank statements (PDF format). Our ML system scans for red flags: sudden large deposits, mule-account patterns, dormant accounts with recent crypto activity, and mismatched names. The PDFs are processed in-memory and permanently deleted after scoring. No human reads them unless a dispute arises.
-
-Layer 3 — AI Questionnaire:
-Answer 10 questions about your trading background, income source, and intended use of the platform. Scored by AI in about 5 minutes. This layer catches social engineering attempts and profiles that don't match the financial data from Layer 2.
-
-Once all three layers pass, you receive Verified Member status and a cryptographic credential bound to your Decentralised Identifier (DID). This credential expires after 6 months and must be renewed.`
-      },
-      {
-        id: "finding-counterparty",
-        title: "7. Finding a Buyer or Seller",
-        content: `Once verified, head to the Marketplace. You'll see a live table of all active sell orders with:
-- Seller name, rating, and average release time
-- Asset (USDT or USDC) and network (Polygon, BSC, Tron)
-- Price per unit in INR
-- Available amount
-- Accepted payment methods (UPI, IMPS, NEFT)
-
-You can filter by asset and chain. Click 'Buy' on any listing to start a trade.
-
-To sell, click 'Post Order' in the top right. Set your asset, amount, price per unit, and accepted payment methods. Your crypto will be locked into escrow the moment the order is created.`
-      },
-      {
-        id: "escrow-explained",
-        title: "8. Escrow Protection Explained",
-        content: `Every trade on CryptoBazaar is protected by a non-custodial escrow smart contract deployed on the public blockchain.
-
-Here's what happens step by step:
-1. The seller creates a sell order. Their crypto is deposited into the escrow contract on-chain.
-2. A buyer clicks 'Buy' and locks the order. A 30-minute payment timer begins.
-3. The buyer sends INR directly to the seller's bank account via UPI/IMPS/NEFT.
-4. The buyer clicks 'I Have Paid' and enters the UTR number.
-5. The seller verifies the payment landed in their bank account.
-6. The seller clicks 'Confirm Release'. The smart contract automatically transfers the crypto to the buyer's wallet.
-
-At no point does CryptoBazaar hold custody of the crypto or the INR. The smart contract is autonomous — once deployed, even we cannot override it. The code controls the funds, not us.`
-      },
-      {
-        id: "payment-confirmation",
-        title: "9. Payment Confirmation Process",
-        content: `After the buyer clicks 'I Have Paid':
-
-The seller has 15 minutes to respond. During this window, the seller must:
-(a) Check their bank account for the incoming credit matching the exact trade amount.
-(b) Verify that the sender name matches the buyer's verified identity on CryptoBazaar.
-(c) Confirm the UTR number provided by the buyer corresponds to the actual transaction.
-
-If the payment checks out, the seller clicks 'Payment Received' and the smart contract releases the crypto.
-
-If the seller doesn't respond within 15 minutes, the trade automatically escalates to dispute resolution. This protects buyers against sellers who stall or ghost after receiving payment.`
-      },
-      {
-        id: "releasing-crypto",
-        title: "10. Releasing Crypto Safely",
-        content: `Golden rules for sellers before releasing:
-
-Never release based on a screenshot. Always verify the payment in your actual bank account or UPI app. Screenshots are trivially easy to forge.
-
-Check the exact amount. If the trade is for ₹50,000, confirm ₹50,000 landed — not ₹49,999 or ₹50,001. Partial payments are not acceptable.
-
-Check the sender name. The name on the incoming transfer must match the buyer's verified name on CryptoBazaar. If a third-party name appears, do not release — raise a dispute immediately.
-
-Once you click 'Confirm Release', the action is irreversible. The smart contract will transfer the crypto to the buyer's wallet within seconds. There is no undo.`
-      },
-      {
-        id: "dispute-process",
-        title: "11. Dispute Resolution Process",
-        content: `Disputes are triggered when:
-- The seller raises a dispute after the buyer marks payment.
-- The seller fails to respond within the 15-minute confirmation window.
-- Either party files a formal complaint within 24 hours.
-
-Both parties have 24 hours to submit evidence — primarily PDF bank statements. Screenshots are supplementary only. All PDFs are forensically analysed for tampering (metadata validation, digital signature verification, anomaly detection).
-
-Our compliance team cross-references the buyer's debit against the seller's credit using UTR numbers. The outcome is almost always clear from bank data alone.
-
-Ruling: If payment is confirmed, crypto is released to the buyer. If not, crypto is returned to the seller. Dispute rulings are final, with a 7-day appeal window for written appeals to disputes@cryptobazaar.co.in.
-
-A second dispute loss within 12 months results in permanent suspension.`
-      },
-      {
-        id: "trading-fees",
-        title: "12. Trading Fees",
-        content: `CryptoBazaar charges a flat fee of 1 unit of the traded asset per completed trade. For example, if you sell 100 USDT, the buyer receives 99 USDT and 1 USDT goes to CryptoBazaar as the platform fee.
-
-Additionally, 0.75% of every completed trade is automatically sent to the Member Protection Fund smart contract. This is not a fee you pay separately — it is deducted from the escrow at settlement.
-
-There are no hidden fees, no withdrawal fees, and no deposit fees. Gas fees for on-chain transactions (escrow deposit, release) are paid by the party initiating the transaction, as standard on any blockchain.
-
-You also need an active Membership Plan to trade:
-- Starter: ₹200/month, ₹5,00,000 monthly volume cap
-- Trader: ₹500/month, ₹20,00,000 monthly volume cap
-- Pro: ₹1,000/month, unlimited volume`
-      }
-    ]
-  },
-  {
-    id: "how-to-buy-usdt",
-    title: "How to Buy USDT in India Using P2P",
-    shortDesc: "Step-by-step guide to purchasing USDT safely with INR.",
-    sections: [
-      {
-        id: "buy-prerequisites",
-        title: "1. What You Need Before Starting",
-        content: `Before you can buy USDT on CryptoBazaar, make sure you have:
-
-A CryptoBazaar account: Sign in with Google at cryptobazaar.co.in.
-
-Verified Member status: You must have passed all 3 verification layers (KYC, bank statement review, AI questionnaire). This typically takes 15–30 minutes on first sign-up.
-
-A connected Web3 wallet: You need a cryptocurrency wallet like MetaMask (for Polygon/BSC) or a Tron-compatible wallet (for TRC-20 USDT). Your wallet address is permanently bound to your account.
-
-An active Membership Plan: Choose Starter (₹200/mo), Trader (₹500/mo), or Pro (₹1,000/mo) depending on your expected monthly volume.
-
-A bank account in your name: The account you use to send INR must exactly match the name on your Aadhaar and PAN. Third-party payments are strictly blocked and will result in a dispute ruling against you.`
-      },
-      {
-        id: "bank-transfer-requirements",
-        title: "2. Bank Transfer Requirements",
-        content: `CryptoBazaar supports three INR payment methods:
-
-UPI: Fastest option. Transactions settle in seconds. Recommended for trades under ₹1,00,000. Make sure your UPI app shows the full UTR (Unique Transaction Reference) number after payment — you'll need to enter this on the platform.
-
-IMPS (Immediate Payment Service): Available 24/7. Settles within seconds to minutes. Works for amounts up to ₹5,00,000 per transaction (bank-dependent). Ideal for mid-size trades.
-
-NEFT (National Electronic Funds Transfer): Processed in batches during banking hours. Can take 30 minutes to 2 hours. Best for very large trades where speed is less important than reliability.
-
-Critical: Always use a bank account registered in your own verified name. Payments from family members, friends, or business accounts will be flagged, and you will lose the dispute.`
-      },
-      {
-        id: "choosing-seller",
-        title: "3. Choosing the Right Seller",
-        content: `Not all sellers are equal. Here's what to look for on the Marketplace:
-
-Rating and trade count: Prefer sellers with a 4.0+ star rating and at least 10 completed trades. A seller with 50+ trades and a 4.5+ rating is a safe bet.
-
-Average release time: This tells you how quickly the seller typically releases crypto after you pay. Under 5 minutes is excellent. Over 15 minutes means the seller may be slow to respond — not ideal if you're in a hurry.
-
-Price per unit: Sellers set their own rates. Compare across listings. A ₹0.50 difference on 1,000 USDT is ₹500 — it adds up. But don't chase the absolute cheapest price at the expense of a reputable seller.
-
-Accepted payment methods: Make sure the seller accepts your preferred payment method (UPI, IMPS, or NEFT).
-
-Network: Confirm the seller's listing matches the network your wallet supports. If your MetaMask is set to Polygon, only buy from Polygon listings.`
-      },
-      {
-        id: "understanding-rates",
-        title: "4. Understanding Exchange Rates",
-        content: `USDT and USDC are pegged to the US Dollar, but the INR price you see on CryptoBazaar is set by individual sellers — not by a central order book.
-
-The price typically tracks the USD/INR exchange rate plus a small premium (1–3%) that compensates the seller for:
-- The risk of holding stablecoins
-- The inconvenience of managing bank transfers
-- Market liquidity conditions
-
-During high-demand periods (crypto bull runs, regulatory news), premiums can spike to 5%+. During low-demand periods, you may find rates very close to the spot USD/INR rate.
-
-Tip: Don't obsess over getting the absolute best rate. A trustworthy seller with a slightly higher price is almost always better than an unknown seller offering a suspiciously low rate.`
-      },
-      {
-        id: "completing-payment",
-        title: "5. Completing Payment",
-        content: `Once you click 'Buy' on a listing, the order is locked and a 30-minute payment timer starts. Here's the process:
-
-Step 1: The seller's payment details appear on your screen (UPI ID, bank account number, IFSC code). Copy them carefully.
-
-Step 2: Open your banking app and initiate a transfer for the exact INR amount shown. Do not round up or down. Send the exact amount.
-
-Step 3: After the transfer completes, note the UTR number from your banking app's transaction confirmation.
-
-Step 4: Upload a screenshot of the payment confirmation on CryptoBazaar (for reference purposes).
-
-Step 5: Enter the UTR number in the provided field.
-
-Step 6: Click 'I Have Paid'. The seller is now notified and has 15 minutes to verify and release.
-
-If you fail to complete payment within 30 minutes, the trade is automatically cancelled and the crypto is returned to the seller. Repeated cancellations may affect your account standing.`
-      },
-      {
-        id: "escrow-protection-buyer",
-        title: "6. How Escrow Protects You as a Buyer",
-        content: `The moment you lock a trade, the seller's crypto is already sitting in the escrow smart contract. It was deposited when they created the listing. This means:
-
-The seller cannot withdraw it while the trade is active.
-The seller cannot cancel the trade after you've marked payment.
-If the seller doesn't respond within 15 minutes, the trade auto-escalates to dispute resolution.
-
-Your only risk as a buyer is sending INR to the wrong account. Always double-check the payment details shown on screen match the seller's verified information. If something looks off — wrong name, different bank — do not pay. Raise a dispute instead.`
-      },
-      {
-        id: "receiving-usdt",
-        title: "7. Receiving Your USDT",
-        content: `Once the seller clicks 'Payment Received', the escrow smart contract automatically transfers the USDT to your connected wallet address. This happens on-chain and typically completes within:
-
-Polygon: 2–5 seconds
-BSC: 3–5 seconds
-Tron: 3–10 seconds
-
-You'll see the USDT appear in your wallet immediately. The on-chain transaction hash is recorded and visible on the trade page — you can verify it on Polygonscan, BscScan, or Tronscan.
-
-A platform fee of 1 USDT is deducted at settlement. So if you bought 100 USDT, you receive 99 USDT in your wallet.
-
-Congratulations — you've just completed a fully non-custodial P2P trade with escrow protection. Your USDT is now yours, in your own wallet, under your own control.`
-      }
-    ]
-  },
-  {
-    id: "how-to-sell-usdt",
-    title: "How to Sell USDT Safely in India",
-    shortDesc: "Best practices for selling crypto and receiving INR securely.",
-    sections: [
-      {
-        id: "creating-sell-order",
-        title: "1. Creating a Sell Order",
-        content: `To sell USDT or USDC on CryptoBazaar:
-
-Step 1: Go to the Marketplace and click 'Post Order'.
-Step 2: Select the asset (USDT or USDC) and the network (Polygon, BSC, or Tron).
-Step 3: Enter the amount you want to sell.
-Step 4: Set your price per unit in INR. You can check current listings to gauge the market rate.
-Step 5: Select which payment methods you accept (UPI, IMPS, NEFT).
-Step 6: Confirm the order. Your wallet will prompt you to approve a transaction that deposits the crypto into the escrow smart contract.
-
-Once confirmed, your listing is live on the Marketplace. Your crypto is now locked in escrow — you cannot withdraw it until the trade completes or you cancel the order (only possible before a buyer locks it).
-
-Tip: Price competitively. If the market rate is ₹93.50 and you list at ₹95.00, buyers will skip your listing. Check what other sellers are offering and price within a reasonable range.`
-      },
-      {
-        id: "verifying-buyer-payments",
-        title: "2. Verifying Buyer Payments",
-        content: `This is the most critical step in selling. When a buyer clicks 'I Have Paid':
-
-Step 1: Open your bank account or UPI app. Do NOT rely on the buyer's screenshot — check your actual account balance and transaction history.
-
-Step 2: Look for an incoming credit matching the exact trade amount (to the rupee).
-
-Step 3: Verify the sender's name. It must match the buyer's verified name on CryptoBazaar. If you see a different name (family member, business account, third party), do not release. Raise a dispute immediately.
-
-Step 4: Cross-reference the UTR number. The UTR provided by the buyer should appear in your bank's transaction details.
-
-Only after confirming all three checks (amount, name, UTR) should you click 'Payment Received' to release the crypto.
-
-Remember: Once released, the action is irreversible. The smart contract will transfer the crypto to the buyer's wallet instantly. There is no undo, no reversal, no admin override.`
-      },
-      {
-        id: "common-seller-mistakes",
-        title: "3. Common Seller Mistakes",
-        content: `Mistake 1: Releasing based on a screenshot.
-Buyers can forge UPI payment screenshots in minutes using free tools. Never release crypto based on a screenshot alone. Always verify in your actual bank account.
-
-Mistake 2: Releasing before the payment clears.
-Some payment methods (especially NEFT) can take time to settle. If the buyer says they've paid but nothing has appeared in your account, wait. Do not release until the money is actually credited.
-
-Mistake 3: Accepting partial payments.
-If the trade is for ₹50,000 and the buyer sends ₹45,000, do not release. The full amount must be received. Raise a dispute for the shortfall.
-
-Mistake 4: Ignoring name mismatches.
-If the incoming payment comes from 'Rahul Sharma' but the buyer's verified name is 'Priya Mehta', this is a red flag. It could be a third-party payment using stolen funds. Raise a dispute.
-
-Mistake 5: Not responding within 15 minutes.
-If you don't respond after the buyer marks payment, the trade auto-escalates to dispute resolution. This wastes time for everyone. If you're going to be away from your phone, cancel your listing first.`
-      },
-      {
-        id: "when-not-to-release",
-        title: "4. When NOT to Release Escrow",
-        content: `Do not release crypto in any of these situations:
-
-- Payment has not appeared in your bank account, regardless of what the buyer claims.
-- The payment amount does not match the trade amount exactly.
-- The sender name on the bank credit does not match the buyer's verified identity.
-- The buyer pressures you to release before you've verified (e.g., 'I'm in a hurry', 'it will come through soon').
-- You receive multiple small payments instead of one lump sum (potential structuring).
-- The buyer asks you to release to a different wallet address than the one on record.
-
-In any of these cases, do not release. Click 'Dispute' and let the compliance team investigate. Your crypto remains safe in escrow during the entire dispute process.`
-      },
-      {
-        id: "payment-reversals",
-        title: "5. Handling Payment Reversals",
-        content: `A payment reversal (or chargeback) occurs when the buyer's bank reverses the INR transfer after you've already released the crypto. This is one of the biggest risks in unprotected P2P trading.
-
-CryptoBazaar mitigates this through:
-
-1. Mandatory identity verification: Every buyer is Aadhaar-linked. Fraudulent chargebacks can be traced to a real person and reported to law enforcement.
-
-2. UTR-based evidence: All trades are recorded with UTR numbers. If a reversal occurs and is fraudulent, the on-chain trade record and UTR provide indisputable evidence for a police complaint.
-
-3. Bank statement forensics: If a dispute arises, our compliance team analyses both parties' actual bank data — not screenshots.
-
-4. Member Protection Fund: If a payment reversal causes your account to be frozen due to a failure in our vetting process, you may be eligible for a disbursement from the MPF.
-
-If you experience a reversal after releasing crypto, contact support@cryptobazaar.co.in immediately with the trade ID and your bank freeze documentation.`
-      },
-      {
-        id: "large-trade-practices",
-        title: "6. Best Practices for Large Trades",
-        content: `For trades above ₹1,00,000:
-
-Use IMPS or NEFT instead of UPI. UPI has daily transaction limits (typically ₹1,00,000 per transaction) that may require the buyer to make multiple payments. IMPS/NEFT handle larger amounts in a single transfer, reducing complexity.
-
-Wait for full settlement before releasing. Large NEFT transfers can take up to 2 hours during banking hours. Do not rush.
-
-Verify the buyer's profile carefully. Check their rating, trade count, and account age. For very large trades (₹5,00,000+), prefer buyers with Pro-tier memberships and 20+ completed trades.
-
-Consider splitting into multiple trades. Instead of one ₹10,00,000 trade, consider two ₹5,00,000 trades. This reduces your exposure per transaction.
-
-Keep records. Save all UTRs, bank statements, and trade IDs for your own tax and compliance records. CryptoBazaar provides full trade history in your Dashboard, but maintaining your own copies is good practice.`
-      }
-    ]
-  },
-  {
-    id: "usdt-vs-usdc",
-    title: "USDT vs USDC: Which Stablecoin Should You Choose?",
-    shortDesc: "A detailed comparison to help you pick the right stablecoin for P2P trading.",
-    sections: [
-      {
-        id: "what-is-usdt",
-        title: "1. What is USDT?",
-        content: `USDT (Tether) is the world's largest stablecoin by market capitalisation and daily trading volume. Issued by Tether Limited, it is pegged 1:1 to the US Dollar — meaning 1 USDT is designed to always be worth approximately $1.
-
-USDT was launched in 2014, making it the oldest stablecoin in existence. It is available on virtually every blockchain, including Ethereum, Tron, Polygon, BNB Chain, Solana, Avalanche, and more.
-
-On CryptoBazaar, USDT is available on Polygon, BNB Chain (BSC), and Tron (TRC-20). It is by far the most popular asset traded on the platform, accounting for the majority of all listings.
-
-Key facts:
-- Market cap: Over $140 billion (as of 2025)
-- Daily trading volume: Highest of any cryptocurrency, including Bitcoin
-- Issuer: Tether Limited (registered in the British Virgin Islands)
-- Reserve backing: Claims 1:1 backing with a mix of cash, cash equivalents, US Treasuries, and other assets`
-      },
-      {
-        id: "what-is-usdc",
-        title: "2. What is USDC?",
-        content: `USDC (USD Coin) is the second-largest stablecoin by market capitalisation. It is issued by Circle, a US-based financial technology company, in partnership with Coinbase.
-
-USDC launched in 2018 and has positioned itself as the 'regulated' alternative to USDT. Circle is a registered Money Services Business in the US and publishes monthly attestation reports from Deloitte verifying that USDC reserves match the number of tokens in circulation.
-
-On CryptoBazaar, USDC is available on Polygon and BNB Chain (BSC).
-
-Key facts:
-- Market cap: Over $55 billion (as of 2025)
-- Daily trading volume: Significantly lower than USDT, but growing
-- Issuer: Circle (US-based, registered as a Money Services Business)
-- Reserve backing: 100% backed by cash and short-dated US Treasury securities. Monthly attestation by Deloitte.`
-      },
-      {
-        id: "key-differences",
-        title: "3. Key Differences",
-        content: `While both USDT and USDC are dollar-pegged stablecoins, they differ in important ways:
-
-Issuer and jurisdiction: USDT is issued by Tether Limited (BVI). USDC is issued by Circle (USA). Circle operates under significantly more regulatory oversight.
-
-Reserve transparency: USDC publishes monthly third-party attestation reports from Deloitte. Tether publishes quarterly reports but has historically faced criticism for opaque reserve composition — including loans and commercial paper.
-
-Regulatory compliance: Circle proactively works with US regulators and has applied for a banking charter. Tether has faced enforcement actions from the New York Attorney General and the CFTC, resulting in settlements totalling $60M+.
-
-Availability on CryptoBazaar: USDT is available on 3 networks (Polygon, BSC, Tron). USDC is available on 2 networks (Polygon, BSC). If you want to trade on Tron, USDT is your only option.
-
-De-peg risk: Both have briefly de-pegged from $1 during extreme market stress. USDC notably dropped to $0.87 during the Silicon Valley Bank crisis in March 2023 (Circle held $3.3B in reserves at SVB). It recovered within days. USDT has experienced smaller de-pegs but has always recovered.`
-      },
-      {
-        id: "liquidity-comparison",
-        title: "4. Liquidity Comparison",
-        content: `Liquidity refers to how easily you can buy or sell an asset without significantly affecting its price. In the context of CryptoBazaar's P2P marketplace:
-
-USDT has dramatically higher liquidity. On any given day, you will find more USDT listings, more sellers, and tighter spreads (smaller gap between buy and sell prices). This is because USDT dominates Indian P2P markets — most traders, OTC desks, and arbitrageurs default to USDT.
-
-USDC has growing but lower liquidity. You may find fewer listings and slightly wider spreads. For large trades (₹5,00,000+), finding a USDC seller at a competitive rate can take longer.
-
-If you need to trade quickly and at the best available rate, USDT is the pragmatic choice. If you're willing to wait for the right listing, USDC is perfectly viable.`
-      },
-      {
-        id: "transparency-comparison",
-        title: "5. Transparency Comparison",
-        content: `This is where the two stablecoins diverge most sharply:
-
-USDC: Circle publishes monthly attestation reports conducted by Deloitte. These reports confirm that the total USDC in circulation is fully backed by cash and short-dated US Treasuries held in regulated financial institutions. The reserves are held at BlackRock (through the Circle Reserve Fund) and various US banks. This is as transparent as stablecoins get.
-
-USDT: Tether publishes quarterly 'Reserves Report' (not a full audit). Historically, Tether's reserves included commercial paper, secured loans, and other less-liquid assets in addition to cash. In recent years, Tether has shifted heavily towards US Treasuries and reduced commercial paper to near-zero. However, Tether has never undergone a full independent audit — only attestations.
-
-Bottom line: If reserve transparency and regulatory compliance are important to you, USDC has a clear edge. If you care more about liquidity and market depth, USDT wins.`
-      },
-      {
-        id: "use-cases",
-        title: "6. Use Cases",
-        content: `When USDT makes more sense:
-- You're an active trader who needs maximum liquidity and the fastest execution.
-- You want to trade on the Tron network (TRC-20) for minimal gas fees.
-- You're doing high-frequency or high-volume trading where spreads matter.
-- You need the widest selection of sellers on CryptoBazaar's marketplace.
-
-When USDC makes more sense:
-- You're holding stablecoins for longer periods and want the highest reserve transparency.
-- You care about the regulatory standing of the issuer.
-- You're using DeFi protocols that require or incentivise USDC (many Aave and Compound pools offer better USDC rates).
-- You want to avoid any association with Tether's regulatory controversies.
-
-For many Indian P2P traders, the honest answer is: both work fine. The practical differences in day-to-day P2P trading are minimal.`
-      },
-      {
-        id: "which-is-better-p2p",
-        title: "7. Which is Better for P2P on CryptoBazaar?",
-        content: `For most CryptoBazaar users, USDT is the better choice for P2P trading purely because of liquidity. More sellers, more listings, faster execution, and tighter spreads. If you're new to P2P, start with USDT on Polygon — it's the most beginner-friendly combination (low fees, fast settlement, good MetaMask support).
-
-If you're a more experienced trader who values transparency and plans to hold stablecoins for weeks or months between trades, USDC on Polygon is an excellent alternative.
-
-Our recommendation by profile:
-- New trader, small amounts: USDT on Polygon
-- Cost-conscious trader: USDT on Tron (lowest gas fees)
-- Transparency-focused holder: USDC on Polygon
-- High-volume trader: USDT on any network (best liquidity)
-- DeFi user who also P2P trades: USDC on Polygon (best DeFi compatibility)
-
-Remember: CryptoBazaar's escrow protection works identically regardless of which stablecoin or network you choose. Your security is the same either way.`
-      }
-    ]
-  },
-  {
-    id: "terms",
-    title: "Terms of Use",
-    shortDesc: "The core legal contract between you and CryptoBazaar.",
-    sections: TERMS_SECTIONS
-  },
-  {
-    id: "privacy",
-    title: "Privacy Policy",
-    shortDesc: "How we collect, secure, and discard your sensitive data.",
-    sections: [
-      {
-        id: "data-minimization",
-        title: "1. Data Minimization Principles",
-        content: `We believe that the safest way to store sensitive data is not to store it at all. 
-
-Unlike traditional exchanges that maintain massive central databases of user identity files and bank transactions, CryptoBazaar uses a zero-custody data architecture. We only store the absolute bare minimum needed to verify eligibility, route trades, and settle disputes.`
-      },
-      {
-        id: "kyc-processing",
-        title: "2. Identity Verification (Layer 1)",
-        content: `Your identity verification (Aadhaar, PAN, and liveness face-match) is processed directly by Didit, our authorized identity verification partner.
-
-CryptoBazaar servers never see or store your raw Aadhaar card number, PAN card scan, or selfie biometric data. Didit verifies your documents, issues a cryptographic credential, and we bind this credential to your Decentralized Identifier (DID) stored locally in your browser and on-chain. We only know if you are verified or not.`
-      },
-      {
-        id: "bank-statements",
-        title: "3. Bank Statements (Layer 2)",
-        content: `During the onboarding phase, you are required to upload 6 months of bank statement PDFs.
-
-This data is processed in-memory by our Machine Learning parser to calculate your risk scoring and flag suspicious transaction patterns (like money-mule activity or shell accounts). Immediately after scoring, the PDF files are permanently deleted from our servers. We never write your statement documents to disk, and no human at CryptoBazaar reads them unless a dispute occurs.`
-      },
-      {
-        id: "security-measures",
-        title: "4. Information Security",
-        content: `We implement state-of-the-art security measures to protect your metadata:
-- All data in transit is encrypted using TLS 1.3.
-- All stored metadata (such as Google identifiers and wallet addresses) is encrypted at rest using AES-256.
-- Database access is restricted to essential microservices using IAM roles and private VPC routing.`
-      }
-    ]
-  },
-  {
-    id: "mpf-guide",
-    title: "Member Protection Fund",
-    shortDesc: "A voluntary pool compensating members for vetting failures.",
-    sections: [
-      {
-        id: "mpf-what-is-it",
-        title: "1. What is the Member Protection Fund?",
-        content: `The Member Protection Fund (MPF) is a dedicated on-chain smart contract holding a pool of funds to compensate Verified Members who suffer wrongful bank freezes.
-
-It is funded by 0.75% of every completed trade. It acts as our direct accountability check: if our screening fails to block a bad actor and you get frozen, the fund is there to help. Note: The MPF is not an insurance product and is run at our discretion.`
-      },
-      {
-        id: "mpf-how-it-works",
-        title: "2. Multisig Governance",
-        content: `The fund is held in a multi-signature safe on-chain. Moving funds requires approval from a minimum of 3 of 5 designated signatories, including:
-- Two independent cryptocurrency legal advisors.
-- One representative from our compliance team.
-- Two independent community representatives chosen from active Pro-tier traders.`
-      },
-      {
-        id: "disbursement-process",
-        title: "3. Requesting a Disbursement",
-        content: `To request a disbursement, you must file a claim under the 'Protection Fund' tab in your Dashboard. You must provide:
-- A copy of the formal bank freeze letter or Cyber Cell police notice.
-- Evidence that the freeze is linked directly to the UTR number of a CryptoBazaar trade.
-- An active membership subscription at the time of the trade.
-
-Claims are processed through three tiers, with Emergency claims (up to ₹10,000) resolved in under 24 hours.`
-      }
-    ]
-  },
-  {
-    id: "disputes-escrow",
-    title: "Disputes & Escrow",
-    shortDesc: "How the secure smart contracts resolve trade conflicts.",
-    sections: [
-      {
-        id: "escrow-mechanics",
-        title: "1. The Escrow Smart Contract",
-        content: `Every transaction on CryptoBazaar is executed using an autonomous, non-custodial escrow smart contract.
-
-Once the seller deposits crypto into the contract, it cannot be recovered until either:
-- The seller clicks 'Confirm Release' (successful trade).
-- The buyer cancels the trade (funds returned to seller).
-- A dispute is raised and our compliance team issues a cryptographic signature resolving the trade based on bank evidence.`
-      },
-      {
-        id: "dispute-resolution",
-        title: "2. The Dispute Process",
-        content: `If a seller does not release the funds after you pay, or if you suspect foul play, you can trigger a Dispute.
-
-Our compliance team will require both parties to upload PDF bank statements. We do not accept screenshots because they are easily forged. All PDFs are run through forensic analysis tools to verify signatures, check metadata, and confirm whether the transfer actually cleared NPCI servers.`
-      }
-    ]
-  },
-  {
-    id: "bank-freezes",
-    title: "P2P Safety Guide",
-    shortDesc: "Practical advice on preventing account freezes in India.",
-    sections: [
-      {
-        id: "what-causes-freezes",
-        title: "1. Understanding UPI/Bank Freezes",
-        content: `Indian bank accounts are frozen when 'tainted' funds (money linked to online scams, cyber fraud, or gambling) touch the account.
-
-Even if you are an innocent seller, if a buyer pays you using money from a compromised account, the police (cyber cell) will mark the entire transaction chain, leading to a debit freeze on your bank account.`
-      },
-      {
-        id: "how-to-stay-safe",
-        title: "2. The CryptoBazaar Shield",
-        content: `We enforce 4 golden rules to make trading as safe as humanly possible:
-
-1. **Gated Access**: Absolutely no unverified users. Everyone passes Aadhaar liveness checks.
-2. **Bank Account Matching**: You must only send and receive funds using a bank account where the name EXACTLY matches your verified PAN and Clerk profile. Third-party payments are strictly blocked.
-3. **ML Risk Profiling**: We analyze statement uploads to screen out 'mule accounts'—dormant accounts that suddenly receive large crypto-related deposits.
-4. **On-chain Wallet Screening**: We screen connected Web3 wallets using Nominis to ensure they have no history with crypto mixers or illicit addresses.`
-      }
-    ]
-  }
-];
+import { ARTICLES_CATEGORIES, Article, ArticleCategory } from "@/data/articlesData";
 
 export default function ArticlesPage() {
-  const [activeArticleId, setActiveArticleId] = useState<string>("how-p2p-works");
+  const [activeCategoryId, setActiveCategoryId] = useState<string>(ARTICLES_CATEGORIES[0].id);
+  const [activeArticleId, setActiveArticleId] = useState<string>(ARTICLES_CATEGORIES[0].articles[0].id);
   const [activeSectionId, setActiveSectionId] = useState<string>("");
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([ARTICLES_CATEGORIES[0].id]);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { isSignedIn, user } = useUser();
   const articleTopRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
 
-  const activeArticle = ARTICLES_DATA.find((a) => a.id === activeArticleId) || ARTICLES_DATA[0];
+  // Find the active article safely
+  let activeArticle = ARTICLES_CATEGORIES[0].articles[0];
+  for (const cat of ARTICLES_CATEGORIES) {
+    const found = cat.articles.find(a => a.id === activeArticleId);
+    if (found) {
+      activeArticle = found;
+      break;
+    }
+  }
 
   // Sync article selection from query parameter on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const topic = params.get("topic");
-      if (topic && ARTICLES_DATA.some((a) => a.id === topic)) {
-        setActiveArticleId(topic);
+      if (topic) {
+        for (const cat of ARTICLES_CATEGORIES) {
+          const found = cat.articles.find((a) => a.id === topic);
+          if (found) {
+            setActiveArticleId(topic);
+            if (!expandedCategories.includes(cat.id)) {
+              setExpandedCategories(prev => [...prev, cat.id]);
+            }
+            break;
+          }
+        }
       }
     }
   }, []);
 
   // Sync initial section ID and scroll to top when changing active article
   useEffect(() => {
-    if (activeArticle.sections.length > 0) {
+    if (activeArticle.sections && activeArticle.sections.length > 0) {
       setActiveSectionId(activeArticle.sections[0].id);
     } else {
       setActiveSectionId("");
@@ -1820,6 +88,25 @@ export default function ArticlesPage() {
         behavior: "smooth"
       });
     }
+  };
+
+  // Parse **bold** markers in content strings into <strong> elements
+  const renderFormattedText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={i} className="text-zinc-900 font-semibold">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
   return (
@@ -1877,62 +164,82 @@ export default function ArticlesPage() {
       <div className="max-w-[1280px] mx-auto flex min-h-[calc(100vh-64px)] relative">
         
         {/* Sidebar TOC - Desktop */}
-        <aside className="w-[300px] border-r border-zinc-200 p-8 shrink-0 hidden md:block sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
+        <aside className="w-[320px] border-r border-zinc-200 p-8 shrink-0 hidden md:block sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
           <div>
-            <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-4">
+            <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-6">
               Documentation Hub
             </h3>
-            <nav className="flex flex-col gap-1">
-              {ARTICLES_DATA.map((article) => (
-                <div key={article.id}>
+            <nav className="flex flex-col gap-4">
+              {ARTICLES_CATEGORIES.map((category) => (
+                <div key={category.id} className="flex flex-col gap-1">
                   <button
-                    onClick={() => setActiveArticleId(article.id)}
-                    className={`flex flex-col w-full p-3 rounded-xl font-sans text-left transition-all duration-200 border ${
-                      activeArticleId === article.id
-                        ? "bg-zinc-100 border-zinc-300 text-black shadow-sm"
-                        : "bg-transparent border-transparent text-zinc-500 hover:text-black hover:bg-zinc-50"
-                    }`}
+                    onClick={() => toggleCategory(category.id)}
+                    className="flex items-center justify-between w-full text-left font-condensed text-base tracking-[0.5px] font-bold text-black py-1 hover:text-lime-dark transition-colors"
                   >
-                    <div className="min-w-0">
-                      <p className="font-condensed text-base tracking-[0.5px] leading-tight font-bold">
-                        {article.title}
-                      </p>
-                      <p className="text-[0.7rem] text-zinc-400 truncate mt-0.5 font-sans">
-                        {article.shortDesc}
-                      </p>
-                    </div>
+                    {category.title}
+                    <span className="text-zinc-400 text-xs font-sans">
+                      {expandedCategories.includes(category.id) ? "−" : "+"}
+                    </span>
                   </button>
 
-                  {/* On This Page — inline below the active article */}
                   <AnimatePresence initial={false}>
-                    {activeArticleId === article.id && article.sections.length > 0 && (
+                    {expandedCategories.includes(category.id) && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden"
+                        className="overflow-hidden flex flex-col gap-1 mt-1"
                       >
-                        <div className="pt-2 pb-3 pl-4 pr-1">
-                          <p className="font-condensed text-[0.65rem] tracking-[3px] uppercase text-zinc-400 mb-2 pl-3">
-                            On This Page
-                          </p>
-                          <nav className="flex flex-col gap-0.5">
-                            {article.sections.map((sec) => (
-                              <button
-                                key={sec.id}
-                                onClick={() => scrollToSection(sec.id)}
-                                className={`font-sans text-[0.7rem] text-left leading-relaxed py-1 px-3 border-l-2 transition-all duration-150 ${
-                                  activeSectionId === sec.id
-                                    ? "border-black text-black font-bold bg-zinc-50 rounded-r-lg"
-                                    : "border-transparent text-zinc-400 hover:text-zinc-900 hover:border-zinc-200"
-                                }`}
-                              >
-                                {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
-                              </button>
-                            ))}
-                          </nav>
-                        </div>
+                        {category.articles.map((article) => (
+                          <div key={article.id}>
+                            <button
+                              onClick={() => setActiveArticleId(article.id)}
+                              className={`flex flex-col w-full p-2.5 rounded-lg font-sans text-left transition-all duration-200 border ${
+                                activeArticleId === article.id
+                                  ? "bg-zinc-100 border-zinc-300 text-black shadow-sm"
+                                  : "bg-transparent border-transparent text-zinc-500 hover:text-black hover:bg-zinc-50"
+                              }`}
+                            >
+                              <div className="min-w-0">
+                                <p className="font-condensed text-[0.9rem] tracking-[0.3px] leading-tight font-medium">
+                                  {article.title}
+                                </p>
+                              </div>
+                            </button>
+
+                            {/* On This Page — inline below the active article */}
+                            <AnimatePresence initial={false}>
+                              {activeArticleId === article.id && article.sections && article.sections.length > 0 && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="pt-1 pb-2 pl-4 pr-1">
+                                    <nav className="flex flex-col gap-0.5 border-l border-zinc-200 ml-1 pl-2">
+                                      {article.sections.map((sec) => (
+                                        <button
+                                          key={sec.id}
+                                          onClick={() => scrollToSection(sec.id)}
+                                          className={`font-sans text-[0.7rem] text-left leading-relaxed py-1 px-2 transition-all duration-150 rounded-r-md ${
+                                            activeSectionId === sec.id
+                                              ? "text-black font-bold bg-zinc-50"
+                                              : "text-zinc-400 hover:text-zinc-900"
+                                          }`}
+                                        >
+                                          {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
+                                        </button>
+                                      ))}
+                                    </nav>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ))}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -1951,53 +258,82 @@ export default function ArticlesPage() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-40 bg-white/95 backdrop-blur-md md:hidden pt-20 px-6 overflow-y-auto"
             >
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-8 pb-10">
                 <div>
-                  <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-3">
-                    Select Resource
+                  <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-6">
+                    Documentation Hub
                   </h3>
-                  <div className="grid gap-2">
-                    {ARTICLES_DATA.map((article) => (
-                      <div key={article.id}>
+                  <div className="flex flex-col gap-4">
+                    {ARTICLES_CATEGORIES.map((category) => (
+                      <div key={category.id} className="flex flex-col gap-1">
                         <button
-                          onClick={() => {
-                            setActiveArticleId(article.id);
-                          }}
-                          className={`flex flex-col w-full p-4 rounded-xl border font-sans text-left transition-all ${
-                            activeArticleId === article.id
-                              ? "bg-zinc-100 border-zinc-300 text-black"
-                              : "bg-zinc-50 border-zinc-200 text-zinc-600"
-                          }`}
+                          onClick={() => toggleCategory(category.id)}
+                          className="flex items-center justify-between w-full text-left font-condensed text-base tracking-[0.5px] font-bold text-black py-2 border-b border-zinc-200"
                         >
-                          <div>
-                            <p className="font-condensed text-base tracking-[0.5px] font-bold">{article.title}</p>
-                            <p className="text-xs text-zinc-400 font-sans mt-0.5">{article.shortDesc}</p>
-                          </div>
+                          {category.title}
+                          <span className="text-zinc-400 text-xs font-sans">
+                            {expandedCategories.includes(category.id) ? "−" : "+"}
+                          </span>
                         </button>
 
-                        {/* Inline sections below active article */}
-                        {activeArticleId === article.id && article.sections.length > 0 && (
-                          <div className="pt-2 pb-2 pl-4 pr-1">
-                            <p className="font-condensed text-[0.65rem] tracking-[3px] uppercase text-zinc-400 mb-2 pl-3">
-                              On This Page
-                            </p>
-                            <div className="flex flex-col gap-1">
-                              {article.sections.map((sec) => (
-                                <button
-                                  key={sec.id}
-                                  onClick={() => scrollToSection(sec.id)}
-                                  className={`font-sans text-sm text-left py-2 px-3 border-l-2 transition-all ${
-                                    activeSectionId === sec.id
-                                      ? "border-black text-black font-bold bg-zinc-50"
-                                      : "border-transparent text-zinc-500"
-                                  }`}
-                                >
-                                  {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
-                                </button>
+                        <AnimatePresence initial={false}>
+                          {expandedCategories.includes(category.id) && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden flex flex-col gap-2 mt-2"
+                            >
+                              {category.articles.map((article) => (
+                                <div key={article.id}>
+                                  <button
+                                    onClick={() => setActiveArticleId(article.id)}
+                                    className={`flex flex-col w-full p-4 rounded-xl border font-sans text-left transition-all ${
+                                      activeArticleId === article.id
+                                        ? "bg-zinc-100 border-zinc-300 text-black"
+                                        : "bg-zinc-50 border-zinc-200 text-zinc-600"
+                                    }`}
+                                  >
+                                    <div className="min-w-0">
+                                      <p className="font-condensed text-[0.95rem] tracking-[0.5px] font-bold">{article.title}</p>
+                                    </div>
+                                  </button>
+
+                                  {/* Inline sections below active article */}
+                                  <AnimatePresence initial={false}>
+                                    {activeArticleId === article.id && article.sections && article.sections.length > 0 && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                                      >
+                                        <div className="pt-3 pb-2 pl-4 pr-1">
+                                          <div className="flex flex-col gap-1 border-l border-zinc-200 pl-3">
+                                            {article.sections.map((sec) => (
+                                              <button
+                                                key={sec.id}
+                                                onClick={() => scrollToSection(sec.id)}
+                                                className={`font-sans text-sm text-left py-1.5 px-3 transition-all rounded-r-lg ${
+                                                  activeSectionId === sec.id
+                                                    ? "text-black font-bold bg-zinc-50"
+                                                    : "text-zinc-500 hover:text-black"
+                                                }`}
+                                              >
+                                                {sec.title.replace(/^\d+(\.\d+)?\s/, "")}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
                               ))}
-                            </div>
-                          </div>
-                        )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ))}
                   </div>
@@ -2027,23 +363,16 @@ export default function ArticlesPage() {
             <h1 className="font-condensed text-[clamp(2.5rem,5vw,4.5rem)] leading-none tracking-[1px] text-black uppercase">
               {activeArticle.title}
             </h1>
-            <p className="font-sans text-sm md:text-base text-zinc-500 mt-4 leading-relaxed max-w-[680px]">
-              {activeArticle.shortDesc}
-            </p>
-          </div>
-
-          {/* Member Protection Fund disclaimer notice */}
-          {activeArticleId === "terms" && (
-            <div className="relative overflow-hidden bg-[#fffbeb] border-[1.5px] border-[#fde68a] rounded-2xl p-6 mb-12 shadow-[0_4px_30px_rgba(245,158,11,0.02)]">
-              <p className="font-sans text-[0.88rem] text-[#92400e] leading-[1.8] relative z-10">
-                <strong>Important Notice:</strong> The Member Protection Fund described in Section 8 is a <strong>contractual service remedy</strong> for CryptoBazaar&apos;s screening failures - it is <strong>not an insurance product</strong> and is not regulated as such. Disbursements require proof that the freeze was caused by a failure in our vetting process (Section 8.4(e)), not merely that a freeze occurred. Payouts are discretionary and subject to fund availability. Please read Section 8 carefully.
+            {activeArticle.shortDesc && (
+              <p className="font-sans text-sm md:text-base text-zinc-500 mt-4 leading-relaxed max-w-[680px]">
+                {activeArticle.shortDesc}
               </p>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Article Content Render */}
           <div className="space-y-12">
-            {activeArticle.sections.map((section, idx) => (
+            {activeArticle.sections && activeArticle.sections.map((section, idx) => (
               <section
                 key={section.id}
                 id={section.id}
@@ -2058,7 +387,7 @@ export default function ArticlesPage() {
                 <div className="space-y-4 font-sans text-[0.92rem] text-zinc-600 leading-[1.85]">
                   {section.content.split("\n\n").map((para, pIdx) => (
                     <p key={pIdx} className="whitespace-pre-line">
-                      {para}
+                      {renderFormattedText(para)}
                     </p>
                   ))}
                 </div>
