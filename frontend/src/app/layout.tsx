@@ -57,6 +57,8 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <head>
+          <link rel="icon" href="/icon.png" media="(prefers-color-scheme: light)" />
+          <link rel="icon" href="/icon2.png" media="(prefers-color-scheme: dark)" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital@1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
