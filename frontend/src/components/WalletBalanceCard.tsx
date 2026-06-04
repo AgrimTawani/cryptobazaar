@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useActiveWalletChain } from "thirdweb/react";
 
 const CHAIN_META: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   POLYGON: { label: "Polygon",      color: "#7b3fe4", bg: "#f5f0ff", border: "#c4b5fd", icon: "⬡" },
@@ -11,13 +10,29 @@ const CHAIN_META: Record<string, { label: string; color: string; bg: string; bor
   BSC:     { label: "BNB Chain",    color: "#b45309", bg: "#fffbeb", border: "#fcd34d", icon: "⬡" },
 };
 
-// ThirdWeb chain ID → our chain key
 const CHAIN_ID_TO_KEY: Record<number, "POLYGON" | "BSC"> = {
   137: "POLYGON",
-  80002: "POLYGON", // Amoy testnet
+  80002: "POLYGON",
   56: "BSC",
-  97: "BSC",        // BSC testnet
+  97: "BSC",
 };
+
+function useMetaMaskChainKey(): "POLYGON" | "BSC" {
+  const [chainId, setChainId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const eth = (window as unknown as { ethereum?: { request: (a: { method: string }) => Promise<string>; on: (e: string, h: (id: string) => void) => void; removeListener: (e: string, h: (id: string) => void) => void } }).ethereum;
+    if (!eth) return;
+
+    eth.request({ method: "eth_chainId" }).then((hex) => setChainId(parseInt(hex, 16)));
+
+    const handler = (hex: string) => setChainId(parseInt(hex, 16));
+    eth.on("chainChanged", handler);
+    return () => eth.removeListener("chainChanged", handler);
+  }, []);
+
+  return CHAIN_ID_TO_KEY[chainId ?? 0] ?? "POLYGON";
+}
 
 const EVM_TOKENS = ["USDT", "USDC"] as const;
 type TokenPref = typeof EVM_TOKENS[number];
@@ -38,11 +53,9 @@ interface Props {
 
 export function WalletBalanceCard({ walletAddress }: Props) {
   const router = useRouter();
-  const activeWalletChain = useActiveWalletChain();
+  const evmChainKey = useMetaMaskChainKey();
 
   const addressType = detectAddressType(walletAddress);
-  const evmChainKey: "POLYGON" | "BSC" =
-    CHAIN_ID_TO_KEY[activeWalletChain?.id ?? 0] ?? "POLYGON";
   const chainKey =
     addressType === "EVM" ? evmChainKey :
     addressType === "TRON" ? "TRON" : "SOLANA";
