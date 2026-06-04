@@ -699,13 +699,15 @@ export default function Home() {
             {/* Legal links */}
             <div>
               <p className="font-sans text-[0.65rem] text-white/25 tracking-[2px] uppercase mb-4">Legal</p>
-              <Link href="/terms" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
+              <Link href="/articles?topic=terms" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
                 Terms of Use
               </Link>
-              <button onClick={() => scrollTo("terms")} className="block font-sans text-[0.82rem] text-white/[0.45] bg-transparent border-0 cursor-pointer mb-[10px] p-0 text-left">
-                Key Points
-              </button>
-              <p className="font-sans text-[0.82rem] text-white/25 mb-[10px]">Privacy Policy</p>
+              <Link href="/articles?topic=privacy" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
+                Privacy Policy
+              </Link>
+              <Link href="/articles?topic=mpf-guide" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
+                Member Protection Fund
+              </Link>
             </div>
 
             {/* Contact */}

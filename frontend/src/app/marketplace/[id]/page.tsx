@@ -1007,7 +1007,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     />
                     <span className="font-sans text-sm text-[#555] leading-relaxed">
                       I have read and agree to the{" "}
-                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-black underline font-semibold">
+                      <a href="/articles" target="_blank" rel="noopener noreferrer" className="text-black underline font-semibold">
                         Terms of Use
                       </a>
                       . I understand I must send ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")} within 30 minutes of locking or the order will expire.
