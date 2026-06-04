@@ -142,6 +142,9 @@ export async function PATCH(
         const orderAmount = parseFloat(order.amount.toString());
         const minTrade = order.minTradeSize ? parseFloat(order.minTradeSize.toString()) : orderAmount;
         const rawBuyAmount = body.buyAmount ? parseFloat(body.buyAmount) : null;
+        if (rawBuyAmount !== null && (isNaN(rawBuyAmount) || rawBuyAmount <= 0)) {
+          return NextResponse.json({ error: "Invalid buyAmount" }, { status: 400 });
+        }
         const buyAmount = rawBuyAmount ?? orderAmount;
 
         if (!order.partialAllowed && Math.abs(buyAmount - orderAmount) > 0.000001) {
@@ -170,7 +173,11 @@ export async function PATCH(
           },
         });
 
-        const room = await db.chatRoom.create({ data: { orderId: id } });
+        const room = await db.chatRoom.upsert({
+          where:  { orderId: id },
+          update: { isActive: true, closedAt: null },
+          create: { orderId: id },
+        });
         await db.chatMessage.create({
           data: {
             chatRoomId: room.id,
@@ -242,6 +249,9 @@ export async function PATCH(
             sellerConfirmedAt: confirmedAt,
             completedAt: fullyFilled ? confirmedAt : null,
             sellerConfirmTimeSecs,
+            totalValueInr: fullyFilled
+              ? order.totalValueInr
+              : remaining * parseFloat(order.pricePerUnit.toString()),
             ...(fullyFilled ? {} : {
               buyerMatchedAt: null,
               paymentWindowExpiresAt: null,
@@ -250,6 +260,13 @@ export async function PATCH(
             }),
           },
         });
+
+        if (!fullyFilled) {
+          await db.chatRoom.update({
+            where: { orderId: id },
+            data:  { isActive: false, closedAt: confirmedAt },
+          });
+        }
 
         const roomConfirm = await db.chatRoom.findUnique({ where: { orderId: id } });
         if (roomConfirm) {
