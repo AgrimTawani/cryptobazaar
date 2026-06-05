@@ -243,11 +243,10 @@ export default function Home() {
       />
       {/* ── NAV ── */}
       <nav
-        className={`fixed z-[101] inset-x-0 mx-auto flex items-center justify-between h-[64px] transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-          scrolled || mobileMenuOpen
-            ? "top-4 w-[calc(100%-32px)] max-w-[960px] rounded-full px-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10"
-            : "top-0 w-full max-w-[100vw] rounded-[0px] px-5 md:px-10 border-transparent shadow-none"
-        }`}
+        className={`fixed z-[101] inset-x-0 mx-auto flex items-center justify-between h-[64px] transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${scrolled || mobileMenuOpen
+          ? "top-4 w-[calc(100%-32px)] max-w-[960px] rounded-full px-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10"
+          : "top-0 w-full max-w-[100vw] rounded-[0px] px-5 md:px-10 border-transparent shadow-none"
+          }`}
         style={{
           background: scrolled || mobileMenuOpen ? "rgba(255, 255, 255, 0.75)" : "rgba(255, 255, 255, 0)",
           backdropFilter: scrolled || mobileMenuOpen ? "saturate(180%) blur(20px)" : "saturate(100%) blur(0px)",
@@ -492,7 +491,7 @@ export default function Home() {
               </p>
               <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px]">
                 TRADE P2P.<br />
-                <em className="not-italic text-lime">the</em>{" "}RIGHT WAY.
+                THE <em className="font-playfair italic lowercase">right</em> WAY.
               </h2>
             </div>
             <p className="font-sans text-base text-white/50 leading-[1.7] md:max-w-[380px] md:self-end">
@@ -577,9 +576,8 @@ export default function Home() {
                       {faq.q}
                     </span>
                     <span
-                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${
-                        openFaq === i ? "bg-lime text-black" : "bg-[#f0f0f0] text-black"
-                      }`}
+                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${openFaq === i ? "bg-lime text-black" : "bg-[#f0f0f0] text-black"
+                        }`}
                     >
                       {openFaq === i ? "−" : "+"}
                     </span>
@@ -614,7 +612,7 @@ export default function Home() {
             Terms of Use
           </p>
           <h2 className="font-condensed text-[clamp(2.4rem,5vw,4rem)] text-black leading-none tracking-[1px] mb-4">
-            THE KEY POINTS.
+            THE KEY <em className="font-playfair italic lowercase">points</em>.
           </h2>
           <p className="font-sans text-[0.9rem] text-[#888] mb-10 leading-[1.6]">
             Here are the things that matter most. Read the full terms before trading.
