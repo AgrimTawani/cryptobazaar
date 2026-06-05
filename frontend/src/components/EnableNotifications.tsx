@@ -10,7 +10,6 @@ export function EnableNotifications({ variant = "banner" }: Props) {
   const [permission, setPermission] = useState<NotificationPermission | null>(null);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [showSteps, setShowSteps] = useState(false);
 
   useEffect(() => {
     if (typeof Notification === "undefined") return;
@@ -83,74 +82,36 @@ export function EnableNotifications({ variant = "banner" }: Props) {
 
   if (variant === "inline") {
     return (
-      <div className="flex flex-col items-end gap-1">
-        <button
-          onClick={permission === "denied" ? () => setShowSteps((s) => !s) : enable}
-          disabled={loading}
-          className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#111] transition-colors disabled:opacity-50"
-        >
-          <span className="text-base">{permission === "denied" ? "🔕" : "🔔"}</span>
-          <span>{permission === "denied" ? "Blocked — how to fix →" : loading ? "Enabling…" : "Enable alerts"}</span>
-        </button>
-        {showSteps && permission === "denied" && (
-          <div className="bg-white border border-[#e5e5e5] rounded-xl px-4 py-3 text-xs text-[#444] space-y-1 shadow-sm w-64">
-            <p className="font-semibold text-[#111] mb-2">How to unblock notifications:</p>
-            <p>1. Click the 🔒 lock icon in the address bar</p>
-            <p>2. Find <strong>Notifications</strong> → set to <strong>Allow</strong></p>
-            <p>3. Refresh the page</p>
-          </div>
-        )}
-      </div>
+      <button
+        onClick={enable}
+        disabled={loading}
+        className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#111] transition-colors disabled:opacity-50"
+      >
+        <span className="text-base">🔔</span>
+        <span>{loading ? "Enabling…" : "Enable alerts"}</span>
+      </button>
     );
   }
 
   return (
-    <div className="bg-[#fffbe6] border border-[#f5d000] rounded-xl px-4 py-3">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">🔔</span>
-          <div>
-            {permission === "denied" ? (
-              <>
-                <p className="text-sm font-semibold text-[#111]">Notifications blocked</p>
-                <p className="text-xs text-[#666]">Enable in your browser settings to get trade alerts</p>
-              </>
-            ) : (
-              <>
-                <p className="text-sm font-semibold text-[#111]">Enable trade notifications</p>
-                <p className="text-xs text-[#666]">Get instant alerts when buyers lock your order or payments are submitted</p>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {permission === "denied" ? (
-            <button
-              onClick={() => setShowSteps((s) => !s)}
-              className="bg-[#111] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#333] transition-colors"
-            >
-              How to enable →
-            </button>
-          ) : (
-            <button
-              onClick={enable}
-              disabled={loading}
-              className="bg-[#111] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#333] transition-colors disabled:opacity-50"
-            >
-              {loading ? "Enabling…" : "Enable"}
-            </button>
-          )}
-          <button onClick={() => setDismissed(true)} className="text-[#aaa] hover:text-[#666] text-lg leading-none" aria-label="Dismiss">×</button>
+    <div className="flex items-center justify-between gap-4 bg-[#fffbe6] border border-[#f5d000] rounded-xl px-4 py-3">
+      <div className="flex items-center gap-3">
+        <span className="text-xl">🔔</span>
+        <div>
+          <p className="text-sm font-semibold text-[#111]">Enable trade notifications</p>
+          <p className="text-xs text-[#666]">Get instant alerts when buyers lock your order or payments are submitted</p>
         </div>
       </div>
-      {showSteps && permission === "denied" && (
-        <div className="mt-3 pt-3 border-t border-[#f5d000] text-xs text-[#555] space-y-1">
-          <p className="font-semibold text-[#111] mb-1.5">How to unblock in your browser:</p>
-          <p>1. Click the 🔒 lock icon in the address bar</p>
-          <p>2. Find <strong>Notifications</strong> → change to <strong>Allow</strong></p>
-          <p>3. Refresh the page — notifications will activate automatically</p>
-        </div>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={enable}
+          disabled={loading}
+          className="bg-[#111] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#333] transition-colors disabled:opacity-50"
+        >
+          {loading ? "Enabling…" : "Enable"}
+        </button>
+        <button onClick={() => setDismissed(true)} className="text-[#aaa] hover:text-[#666] text-lg leading-none" aria-label="Dismiss">×</button>
+      </div>
     </div>
   );
 }
