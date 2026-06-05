@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ARTICLES_CATEGORIES } from "@/data/articlesData";
+import { MoveToTopButton } from "@/components/MoveToTopButton";
 
 export const metadata: Metadata = {
   title: "Knowledge Base | CryptoBazaar",
@@ -153,6 +154,7 @@ export default function ArticlesIndexPage() {
           </a>
         </div>
       </div>
+      <MoveToTopButton />
     </div>
   );
 }

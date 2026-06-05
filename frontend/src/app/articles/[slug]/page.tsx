@@ -9,6 +9,7 @@ import {
 } from "@/data/articlesData";
 import { ArticleSidebar } from "@/components/ArticleSidebar";
 import { ArticleHeader } from "@/components/ArticleHeader";
+import { MoveToTopButton } from "@/components/MoveToTopButton";
 
 // ── Static params for all articles ──
 export function generateStaticParams() {
@@ -229,6 +230,7 @@ export default async function ArticlePage({
           </div>
         </main>
       </div>
+      <MoveToTopButton />
     </div>
   );
 }

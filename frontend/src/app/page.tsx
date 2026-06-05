@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { MoveToTopButton } from "@/components/MoveToTopButton";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
@@ -151,7 +152,6 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const { isSignedIn, user } = useUser();
 
   useEffect(() => {
@@ -195,20 +195,11 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [currentWord, isDeleting, loopNum]);
 
-  // Navbar and Scroll-Top handlers
+  // Navbar handlers
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 20);
-
-      const howSection = document.getElementById("how");
-      if (howSection) {
-        const rect = howSection.getBoundingClientRect();
-        // Only visible when scrolled past hero and "how" section is on-screen
-        setShowScrollTop(y > 100 && rect.top <= window.innerHeight - 100);
-      } else {
-        setShowScrollTop(y > 500);
-      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -747,22 +738,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ clipPath: "inset(0% 50% 0% 50%)", opacity: 0 }}
-            animate={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }}
-            exit={{ clipPath: "inset(0% 50% 0% 50%)", opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-6 right-6 z-[99] flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-black border border-lime text-lime font-condensed text-[1.15rem] tracking-wider uppercase transition-all duration-300 hover:bg-lime hover:text-black hover:shadow-[0_8px_24px_rgba(212,255,0,0.35)] active:scale-95"
-            aria-label="Scroll to top"
-          >
-            <span className="font-sans font-black text-[1.15rem]">⬆</span>
-            <span>MOVE TO TOP</span>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      <MoveToTopButton />
     </div>
   );
 }
