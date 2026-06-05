@@ -471,35 +471,30 @@ model BankStatementAnalysis {
   id        String   @id @default(uuid())
   userId    Int      @unique @map("user_id")
 
-  // Status
-  status          String   // e.g., COMPLETED, LOCKED_PDF, EXTRACTION_FAILED
-  errorMessage    String?
+  status          String
+  errorMessage    String?  @map("error_message")
 
-  // A-Checks: Income & Spend
-  hasRegularIncome       Boolean? // A2
-  recurringBillCount     Int?     // A3
-  transactionModes       String[] // A4: e.g., ["UPI", "NEFT", "IMPS"]
-  hasMerchantSpend       Boolean? // A5
+  hasRegularIncome       Boolean? @map("has_regular_income")
+  recurringBillCount     Int?     @map("recurring_bill_count")
+  transactionModes       String[] @map("transaction_modes")
+  hasMerchantSpend       Boolean? @map("has_merchant_spend")
 
-  // B-Checks: Trading Behavior
-  exchangeTxCount        Int?     // B1
-  monthsWithCryptoTrades Int?     // B2
-  hasBidirectionalCrypto Boolean? // B3
-  maxVolumeSpikeRatio    Float?   // B4
+  exchangeTxCount        Int?     @map("exchange_tx_count")
+  monthsWithCryptoTrades Int?     @map("months_with_crypto_trades")
+  hasBidirectionalCrypto Boolean? @map("has_bidirectional_crypto")
+  maxVolumeSpikeRatio    Float?   @map("max_volume_spike_ratio")
 
-  // C-Checks: Mule/Inflow Pattern
-  avgUniqueSendersPerMonth Float? // C1
-  senderRecurrenceRate     Float? // C2
-  avgCreditToDebitHours    Float? // C3
-  roundNumberRatio         Float? // C4
-  structuringClustersCount Int?   // C5
-  inflowSpikeRatio         Float? // C6
+  avgUniqueSendersPerMonth Float?  @map("avg_unique_senders_per_month")
+  senderRecurrenceRate     Float?  @map("sender_recurrence_rate")
+  avgCreditToDebitHours    Float?  @map("avg_credit_to_debit_hours")
+  roundNumberRatio         Float?  @map("round_number_ratio")
+  structuringClustersCount Int?    @map("structuring_clusters_count")
+  inflowSpikeRatio         Float?  @map("inflow_spike_ratio")
 
-  // D-Checks: Financial Stability
-  avgMonthlyBalance      Decimal? @db.Decimal(15, 2) // D1
-  balanceDropsToZero     Int?     // D2
-  returnedPaymentsCount  Int?     // D3
-  positiveNetFlowMonths  Int?     // D4
+  avgMonthlyBalance     Decimal? @map("avg_monthly_balance") @db.Decimal(15, 2)
+  balanceDropsToZero    Int?     @map("balance_drops_to_zero")
+  returnedPaymentsCount Int?     @map("returned_payments_count")
+  positiveNetFlowMonths Int?     @map("positive_net_flow_months")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

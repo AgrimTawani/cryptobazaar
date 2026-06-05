@@ -17,13 +17,13 @@ CREATE TYPE "SubscriptionStatus" AS ENUM ('ACTIVE', 'EXPIRED', 'CANCELLED');
 CREATE TYPE "Asset" AS ENUM ('USDT', 'USDC');
 
 -- CreateEnum
-CREATE TYPE "Chain" AS ENUM ('POLYGON', 'SOLANA', 'TRON');
+CREATE TYPE "Chain" AS ENUM ('POLYGON', 'SOLANA', 'TRON', 'BSC');
 
 -- CreateEnum
 CREATE TYPE "PaymentMethod" AS ENUM ('UPI', 'IMPS', 'NEFT');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('LISTED', 'MATCHED', 'ESCROW_PENDING', 'ESCROW_FUNDED', 'BUYER_PAID', 'COMPLETED', 'DISPUTED', 'DISPUTE_RESOLVED_BUYER', 'DISPUTE_RESOLVED_SELLER', 'EXPIRED', 'CANCELLED');
+CREATE TYPE "OrderStatus" AS ENUM ('LISTED', 'BUYER_MATCHED', 'BUYER_PAID', 'COMPLETED', 'DISPUTED', 'DISPUTE_RESOLVED_BUYER', 'DISPUTE_RESOLVED_SELLER', 'EXPIRED', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "DisputeStatus" AS ENUM ('OPEN', 'EVIDENCE_SUBMITTED', 'UNDER_REVIEW', 'RESOLVED_BUYER', 'RESOLVED_SELLER');
@@ -37,9 +37,12 @@ CREATE TYPE "ClaimStatus" AS ENUM ('SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'REJ
 -- CreateEnum
 CREATE TYPE "RiskLevel" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'BLOCKED');
 
+-- CreateEnum
+CREATE TYPE "MessageType" AS ENUM ('TEXT', 'IMAGE', 'SYSTEM');
+
 -- CreateTable
 CREATE TABLE "users" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "clerk_id" TEXT NOT NULL,
     "status" "UserStatus" NOT NULL DEFAULT 'LOGIN_DONE',
     "email" TEXT,
@@ -55,13 +58,10 @@ CREATE TABLE "users" (
     "state" TEXT,
     "pincode" TEXT,
     "kyc_session_id" TEXT,
-    "kyc_provider" TEXT DEFAULT 'didit',
     "kyc_verified_at" TIMESTAMP(3),
-    "kyc_expires_at" TIMESTAMP(3),
-    "did" TEXT,
-    "kyc_credential_id" TEXT,
-    "edd_credential_id" TEXT,
-    "interview_cred_id" TEXT,
+    "upi_id" TEXT,
+    "bank_account" TEXT,
+    "ifsc_code" TEXT,
     "wallet_address" TEXT,
     "wallet_chain" TEXT,
     "wallet_verified_at" TIMESTAMP(3),
@@ -69,8 +69,23 @@ CREATE TABLE "users" (
     "subscription_expires_at" TIMESTAMP(3),
     "monthly_trade_volume_inr" DECIMAL(20,2) NOT NULL DEFAULT 0,
     "total_trade_volume_inr" DECIMAL(20,2) NOT NULL DEFAULT 0,
-    "trade_count" INTEGER NOT NULL DEFAULT 0,
+    "total_trade_count" INTEGER NOT NULL DEFAULT 0,
+    "weekly_trade_count" INTEGER NOT NULL DEFAULT 0,
+    "monthly_trade_count" INTEGER NOT NULL DEFAULT 0,
     "volume_reset_at" TIMESTAMP(3),
+    "weekly_reset_at" TIMESTAMP(3),
+    "avg_buyer_rating" DECIMAL(3,2),
+    "avg_buyer_speed_rating" DECIMAL(3,2),
+    "avg_buyer_politeness" DECIMAL(3,2),
+    "buyer_rating_count" INTEGER NOT NULL DEFAULT 0,
+    "avg_buyer_payment_time_secs" INTEGER,
+    "avg_seller_rating" DECIMAL(3,2),
+    "avg_seller_speed_rating" DECIMAL(3,2),
+    "avg_seller_politeness" DECIMAL(3,2),
+    "seller_rating_count" INTEGER NOT NULL DEFAULT 0,
+    "avg_seller_confirm_time_secs" INTEGER,
+    "disputes_raised_count" INTEGER NOT NULL DEFAULT 0,
+    "disputes_lost_count" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -78,9 +93,20 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "onboarding_records" (
+CREATE TABLE "push_subscriptions" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "endpoint" TEXT NOT NULL,
+    "p256dh" TEXT NOT NULL,
+    "auth" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "onboarding_records" (
+    "user_id" INTEGER NOT NULL,
     "layer" "OnboardingLayer" NOT NULL,
     "status" "OnboardingLayerStatus" NOT NULL DEFAULT 'PENDING',
     "attempt_number" INTEGER NOT NULL DEFAULT 1,
@@ -94,13 +120,13 @@ CREATE TABLE "onboarding_records" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "onboarding_records_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "onboarding_records_pkey" PRIMARY KEY ("user_id","layer")
 );
 
 -- CreateTable
 CREATE TABLE "wallet_screens" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "wallet_address" TEXT NOT NULL,
     "provider" TEXT NOT NULL DEFAULT 'nominis',
     "risk_score" DOUBLE PRECISION,
@@ -116,7 +142,7 @@ CREATE TABLE "wallet_screens" (
 -- CreateTable
 CREATE TABLE "subscriptions" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "tier" "SubscriptionTier" NOT NULL,
     "status" "SubscriptionStatus" NOT NULL DEFAULT 'ACTIVE',
     "amount_paid" DECIMAL(10,2) NOT NULL,
@@ -134,8 +160,8 @@ CREATE TABLE "subscriptions" (
 CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
-    "seller_id" TEXT NOT NULL,
-    "buyer_id" TEXT,
+    "seller_id" INTEGER NOT NULL,
+    "buyer_id" INTEGER,
     "asset" "Asset" NOT NULL,
     "chain" "Chain" NOT NULL,
     "amount" DECIMAL(20,8) NOT NULL,
@@ -143,6 +169,9 @@ CREATE TABLE "orders" (
     "total_value_inr" DECIMAL(20,2) NOT NULL,
     "min_trade_size" DECIMAL(20,2),
     "max_trade_size" DECIMAL(20,2),
+    "partial_allowed" BOOLEAN NOT NULL DEFAULT false,
+    "original_amount" DECIMAL(20,8) NOT NULL DEFAULT 0,
+    "locked_amount" DECIMAL(20,8),
     "accepted_payment_methods" "PaymentMethod"[],
     "seller_upi_id" TEXT,
     "seller_bank_account" TEXT,
@@ -155,6 +184,9 @@ CREATE TABLE "orders" (
     "utr" TEXT,
     "payment_method" "PaymentMethod",
     "payment_screenshot_ipfs" TEXT,
+    "buyer_payment_time_secs" INTEGER,
+    "seller_confirm_time_secs" INTEGER,
+    "buyer_matched_at" TIMESTAMP(3),
     "payment_window_expires_at" TIMESTAMP(3),
     "payment_submitted_at" TIMESTAMP(3),
     "confirmation_window_expires_at" TIMESTAMP(3),
@@ -168,10 +200,50 @@ CREATE TABLE "orders" (
 );
 
 -- CreateTable
+CREATE TABLE "chat_rooms" (
+    "id" TEXT NOT NULL,
+    "order_id" TEXT NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "closed_at" TIMESTAMP(3),
+
+    CONSTRAINT "chat_rooms_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chat_messages" (
+    "id" TEXT NOT NULL,
+    "chat_room_id" TEXT NOT NULL,
+    "sender_id" INTEGER,
+    "type" "MessageType" NOT NULL DEFAULT 'TEXT',
+    "content" TEXT NOT NULL,
+    "is_read" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "chat_messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "trade_ratings" (
+    "id" TEXT NOT NULL,
+    "order_id" TEXT NOT NULL,
+    "rater_id" INTEGER NOT NULL,
+    "rated_user_id" INTEGER NOT NULL,
+    "rater_role" TEXT NOT NULL,
+    "speed_rating" INTEGER NOT NULL,
+    "politeness_rating" INTEGER NOT NULL,
+    "overall_rating" INTEGER NOT NULL,
+    "comment" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "trade_ratings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "disputes" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
-    "raised_by_id" TEXT NOT NULL,
+    "raised_by_id" INTEGER NOT NULL,
     "raised_by_role" TEXT NOT NULL,
     "status" "DisputeStatus" NOT NULL DEFAULT 'OPEN',
     "evidence_deadline" TIMESTAMP(3),
@@ -195,7 +267,7 @@ CREATE TABLE "disputes" (
 -- CreateTable
 CREATE TABLE "protection_fund_claims" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "order_id" TEXT NOT NULL,
     "tier" "ClaimTier" NOT NULL,
     "status" "ClaimStatus" NOT NULL DEFAULT 'SUBMITTED',
@@ -217,6 +289,36 @@ CREATE TABLE "protection_fund_claims" (
     CONSTRAINT "protection_fund_claims_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "bank_statement_analyses" (
+    "id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "status" TEXT NOT NULL,
+    "error_message" TEXT,
+    "has_regular_income" BOOLEAN,
+    "recurring_bill_count" INTEGER,
+    "transaction_modes" TEXT[],
+    "has_merchant_spend" BOOLEAN,
+    "exchange_tx_count" INTEGER,
+    "months_with_crypto_trades" INTEGER,
+    "has_bidirectional_crypto" BOOLEAN,
+    "max_volume_spike_ratio" DOUBLE PRECISION,
+    "avg_unique_senders_per_month" DOUBLE PRECISION,
+    "sender_recurrence_rate" DOUBLE PRECISION,
+    "avg_credit_to_debit_hours" DOUBLE PRECISION,
+    "round_number_ratio" DOUBLE PRECISION,
+    "structuring_clusters_count" INTEGER,
+    "inflow_spike_ratio" DOUBLE PRECISION,
+    "avg_monthly_balance" DECIMAL(15,2),
+    "balance_drops_to_zero" INTEGER,
+    "returned_payments_count" INTEGER,
+    "positive_net_flow_months" INTEGER,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "bank_statement_analyses_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_clerk_id_key" ON "users"("clerk_id");
 
@@ -224,13 +326,10 @@ CREATE UNIQUE INDEX "users_clerk_id_key" ON "users"("clerk_id");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_did_key" ON "users"("did");
-
--- CreateIndex
 CREATE UNIQUE INDEX "users_wallet_address_key" ON "users"("wallet_address");
 
 -- CreateIndex
-CREATE INDEX "onboarding_records_user_id_idx" ON "onboarding_records"("user_id");
+CREATE UNIQUE INDEX "push_subscriptions_endpoint_key" ON "push_subscriptions"("endpoint");
 
 -- CreateIndex
 CREATE INDEX "wallet_screens_user_id_idx" ON "wallet_screens"("user_id");
@@ -254,10 +353,31 @@ CREATE INDEX "orders_status_idx" ON "orders"("status");
 CREATE INDEX "orders_created_at_idx" ON "orders"("created_at");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "chat_rooms_order_id_key" ON "chat_rooms"("order_id");
+
+-- CreateIndex
+CREATE INDEX "chat_messages_chat_room_id_idx" ON "chat_messages"("chat_room_id");
+
+-- CreateIndex
+CREATE INDEX "chat_messages_created_at_idx" ON "chat_messages"("created_at");
+
+-- CreateIndex
+CREATE INDEX "trade_ratings_rated_user_id_idx" ON "trade_ratings"("rated_user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "trade_ratings_order_id_rater_id_key" ON "trade_ratings"("order_id", "rater_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "disputes_order_id_key" ON "disputes"("order_id");
 
 -- CreateIndex
 CREATE INDEX "protection_fund_claims_user_id_idx" ON "protection_fund_claims"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "bank_statement_analyses_user_id_key" ON "bank_statement_analyses"("user_id");
+
+-- AddForeignKey
+ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "onboarding_records" ADD CONSTRAINT "onboarding_records_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -275,6 +395,24 @@ ALTER TABLE "orders" ADD CONSTRAINT "orders_seller_id_fkey" FOREIGN KEY ("seller
 ALTER TABLE "orders" ADD CONSTRAINT "orders_buyer_id_fkey" FOREIGN KEY ("buyer_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "chat_rooms" ADD CONSTRAINT "chat_rooms_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_chat_room_id_fkey" FOREIGN KEY ("chat_room_id") REFERENCES "chat_rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "trade_ratings" ADD CONSTRAINT "trade_ratings_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "trade_ratings" ADD CONSTRAINT "trade_ratings_rater_id_fkey" FOREIGN KEY ("rater_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "trade_ratings" ADD CONSTRAINT "trade_ratings_rated_user_id_fkey" FOREIGN KEY ("rated_user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "disputes" ADD CONSTRAINT "disputes_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -285,3 +423,7 @@ ALTER TABLE "protection_fund_claims" ADD CONSTRAINT "protection_fund_claims_user
 
 -- AddForeignKey
 ALTER TABLE "protection_fund_claims" ADD CONSTRAINT "protection_fund_claims_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "bank_statement_analyses" ADD CONSTRAINT "bank_statement_analyses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
