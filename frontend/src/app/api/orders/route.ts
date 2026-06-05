@@ -178,7 +178,7 @@ export async function POST(request: Request) {
     });
 
     if (user.email) {
-      notify({
+      await notify({
         push: {
           userId: user.id,
           title: "Listing is live!",

@@ -103,7 +103,7 @@ export async function POST(
     // Push-only notification to counterparty (no email for chat)
     const counterpartyId = ctx.isSeller ? ctx.order.buyerId : ctx.order.sellerId;
     if (counterpartyId) {
-      notify({
+      await notify({
         push: {
           userId: counterpartyId,
           title: ctx.user.name ?? "New message",
