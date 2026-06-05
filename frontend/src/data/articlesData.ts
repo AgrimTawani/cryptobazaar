@@ -1990,3 +1990,30 @@ export const ARTICLES_CATEGORIES: ArticleCategory[] = [
     ]
   }
 ];
+
+// ── HELPERS ──
+
+/** Look up an article by its ID (used as URL slug). Returns the article and its parent category. */
+export function getArticleBySlug(slug: string): { article: Article; category: ArticleCategory } | null {
+  for (const category of ARTICLES_CATEGORIES) {
+    const article = category.articles.find((a) => a.id === slug);
+    if (article) return { article, category };
+  }
+  return null;
+}
+
+/** Return every article slug — used by generateStaticParams. */
+export function getAllArticleSlugs(): string[] {
+  return ARTICLES_CATEGORIES.flatMap((cat) => cat.articles.map((a) => a.id));
+}
+
+/** Find previous and next articles across all categories for navigation. */
+export function getAdjacentArticles(slug: string): { prev: Article | null; next: Article | null } {
+  const allArticles = ARTICLES_CATEGORIES.flatMap((cat) => cat.articles);
+  const idx = allArticles.findIndex((a) => a.id === slug);
+  if (idx === -1) return { prev: null, next: null };
+  return {
+    prev: idx > 0 ? allArticles[idx - 1] : null,
+    next: idx < allArticles.length - 1 ? allArticles[idx + 1] : null,
+  };
+}
