@@ -356,12 +356,12 @@ export default function SellPage() {
               <button
                 type="button"
                 onClick={() => { setPartialAllowed((p) => !p); setMinOrderAmount(""); }}
-                className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer border-0 shrink-0 ${
+                className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer border-0 shrink-0 p-0 ${
                   partialAllowed ? "bg-[#7b3fe4]" : "bg-[#e5e5e5]"
                 }`}
               >
-                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                  partialAllowed ? "translate-x-6" : "translate-x-0.5"
+                <span className={`absolute top-[2px] left-[2px] w-5 h-5 rounded-full bg-white shadow transition-all ${
+                  partialAllowed ? "translate-x-6" : "translate-x-0"
                 }`} />
               </button>
             </div>
@@ -462,18 +462,18 @@ export default function SellPage() {
                   <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.ifscCode}</p>
                 </div>
                 {profilePayment.upiId && (
-                  <div className="col-span-2 mt-2">
-                    <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-2">UPI ID</p>
-                    <div className="flex gap-4 items-center">
-                      <p className="font-mono text-sm font-semibold text-[#111] break-all">{profilePayment.upiId}</p>
-                      <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0">
-                        <QRCodeSVG 
-                          value={`upi://pay?pa=${profilePayment.upiId}&cu=INR`} 
-                          size={64} 
-                          level="M"
-                          includeMargin={false}
-                        />
-                      </div>
+                  <div className="col-span-2 mt-2 pt-3 border-t border-[#e8e8e8] flex items-center justify-between">
+                    <div>
+                      <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-1">UPI ID</p>
+                      <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.upiId}</p>
+                    </div>
+                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] shrink-0 shadow-sm ml-4">
+                      <QRCodeSVG 
+                        value={`upi://pay?pa=${profilePayment.upiId}&cu=INR`} 
+                        size={96} 
+                        level="M"
+                        includeMargin={false}
+                      />
                     </div>
                   </div>
                 )}
