@@ -7,6 +7,7 @@ import { useActiveAccount, useSendTransaction, useActiveWalletConnectionStatus, 
 import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
+import Image from "next/image";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
@@ -147,7 +148,7 @@ function SellerReviewsCard({ order }: { order: OrderDetail }) {
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2 min-w-0">
                 {review.raterAvatar
-                  ? <img src={review.raterAvatar} className="w-5 h-5 rounded-full shrink-0" alt="" />
+                  ? <Image src={review.raterAvatar} className="w-5 h-5 rounded-full shrink-0" alt={`${review.raterName}'s avatar`} width={20} height={20} />
                   : <div className="w-5 h-5 rounded-full bg-[#e5e5e5] shrink-0" />}
                 <span className="font-sans text-xs font-semibold text-[#333] truncate">{review.raterName}</span>
               </div>
@@ -540,7 +541,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   return (
                     <div key={msg.id} className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                       {msg.senderAvatar
-                        ? <img src={msg.senderAvatar} className="w-7 h-7 rounded-full shrink-0 mt-1" alt="" />
+                        ? <Image src={msg.senderAvatar} className="w-7 h-7 rounded-full shrink-0 mt-1" alt="Avatar" width={28} height={28} />
                         : <div className="w-7 h-7 rounded-full bg-[#e5e5e5] shrink-0 mt-1" />}
                       <div className={`max-w-[75%] flex flex-col gap-0.5 ${isMe ? "items-end" : "items-start"}`}>
                         <span className="font-sans text-xs text-[#999] font-semibold uppercase tracking-wide">{msg.senderName ?? "Unknown"}</span>
@@ -770,7 +771,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Counterparty</p>
                 <div className="flex items-center gap-3 mb-4">
                   {counterpartyAvatar
-                    ? <img src={counterpartyAvatar} className="w-10 h-10 rounded-full shrink-0" alt="" />
+                    ? <Image src={counterpartyAvatar} className="w-10 h-10 rounded-full shrink-0" alt="Avatar" width={40} height={40} />
                     : <div className="w-10 h-10 rounded-full bg-[#e5e5e5] shrink-0" />}
                   <div>
                     <div className="flex items-center gap-2">

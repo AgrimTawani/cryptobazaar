@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
 
 export function ArticleHeader() {
@@ -37,9 +38,9 @@ export function ArticleHeader() {
             className="flex items-center gap-2 no-underline py-1.5 pr-3.5 pl-1.5 border border-zinc-200 rounded-full bg-zinc-50 hover:bg-zinc-100 transition-colors"
           >
             {user?.imageUrl && (
-              <img
+              <Image
                 src={user.imageUrl}
-                alt=""
+                alt="User profile picture"
                 width={24}
                 height={24}
                 className="rounded-full"

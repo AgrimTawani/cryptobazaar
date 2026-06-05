@@ -1,4 +1,11 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "CB | Verification",
+  description: "Complete your identity and bank verification to start trading on CryptoBazaar.",
+  alternates: { canonical: "https://cryptobazaar.co.in/onboarding" },
+};
 
 export default function OnboardingLayout({
   children,

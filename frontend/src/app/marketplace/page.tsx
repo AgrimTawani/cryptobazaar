@@ -2,6 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
@@ -170,7 +171,7 @@ export default function MarketplacePage() {
             className="flex items-center gap-2 no-underline py-1 pr-3 pl-1 border-[1.5px] border-[#e0e0e0] rounded-full bg-white"
           >
             {user?.imageUrl && (
-              <img src={user.imageUrl} alt="" width={24} height={24} className="rounded-full" />
+              <Image src={user.imageUrl} alt={user.firstName ? `${user.firstName}'s avatar` : "User avatar"} width={24} height={24} className="rounded-full" />
             )}
             <span className="font-sans text-sm font-medium text-[#111] hidden sm:inline">
               {user?.firstName ?? "Dashboard"}
@@ -286,7 +287,7 @@ export default function MarketplacePage() {
             <div key={order.id} className="grid grid-cols-[1fr_90px_130px_140px_160px_120px] gap-3 items-center py-3 px-5 border-b border-[#f2f2f2] hover:bg-[#fafafa] transition-colors last:border-b-0">
               <div className="flex items-center gap-2.5 min-w-0">
                 {!isGuest && order.sellerAvatar
-                  ? <img src={order.sellerAvatar} alt="" width={28} height={28} className="rounded-full shrink-0" />
+                  ? <Image src={order.sellerAvatar} alt={`${order.sellerName}'s avatar`} width={28} height={28} className="rounded-full shrink-0" />
                   : <div className="w-7 h-7 rounded-full bg-[#e5e5e5] shrink-0" />}
                 <div className="min-w-0">
                   <p className={`font-sans text-sm text-[#111] truncate font-medium ${isGuest ? "blur-sm select-none" : ""}`}>
@@ -368,7 +369,7 @@ export default function MarketplacePage() {
               className="bg-white border border-[#e8e8e8] rounded-xl p-4 no-underline block">
               <div className="flex items-center gap-2 mb-3">
                 {!isGuest && order.sellerAvatar
-                  ? <img src={order.sellerAvatar} alt="" width={26} height={26} className="rounded-full shrink-0" />
+                  ? <Image src={order.sellerAvatar} alt={`${order.sellerName}'s avatar`} width={26} height={26} className="rounded-full shrink-0" />
                   : <div className="w-[26px] h-[26px] rounded-full bg-[#e5e5e5] shrink-0" />}
                 <div>
                   <p className={`font-sans text-sm text-[#111] font-medium ${isGuest ? "blur-sm select-none" : ""}`}>

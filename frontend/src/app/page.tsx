@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 
 
 const FAQS = [
@@ -284,9 +285,9 @@ export default function Home() {
               className="flex items-center gap-[10px] no-underline pt-[6px] pr-[18px] pb-[6px] pl-[6px] border-[1.5px] border-solid border-black rounded-full bg-black"
             >
               {user?.imageUrl && (
-                <img
+                <Image
                   src={user.imageUrl}
-                  alt={user.firstName ?? ""}
+                  alt={user.firstName ? `${user.firstName}'s avatar` : "User avatar"}
                   width={28}
                   height={28}
                   className="rounded-full object-cover"

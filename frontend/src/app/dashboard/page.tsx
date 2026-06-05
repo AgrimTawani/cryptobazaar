@@ -2,6 +2,7 @@
 
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
@@ -93,7 +94,7 @@ export default function DashboardPage() {
         {/* Profile card */}
         <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">
           {user?.imageUrl && (
-            <img src={user.imageUrl} alt={user.fullName ?? ""} width={56} height={56}
+            <Image src={user.imageUrl} alt={user.fullName ? `${user.fullName}'s avatar` : "User avatar"} width={56} height={56}
               className="rounded-full shrink-0 border-2 border-[#f0f0f0]" />
           )}
           <div className="flex-1">
