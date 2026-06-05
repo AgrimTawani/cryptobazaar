@@ -37,6 +37,9 @@ interface OnboardingStatus {
   kyc: string;
   edd: string;
   interview: string;
+  upiId?: string | null;
+  bankAccount?: string | null;
+  ifscCode?: string | null;
 }
 
 export default function DashboardPage() {
@@ -154,8 +157,9 @@ export default function DashboardPage() {
         {/* Two-column: checklist + activity */}
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-3">
 
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
-            <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
+          <div className="flex flex-col gap-3">
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+              <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
             {[
               { label: "Google Login",       done: true },
               { label: "KYC — Identity",     done: dbStatus?.kyc === "PASSED" },
@@ -179,6 +183,28 @@ export default function DashboardPage() {
                 className="mt-4 block text-center font-sans text-sm font-semibold text-black bg-lime py-2 rounded-lg no-underline">
                 Continue verification →
               </Link>
+            )}
+            </div>
+
+            {(dbStatus?.upiId || dbStatus?.bankAccount) && (
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
+                <div className="flex flex-col gap-3">
+                  {dbStatus.upiId && (
+                    <div>
+                      <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
+                      <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                    </div>
+                  )}
+                  {dbStatus.bankAccount && (
+                    <div>
+                      <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
+                      <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
+                      {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
