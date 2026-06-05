@@ -12,8 +12,23 @@ export function EnableNotifications({ variant = "banner" }: Props) {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (typeof Notification !== "undefined") {
-      setPermission(Notification.permission);
+    if (typeof Notification === "undefined") return;
+    const perm = Notification.permission;
+    setPermission(perm);
+    if (perm === "granted") {
+      navigator.serviceWorker.register("/sw.js").then(async (reg) => {
+        await navigator.serviceWorker.ready;
+        const existing = await reg.pushManager.getSubscription();
+        const sub = existing ?? await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
+        });
+        await fetch("/api/notifications/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sub.toJSON()),
+        });
+      }).catch((err) => console.error("[EnableNotifications] auto-subscribe", err));
     }
   }, []);
 
