@@ -3,6 +3,7 @@
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
@@ -235,9 +236,19 @@ export default function DashboardPage() {
                   {/* UPI Section */}
                   <div>
                     {dbStatus?.upiId ? (
-                      <div>
-                        <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
-                        <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                      <div className="flex gap-4 items-center">
+                        <div>
+                          <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
+                          <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                        </div>
+                        <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0">
+                          <QRCodeSVG 
+                            value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
+                            size={64} 
+                            level="M"
+                            includeMargin={false}
+                          />
+                        </div>
                       </div>
                     ) : (
                       showAddUpi ? (

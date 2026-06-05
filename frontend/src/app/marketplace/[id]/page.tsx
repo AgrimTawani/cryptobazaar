@@ -8,6 +8,7 @@ import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
@@ -796,7 +797,16 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       {order.sellerUpiId && (
                         <div>
                           <p className="font-sans text-xs text-[#bbb] mb-0.5">UPI ID</p>
-                          <p className="font-mono text-sm font-semibold text-[#111]">{order.sellerUpiId}</p>
+                          <p className="font-mono text-sm font-semibold text-[#111] mb-3">{order.sellerUpiId}</p>
+                          <div className="bg-white p-2 rounded-lg border border-[#e5e5e5] w-fit">
+                            <QRCodeSVG 
+                              value={`upi://pay?pa=${order.sellerUpiId}&cu=INR`} 
+                              size={120} 
+                              level="M"
+                              includeMargin={false}
+                            />
+                          </div>
+                          <p className="font-sans text-[0.65rem] text-[#aaa] mt-1.5">Scan to pay via any UPI app</p>
                         </div>
                       )}
                       {order.sellerBankAccount && (

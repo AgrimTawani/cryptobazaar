@@ -25,6 +25,7 @@
     "pdf-parse": "^2.4.5",
     "pg": "^8.20.0",
     "prisma": "^6.17.1",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "thirdweb": "^5.119.4"
