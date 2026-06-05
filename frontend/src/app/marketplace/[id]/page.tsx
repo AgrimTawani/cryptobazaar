@@ -12,6 +12,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
+import { EnableNotifications } from "@/components/EnableNotifications";
 
 const amoyChain = defineChain(80002);
 const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ?? "") as `0x${string}`;
@@ -487,6 +488,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   <span className="font-sans text-sm font-semibold text-[#111]">Trade Chat</span>
                 </div>
                 <div className="flex items-center gap-3">
+                  <EnableNotifications variant="inline" />
                   {timeLeft !== null && !TERMINAL.includes(order.status) && (
                     <span className={`font-mono text-sm font-bold ${timedOut ? "text-[#dc2626]" : "text-[#1e40af]"}`}>
                       ⏱ {timedOut ? "00:00" : formatTime(timeLeft)}

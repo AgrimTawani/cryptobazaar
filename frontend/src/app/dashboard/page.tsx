@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { EnableNotifications } from "@/components/EnableNotifications";
 
 interface ActivityRow {
   id: string;
@@ -136,6 +137,10 @@ export default function DashboardPage() {
       </header>
 
       <div className="max-w-[960px] mx-auto py-6 px-4 md:px-6">
+
+        <div className="mb-4">
+          <EnableNotifications variant="banner" />
+        </div>
 
         {/* Profile card */}
         <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">

@@ -197,8 +197,22 @@ model User {
   chatMessages         ChatMessage[]
   ratingsGiven         TradeRating[]        @relation("RatingsGiven")
   ratingsReceived      TradeRating[]        @relation("RatingsReceived")
+  pushSubscriptions    PushSubscription[]
 
   @@map("users")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    Int      @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("push_subscriptions")
 }
 
 model OnboardingRecord {

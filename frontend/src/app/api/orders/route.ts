@@ -1,6 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { notify } from "@/lib/notify";
+import { createElement } from "react";
+import OrderCreatedEmail from "@/lib/emails/order-created";
 
 const ACTIVE_STATUSES = ["LISTED", "BUYER_MATCHED", "BUYER_PAID", "DISPUTED"];
 
@@ -173,6 +176,28 @@ export async function POST(request: Request) {
         minTradeSize:    (partialAllowed && minOrderAmount) ? minOrderAmount : null,
       },
     });
+
+    if (user.email) {
+      notify({
+        push: {
+          userId: user.id,
+          title: "Listing is live!",
+          body: `Your ${amountNum} ${asset} order is on the marketplace`,
+          url: `/marketplace/${order.id}`,
+        },
+        email: {
+          to: user.email,
+          subject: `Your ${amountNum} ${asset} listing is live on CryptoBazaar`,
+          react: createElement(OrderCreatedEmail, {
+            sellerName: user.name ?? "Seller",
+            amount: String(amountNum),
+            asset,
+            pricePerUnit: String(priceNum),
+            orderId: order.id,
+          }),
+        },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ id: order.id, orderId: order.orderId });
   } catch (err) {

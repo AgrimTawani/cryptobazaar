@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { notify } from "@/lib/notify";
 
 const TERMINAL = ["COMPLETED", "CANCELLED", "EXPIRED", "DISPUTE_RESOLVED_BUYER", "DISPUTE_RESOLVED_SELLER"];
 
@@ -98,6 +99,19 @@ export async function POST(
       },
       include: { sender: { select: { name: true, avatarUrl: true } } },
     });
+
+    // Push-only notification to counterparty (no email for chat)
+    const counterpartyId = ctx.isSeller ? ctx.order.buyerId : ctx.order.sellerId;
+    if (counterpartyId) {
+      notify({
+        push: {
+          userId: counterpartyId,
+          title: ctx.user.name ?? "New message",
+          body: content.trim().slice(0, 80),
+          url: `/marketplace/${id}`,
+        },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       id: msg.id,
