@@ -50,17 +50,59 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoadingDb, setIsLoadingDb] = useState(true);
 
-  useEffect(() => {
+  // Forms for adding payment details
+  const [showAddUpi, setShowAddUpi] = useState(false);
+  const [upiInput, setUpiInput] = useState("");
+  const [showAddBank, setShowAddBank] = useState(false);
+  const [bankAccInput, setBankAccInput] = useState("");
+  const [ifscInput, setIfscInput] = useState("");
+  const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
+
+  const fetchDashboardData = () => {
     Promise.all([
       fetch("/api/onboarding/status").then((r) => r.json()).catch(() => null),
       fetch("/api/dashboard/stats").then((r) => r.json()).catch(() => null),
-      new Promise((resolve) => setTimeout(resolve, 1500)),
     ]).then(([statusData, statsData]) => {
       if (statusData) setDbStatus(statusData);
       if (statsData) setStats(statsData);
       setIsLoadingDb(false);
     });
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
+
+  const handleAddPaymentDetail = async (type: "upi" | "bank") => {
+    if (type === "upi" && !upiInput) return;
+    if (type === "bank" && (!bankAccInput || !ifscInput)) return;
+
+    setIsSubmittingPayment(true);
+    try {
+      const payload = type === "upi" 
+        ? { upiId: upiInput } 
+        : { bankAccount: bankAccInput, ifscCode: ifscInput };
+        
+      const res = await fetch("/api/dashboard/payment-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        if (type === "upi") setShowAddUpi(false);
+        if (type === "bank") setShowAddBank(false);
+        fetchDashboardData(); // Refresh data
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to add payment detail");
+      }
+    } catch (e) {
+      alert("Error adding payment detail");
+    } finally {
+      setIsSubmittingPayment(false);
+    }
+  };
 
   const userStatus = dbStatus?.userStatus ?? "LOGIN_DONE";
   const isVerified = userStatus === "VERIFIED";
@@ -186,23 +228,75 @@ export default function DashboardPage() {
             )}
             </div>
 
-            {(dbStatus?.upiId || dbStatus?.bankAccount) && (
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+            {(dbStatus?.upiId || dbStatus?.bankAccount || !dbStatus?.upiId || !dbStatus?.bankAccount) && (
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 mt-3">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
-                <div className="flex flex-col gap-3">
-                  {dbStatus.upiId && (
-                    <div>
-                      <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
-                      <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
-                    </div>
-                  )}
-                  {dbStatus.bankAccount && (
-                    <div>
-                      <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
-                      <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
-                      {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
-                    </div>
-                  )}
+                <div className="flex flex-col gap-4">
+                  {/* UPI Section */}
+                  <div>
+                    {dbStatus?.upiId ? (
+                      <div>
+                        <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
+                        <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                      </div>
+                    ) : (
+                      showAddUpi ? (
+                        <div className="flex flex-col gap-2">
+                          <p className="font-sans text-xs text-[#888]">Add UPI ID</p>
+                          <input 
+                            type="text" 
+                            placeholder="Enter UPI ID" 
+                            value={upiInput} 
+                            onChange={e => setUpiInput(e.target.value)}
+                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
+                          />
+                          <div className="flex gap-2">
+                            <button onClick={() => handleAddPaymentDetail("upi")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
+                            <button onClick={() => setShowAddUpi(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={() => setShowAddUpi(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add UPI ID</button>
+                      )
+                    )}
+                  </div>
+
+                  {/* Bank Section */}
+                  <div>
+                    {dbStatus?.bankAccount ? (
+                      <div>
+                        <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
+                        <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
+                        {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
+                      </div>
+                    ) : (
+                      showAddBank ? (
+                        <div className="flex flex-col gap-2">
+                          <p className="font-sans text-xs text-[#888]">Add Bank Account</p>
+                          <input 
+                            type="text" 
+                            placeholder="Account Number" 
+                            value={bankAccInput} 
+                            onChange={e => setBankAccInput(e.target.value)}
+                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
+                          />
+                          <input 
+                            type="text" 
+                            placeholder="IFSC Code" 
+                            value={ifscInput} 
+                            onChange={e => setIfscInput(e.target.value.toUpperCase())}
+                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black uppercase"
+                          />
+                          <div className="flex gap-2">
+                            <button onClick={() => handleAddPaymentDetail("bank")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
+                            <button onClick={() => setShowAddBank(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={() => setShowAddBank(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add Bank Account</button>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
             )}
