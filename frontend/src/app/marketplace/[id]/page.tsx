@@ -800,7 +800,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                           <p className="font-mono text-sm font-semibold text-[#111] mb-3">{order.sellerUpiId}</p>
                           <div className="bg-white p-2 rounded-lg border border-[#e5e5e5] w-fit">
                             <QRCodeSVG 
-                              value={`upi://pay?pa=${order.sellerUpiId}&cu=INR`} 
+                              value={`upi://pay?pa=${order.sellerUpiId}&am=${parseFloat(order.totalValueInr).toFixed(2)}&cu=INR`} 
                               size={120} 
                               level="M"
                               includeMargin={false}
