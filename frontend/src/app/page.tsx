@@ -298,7 +298,14 @@ export default function Home() {
               </span>
             </Link>
           ) : (
-            <Link href="/login" className="btn-login font-condensed">Get Started</Link>
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="font-condensed text-[1.1rem] tracking-[0.05em] text-[#555] hover:text-black transition-colors duration-200 no-underline">
+                Log In
+              </Link>
+              <Link href="/login" className="btn-login font-condensed">
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
         {/* Mobile hamburger */}
@@ -337,7 +344,14 @@ export default function Home() {
               {isSignedIn ? (
                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Dashboard</Link>
               ) : (
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">Get Started</Link>
+                <div className="flex flex-col items-center gap-4">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="font-condensed text-[1.6rem] tracking-[2px] text-black no-underline">
+                    Log In
+                  </Link>
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="btn-login font-condensed">
+                    Sign Up
+                  </Link>
+                </div>
               )}
             </div>
           </motion.div>
