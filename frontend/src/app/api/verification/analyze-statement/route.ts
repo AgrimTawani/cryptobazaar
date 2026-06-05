@@ -177,11 +177,13 @@ export async function POST(req: NextRequest) {
 
     // ── Step 3: Send to Python Microservice for Analysis ──────────────────────
     const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
+    console.log(`[analyze-statement] Sending PDF to microservice at: ${microserviceUrl}`);
     let analysisData = null;
     try {
       const formDataService = new FormData();
+      // Explicitly append as a blob with a guaranteed .pdf filename to prevent FastAPI 400 errors
       const blob = new Blob([buffer], { type: "application/pdf" });
-      formDataService.append("file", blob, file.name || "statement.pdf");
+      formDataService.append("file", blob, "statement.pdf");
 
       const msResponse = await fetch(microserviceUrl, {
         method: "POST",
@@ -189,7 +191,8 @@ export async function POST(req: NextRequest) {
       });
       
       if (!msResponse.ok) {
-        console.error("Microservice returned error", msResponse.status);
+        const errorText = await msResponse.text();
+        console.error("Microservice returned error", msResponse.status, errorText);
       } else {
         const msResult = await msResponse.json();
         if (msResult.status === "LOCKED_PDF") {
