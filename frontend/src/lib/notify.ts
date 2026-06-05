@@ -1,5 +1,6 @@
 import webpush from "web-push";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import { render } from "@react-email/render";
 import { db } from "@/lib/db";
 import type { ReactElement } from "react";
 
@@ -9,7 +10,15 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.GMAIL_USER!,
+    pass: process.env.GMAIL_APP_PASSWORD!,
+  },
+});
 
 interface PushPayload {
   userId: number;
@@ -49,11 +58,12 @@ async function sendPush(payload: PushPayload) {
 }
 
 async function sendEmail(payload: EmailPayload) {
-  await resend.emails.send({
-    from: "CryptoBazaar <alerts@cryptobazaar.co.in>",
+  const html = await render(payload.react);
+  await transporter.sendMail({
+    from: `"CryptoBazaar" <${process.env.GMAIL_USER}>`,
     to: payload.to,
     subject: payload.subject,
-    react: payload.react,
+    html,
   });
 }
 
