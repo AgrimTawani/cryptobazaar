@@ -374,7 +374,7 @@ export async function PATCH(
         }
         // Notify admin
         await notify({
-          email: { to: "alert@cryptobazaar.co.in", subject: `[Admin] Dispute on ${disputeAmount} ${order.asset} order`, react: createElement(DisputeRaisedEmail, { role: "admin", name: "Admin", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) },
+          email: { to: "alerts@cryptobazaar.co.in", subject: `[Admin] Dispute on ${disputeAmount} ${order.asset} order`, react: createElement(DisputeRaisedEmail, { role: "admin", name: "Admin", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) },
         }).catch(() => {});
         break;
       }

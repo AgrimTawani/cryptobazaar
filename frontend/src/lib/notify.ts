@@ -50,7 +50,7 @@ async function sendPush(payload: PushPayload) {
 
 async function sendEmail(payload: EmailPayload) {
   await resend.emails.send({
-    from: "CryptoBazaar <alert@cryptobazaar.co.in>",
+    from: "CryptoBazaar <alerts@cryptobazaar.co.in>",
     to: payload.to,
     subject: payload.subject,
     react: payload.react,
