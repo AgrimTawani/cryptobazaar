@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Bebas_Neue, Playfair_Display, Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThirdwebProvider } from "thirdweb/react";
 import { ThirdwebAutoConnect } from "@/components/ThirdwebAutoConnect";
@@ -8,24 +8,6 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700"],
-});
-
-const bebasNeue = Bebas_Neue({
-  subsets: ["latin"],
-  variable: "--font-bebas-neue",
-  weight: "400",
-});
-
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair-display",
-  style: "italic",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
   weight: ["400", "500", "600", "700"],
 });
 
@@ -77,8 +59,11 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/icon.png" media="(prefers-color-scheme: light)" />
           <link rel="icon" href="/icon2.png" media="(prefers-color-scheme: dark)" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital@1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
         </head>
-        <body className={`${inter.variable} ${bebasNeue.variable} ${playfairDisplay.variable} ${manrope.variable}`}>
+        <body className={`${inter.variable}`}>
           <ScrollbarThemer />
           <ThirdwebProvider>
             <ThirdwebAutoConnect />

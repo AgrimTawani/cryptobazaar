@@ -3,10 +3,10 @@
 @theme {
   --color-lime: #D4FF00;
   --color-lime-dark: #c2eb00;
-  --font-condensed: var(--font-bebas-neue), 'Bebas Neue', sans-serif;
-  --font-sans: var(--font-manrope), 'Manrope', sans-serif;
+  --font-condensed: 'Bebas Neue', sans-serif;
+  --font-sans: 'Manrope', sans-serif;
   --font-cascadia: 'Cascadia Mono', Consolas, monospace;
-  --font-playfair: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
 }
 
 :root {
@@ -21,9 +21,9 @@
   --border: #e5e5e5;
   --border-dark: #ccc;
   --accent-primary: var(--lime);
-  --sans: var(--font-manrope), 'Manrope', sans-serif;
-  --condensed: var(--font-bebas-neue), 'Bebas Neue', sans-serif;
-  --serif-italic: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
+  --sans: 'Manrope', sans-serif;
+  --condensed: 'Bebas Neue', sans-serif;
+  --serif-italic: 'Playfair Display', Georgia, serif;
 }
 
 @layer base {
@@ -122,7 +122,7 @@
   }
 
   .font-manrope {
-    font-family: var(--font-manrope), 'Manrope', sans-serif !important;
+    font-family: 'Manrope', sans-serif !important;
   }
 }
 
