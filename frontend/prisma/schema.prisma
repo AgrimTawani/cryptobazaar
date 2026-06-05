@@ -198,6 +198,7 @@ model User {
   ratingsGiven         TradeRating[]        @relation("RatingsGiven")
   ratingsReceived      TradeRating[]        @relation("RatingsReceived")
   pushSubscriptions    PushSubscription[]
+  bankStatementAnalysis BankStatementAnalysis?
 
   @@map("users")
 }
@@ -465,3 +466,46 @@ model ProtectionFundClaim {
   @@index([userId])
   @@map("protection_fund_claims")
 }
+
+model BankStatementAnalysis {
+  id        String   @id @default(uuid())
+  userId    Int      @unique @map("user_id")
+
+  // Status
+  status          String   // e.g., COMPLETED, LOCKED_PDF, EXTRACTION_FAILED
+  errorMessage    String?
+
+  // A-Checks: Income & Spend
+  hasRegularIncome       Boolean? // A2
+  recurringBillCount     Int?     // A3
+  transactionModes       String[] // A4: e.g., ["UPI", "NEFT", "IMPS"]
+  hasMerchantSpend       Boolean? // A5
+
+  // B-Checks: Trading Behavior
+  exchangeTxCount        Int?     // B1
+  monthsWithCryptoTrades Int?     // B2
+  hasBidirectionalCrypto Boolean? // B3
+  maxVolumeSpikeRatio    Float?   // B4
+
+  // C-Checks: Mule/Inflow Pattern
+  avgUniqueSendersPerMonth Float? // C1
+  senderRecurrenceRate     Float? // C2
+  avgCreditToDebitHours    Float? // C3
+  roundNumberRatio         Float? // C4
+  structuringClustersCount Int?   // C5
+  inflowSpikeRatio         Float? // C6
+
+  // D-Checks: Financial Stability
+  avgMonthlyBalance      Decimal? @db.Decimal(15, 2) // D1
+  balanceDropsToZero     Int?     // D2
+  returnedPaymentsCount  Int?     // D3
+  positiveNetFlowMonths  Int?     // D4
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("bank_statement_analyses")
+}
+

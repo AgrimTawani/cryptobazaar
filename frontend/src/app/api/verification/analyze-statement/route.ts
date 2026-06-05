@@ -175,7 +175,84 @@ export async function POST(req: NextRequest) {
     const attemptNumber = existingRecord ? existingRecord.attemptNumber + 1 : 1;
     const r2Key = await uploadToR2(buffer, user.id, user.name, attemptNumber);
 
-    // ── Step 3: Write result to DB — manual compliance review ────────────────
+    // ── Step 3: Send to Python Microservice for Analysis ──────────────────────
+    const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
+    let analysisData = null;
+    try {
+      const formDataService = new FormData();
+      const blob = new Blob([buffer], { type: "application/pdf" });
+      formDataService.append("file", blob, file.name || "statement.pdf");
+
+      const msResponse = await fetch(microserviceUrl, {
+        method: "POST",
+        body: formDataService,
+      });
+      
+      if (!msResponse.ok) {
+        console.error("Microservice returned error", msResponse.status);
+      } else {
+        const msResult = await msResponse.json();
+        if (msResult.status === "LOCKED_PDF") {
+           return NextResponse.json({ error: "PDF is password protected. Please upload an unlocked PDF." }, { status: 400 });
+        }
+        if (msResult.status === "COMPLETED") {
+          analysisData = msResult;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to connect to Bank Analyzer microservice", err);
+    }
+
+    if (analysisData) {
+      await db.bankStatementAnalysis.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          status: analysisData.status,
+          hasRegularIncome: analysisData.hasRegularIncome,
+          recurringBillCount: analysisData.recurringBillCount,
+          transactionModes: analysisData.transactionModes,
+          hasMerchantSpend: analysisData.hasMerchantSpend,
+          exchangeTxCount: analysisData.exchangeTxCount,
+          monthsWithCryptoTrades: analysisData.monthsWithCryptoTrades,
+          hasBidirectionalCrypto: analysisData.hasBidirectionalCrypto,
+          maxVolumeSpikeRatio: analysisData.maxVolumeSpikeRatio,
+          avgUniqueSendersPerMonth: analysisData.avgUniqueSendersPerMonth,
+          senderRecurrenceRate: analysisData.senderRecurrenceRate,
+          avgCreditToDebitHours: analysisData.avgCreditToDebitHours,
+          roundNumberRatio: analysisData.roundNumberRatio,
+          structuringClustersCount: analysisData.structuringClustersCount,
+          inflowSpikeRatio: analysisData.inflowSpikeRatio,
+          avgMonthlyBalance: analysisData.avgMonthlyBalance,
+          balanceDropsToZero: analysisData.balanceDropsToZero,
+          returnedPaymentsCount: analysisData.returnedPaymentsCount,
+          positiveNetFlowMonths: analysisData.positiveNetFlowMonths,
+        },
+        update: {
+          status: analysisData.status,
+          hasRegularIncome: analysisData.hasRegularIncome,
+          recurringBillCount: analysisData.recurringBillCount,
+          transactionModes: analysisData.transactionModes,
+          hasMerchantSpend: analysisData.hasMerchantSpend,
+          exchangeTxCount: analysisData.exchangeTxCount,
+          monthsWithCryptoTrades: analysisData.monthsWithCryptoTrades,
+          hasBidirectionalCrypto: analysisData.hasBidirectionalCrypto,
+          maxVolumeSpikeRatio: analysisData.maxVolumeSpikeRatio,
+          avgUniqueSendersPerMonth: analysisData.avgUniqueSendersPerMonth,
+          senderRecurrenceRate: analysisData.senderRecurrenceRate,
+          avgCreditToDebitHours: analysisData.avgCreditToDebitHours,
+          roundNumberRatio: analysisData.roundNumberRatio,
+          structuringClustersCount: analysisData.structuringClustersCount,
+          inflowSpikeRatio: analysisData.inflowSpikeRatio,
+          avgMonthlyBalance: analysisData.avgMonthlyBalance,
+          balanceDropsToZero: analysisData.balanceDropsToZero,
+          returnedPaymentsCount: analysisData.returnedPaymentsCount,
+          positiveNetFlowMonths: analysisData.positiveNetFlowMonths,
+        }
+      });
+    }
+
+    // ── Step 4: Write result to DB — manual compliance review ────────────────
     const score = 75;
     await db.onboardingRecord.upsert({
       where: { userId_layer: { userId: user.id, layer: "EDD" } },
