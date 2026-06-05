@@ -9,11 +9,11 @@ export function ArticleHeader() {
   const { isSignedIn, user } = useUser();
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-zinc-200 px-5 md:px-10 h-16 flex items-center justify-between sticky top-0 z-50">
+    <header className="bg-white/80 backdrop-blur-md border-b border-zinc-200 px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-4">
         <Link
           href="/"
-          className="font-condensed text-[1.6rem] tracking-[3px] text-black hover:text-lime-dark transition-colors duration-200"
+          className="nav-logo no-underline text-black"
         >
           CRYPTOBAZAAR
         </Link>

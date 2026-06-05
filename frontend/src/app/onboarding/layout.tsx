@@ -15,7 +15,7 @@ export default function OnboardingLayout({
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {/* Top bar */}
-      <header className="flex items-center justify-between py-4 px-5 md:py-5 md:px-10 bg-white border-b border-[#f0f0f0]">
+      <header className="flex items-center justify-between px-5 md:px-10 h-[64px] bg-white border-b border-[#f0f0f0] sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
