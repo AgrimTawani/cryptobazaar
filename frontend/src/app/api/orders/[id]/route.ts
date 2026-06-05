@@ -203,19 +203,15 @@ export async function PATCH(
 
         const totalInrStr = lockedValueInr.toLocaleString("en-IN", { maximumFractionDigits: 0 });
         // Notify seller (urgent)
-        if (order.seller.email) {
-          await notify({
-            push: { userId: order.seller.id, title: "Buyer locked your order ⚡", body: `${user.name ?? "Buyer"} locked ${buyAmount} ${order.asset} · ₹${totalInrStr}`, url: `/marketplace/${id}` },
-            email: { to: order.seller.email, subject: `Buyer locked your ${buyAmount} ${order.asset} order`, react: createElement(OrderLockedEmail, { role: "seller", name: order.seller.name ?? "Seller", counterpartyName: user.name ?? "Buyer", amount: String(buyAmount), asset: order.asset, totalInr: totalInrStr, orderId: id, paymentWindowMins: 30 }) },
-          }).catch(() => {});
-        }
+        await notify({
+          push: { userId: order.seller.id, title: "Buyer locked your order ⚡", body: `${user.name ?? "Buyer"} locked ${buyAmount} ${order.asset} · ₹${totalInrStr}`, url: `/marketplace/${id}` },
+          ...(order.seller.email ? { email: { to: order.seller.email, subject: `Buyer locked your ${buyAmount} ${order.asset} order`, react: createElement(OrderLockedEmail, { role: "seller", name: order.seller.name ?? "Seller", counterpartyName: user.name ?? "Buyer", amount: String(buyAmount), asset: order.asset, totalInr: totalInrStr, orderId: id, paymentWindowMins: 30 }) } } : {}),
+        }).catch(() => {});
         // Notify buyer
-        if (user.email) {
-          await notify({
-            push: { userId: user.id, title: "Order locked", body: `Send ₹${totalInrStr} within 30 minutes`, url: `/marketplace/${id}` },
-            email: { to: user.email, subject: `Send ₹${totalInrStr} — ${buyAmount} ${order.asset} locked`, react: createElement(OrderLockedEmail, { role: "buyer", name: user.name ?? "Buyer", counterpartyName: order.seller.name ?? "Seller", amount: String(buyAmount), asset: order.asset, totalInr: totalInrStr, orderId: id, paymentWindowMins: 30 }) },
-          }).catch(() => {});
-        }
+        await notify({
+          push: { userId: user.id, title: "Order locked", body: `Send ₹${totalInrStr} within 30 minutes`, url: `/marketplace/${id}` },
+          ...(user.email ? { email: { to: user.email, subject: `Send ₹${totalInrStr} — ${buyAmount} ${order.asset} locked`, react: createElement(OrderLockedEmail, { role: "buyer", name: user.name ?? "Buyer", counterpartyName: order.seller.name ?? "Seller", amount: String(buyAmount), asset: order.asset, totalInr: totalInrStr, orderId: id, paymentWindowMins: 30 }) } } : {}),
+        }).catch(() => {});
         break;
       }
 
@@ -255,19 +251,15 @@ export async function PATCH(
         const paidAmountStr = order.lockedAmount?.toString() ?? order.amount.toString();
         const paidInrStr = order.totalValueInr.toNumber().toLocaleString("en-IN", { maximumFractionDigits: 0 });
         // Notify seller (urgent)
-        if (order.seller.email) {
-          await notify({
-            push: { userId: order.seller.id, title: "Payment submitted ⚠️", body: `Buyer paid ₹${paidInrStr} — verify and confirm`, url: `/marketplace/${id}` },
-            email: { to: order.seller.email, subject: "Buyer submitted payment proof — verify and confirm", react: createElement(PaymentSubmittedEmail, { role: "seller", name: order.seller.name ?? "Seller", amount: paidAmountStr, asset: order.asset, totalInr: paidInrStr, utr: utr ?? undefined, orderId: id }) },
-          }).catch(() => {});
-        }
+        await notify({
+          push: { userId: order.seller.id, title: "Payment submitted ⚠️", body: `Buyer paid ₹${paidInrStr} — verify and confirm`, url: `/marketplace/${id}` },
+          ...(order.seller.email ? { email: { to: order.seller.email, subject: "Buyer submitted payment proof — verify and confirm", react: createElement(PaymentSubmittedEmail, { role: "seller", name: order.seller.name ?? "Seller", amount: paidAmountStr, asset: order.asset, totalInr: paidInrStr, utr: utr ?? undefined, orderId: id }) } } : {}),
+        }).catch(() => {});
         // Notify buyer
-        if (user.email) {
-          await notify({
-            push: { userId: user.id, title: "Payment submitted", body: "Waiting for seller to confirm", url: `/marketplace/${id}` },
-            email: { to: user.email, subject: "Payment submitted — waiting for seller confirmation", react: createElement(PaymentSubmittedEmail, { role: "buyer", name: user.name ?? "Buyer", amount: paidAmountStr, asset: order.asset, totalInr: paidInrStr, orderId: id }) },
-          }).catch(() => {});
-        }
+        await notify({
+          push: { userId: user.id, title: "Payment submitted", body: "Waiting for seller to confirm", url: `/marketplace/${id}` },
+          ...(user.email ? { email: { to: user.email, subject: "Payment submitted — waiting for seller confirmation", react: createElement(PaymentSubmittedEmail, { role: "buyer", name: user.name ?? "Buyer", amount: paidAmountStr, asset: order.asset, totalInr: paidInrStr, orderId: id }) } } : {}),
+        }).catch(() => {});
         break;
       }
 
@@ -329,11 +321,11 @@ export async function PATCH(
           });
         }
 
-        if (fullyFilled && order.buyer?.email) {
+        if (fullyFilled && order.buyer) {
           const payout = (locked - 1).toFixed(2);
           await notify({
             push: { userId: order.buyer.id, title: "Trade complete ✅", body: `${payout} ${order.asset} released to your wallet`, url: `/marketplace/${id}` },
-            email: { to: order.buyer.email, subject: `Trade complete — ${payout} ${order.asset} sent to your wallet`, react: createElement(PaymentConfirmedEmail, { buyerName: order.buyer.name ?? "Buyer", amount: String(locked), asset: order.asset, payout, orderId: id }) },
+            ...(order.buyer.email ? { email: { to: order.buyer.email, subject: `Trade complete — ${payout} ${order.asset} sent to your wallet`, react: createElement(PaymentConfirmedEmail, { buyerName: order.buyer.name ?? "Buyer", amount: String(locked), asset: order.asset, payout, orderId: id }) } } : {}),
           }).catch(() => {});
         }
         break;
@@ -366,10 +358,10 @@ export async function PATCH(
         const disputeAmount = order.lockedAmount?.toString() ?? order.amount.toString();
         const raisedByRole = isSeller ? "seller" : "buyer";
         const counterparty = isSeller ? order.buyer : order.seller;
-        if (counterparty?.email) {
+        if (counterparty) {
           await notify({
             push: { userId: counterparty.id, title: "Dispute raised", body: "Admin will review within 24 hours", url: `/marketplace/${id}` },
-            email: { to: counterparty.email, subject: "Dispute raised on your trade", react: createElement(DisputeRaisedEmail, { role: isSeller ? "buyer" : "seller", name: counterparty.name ?? "User", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) },
+            ...(counterparty.email ? { email: { to: counterparty.email, subject: "Dispute raised on your trade", react: createElement(DisputeRaisedEmail, { role: isSeller ? "buyer" : "seller", name: counterparty.name ?? "User", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) } } : {}),
           }).catch(() => {});
         }
         // Notify admin
@@ -425,13 +417,11 @@ export async function PATCH(
           });
         }
 
-        if (order.seller.email) {
-          const cancelledAmount = order.lockedAmount?.toString() ?? order.amount.toString();
-          await notify({
-            push: { userId: order.seller.id, title: "Buyer cancelled", body: `Your ${cancelledAmount} ${order.asset} listing is open again`, url: `/marketplace/${id}` },
-            email: { to: order.seller.email, subject: `Buyer cancelled — your ${cancelledAmount} ${order.asset} listing is live again`, react: createElement(BuyerCancelledEmail, { sellerName: order.seller.name ?? "Seller", amount: cancelledAmount, asset: order.asset, orderId: id }) },
-          }).catch(() => {});
-        }
+        const cancelledAmount = order.lockedAmount?.toString() ?? order.amount.toString();
+        await notify({
+          push: { userId: order.seller.id, title: "Buyer cancelled", body: `Your ${cancelledAmount} ${order.asset} listing is open again`, url: `/marketplace/${id}` },
+          ...(order.seller.email ? { email: { to: order.seller.email, subject: `Buyer cancelled — your ${cancelledAmount} ${order.asset} listing is live again`, react: createElement(BuyerCancelledEmail, { sellerName: order.seller.name ?? "Seller", amount: cancelledAmount, asset: order.asset, orderId: id }) } } : {}),
+        }).catch(() => {});
         break;
       }
 
@@ -448,11 +438,11 @@ export async function PATCH(
           data: { status: "CANCELLED", cancelledAt: new Date() },
         });
 
-        if (order.buyer?.email) {
+        if (order.buyer) {
           const timedOutAmount = order.lockedAmount?.toString() ?? order.amount.toString();
           await notify({
             push: { userId: order.buyer.id, title: "Order timed out", body: "Payment window expired — order cancelled", url: `/marketplace/${id}` },
-            email: { to: order.buyer.email, subject: "Payment window expired — order cancelled", react: createElement(OrderTimedOutEmail, { buyerName: order.buyer.name ?? "Buyer", amount: timedOutAmount, asset: order.asset, orderId: id }) },
+            ...(order.buyer.email ? { email: { to: order.buyer.email, subject: "Payment window expired — order cancelled", react: createElement(OrderTimedOutEmail, { buyerName: order.buyer.name ?? "Buyer", amount: timedOutAmount, asset: order.asset, orderId: id }) } } : {}),
           }).catch(() => {});
         }
         break;

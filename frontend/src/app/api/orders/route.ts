@@ -177,14 +177,14 @@ export async function POST(request: Request) {
       },
     });
 
-    if (user.email) {
-      await notify({
-        push: {
-          userId: user.id,
-          title: "Listing is live!",
-          body: `Your ${amountNum} ${asset} order is on the marketplace`,
-          url: `/marketplace/${order.id}`,
-        },
+    await notify({
+      push: {
+        userId: user.id,
+        title: "Listing is live!",
+        body: `Your ${amountNum} ${asset} order is on the marketplace`,
+        url: `/marketplace/${order.id}`,
+      },
+      ...(user.email ? {
         email: {
           to: user.email,
           subject: `Your ${amountNum} ${asset} listing is live on CryptoBazaar`,
@@ -196,8 +196,8 @@ export async function POST(request: Request) {
             orderId: order.id,
           }),
         },
-      }).catch(() => {});
-    }
+      } : {}),
+    }).catch(() => {});
 
     return NextResponse.json({ id: order.id, orderId: order.orderId });
   } catch (err) {
