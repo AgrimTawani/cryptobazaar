@@ -646,7 +646,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
                     <button onClick={() => run("cancel", async () => {
-                      await sendTx(prepareContractCall({ contract: escrowContract, method: "function cancelOrder(uint256 id)", params: [onChainId] }));
+                      await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
                     })} disabled={!!busy || !walletOk}
                       className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "cancel" ? "…" : "✕  Cancel Order"}
@@ -752,6 +752,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <div className="text-right">
                       <p className="font-condensed text-xl tracking-wide leading-tight">{order.amount} {order.asset}</p>
                       <p className="font-sans text-xs text-[#aaa] mt-0.5">{order.chain} Network</p>
+                      {role === "buyer" && (
+                        <p className="font-sans text-xs text-[#888] mt-1">
+                          You receive <span className="font-semibold text-[#111]">{(parseFloat(order.amount) - 1).toFixed(parseFloat(order.amount) % 1 === 0 ? 0 : 2)} {order.asset}</span> after 1 {order.asset} platform fee
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-between items-baseline">

@@ -46,8 +46,9 @@ contract CryptoBazaarEscrow {
     event OrderCompleted (uint256 indexed id, address indexed buyer, uint128 payout, uint128 fee, uint128 remaining);
     event DisputeRaised  (uint256 indexed id, address indexed raisedBy);
     event DisputeResolved(uint256 indexed id, address indexed winner);
-    event OrderCancelled (uint256 indexed id);
-    event OrderTimedOut  (uint256 indexed id);
+    event OrderCancelled      (uint256 indexed id);
+    event OrderTimedOut       (uint256 indexed id);
+    event BuyerCancelled      (uint256 indexed id, address indexed buyer);
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert Unauthorized();
@@ -112,6 +113,19 @@ contract CryptoBazaarEscrow {
         o.amount = 0;
         IERC20(o.token).safeTransfer(o.seller, refund);
         emit OrderCancelled(id);
+    }
+
+    function buyerCancel(uint256 id) external {
+        Order storage o = orders[id];
+        if (o.status != Status.LOCKED) revert InvalidState();
+        if (msg.sender != o.buyer)     revert Unauthorized();
+
+        address buyer  = o.buyer;
+        o.status       = Status.OPEN;
+        o.buyer        = address(0);
+        o.lockedAt     = 0;
+        o.lockedAmount = 0;
+        emit BuyerCancelled(id, buyer);
     }
 
     function timeoutCancel(uint256 id) external {
