@@ -13,9 +13,11 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       // If the exact trade page is open and visible, skip OS notification
-      const isOpen = clients.some(
-        (c) => c.url.includes(url) && c.visibilityState === "visible"
-      );
+      const isOpen = clients.some((c) => {
+        try {
+          return new URL(c.url).pathname === url && c.visibilityState === "visible";
+        } catch { return false; }
+      });
       if (isOpen) return;
 
       return self.registration.showNotification(title, {
