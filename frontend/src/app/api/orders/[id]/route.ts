@@ -326,6 +326,41 @@ export async function PATCH(
         break;
       }
 
+      case "buyerCancel": {
+        if (!isBuyer)
+          return NextResponse.json({ error: "Only buyer can cancel" }, { status: 403 });
+        if (order.status !== "BUYER_MATCHED")
+          return NextResponse.json({ error: "Can only cancel a locked order" }, { status: 400 });
+
+        await db.order.update({
+          where: { id },
+          data: {
+            status: "LISTED",
+            buyerId: null,
+            lockedAmount: null,
+            buyerMatchedAt: null,
+            paymentWindowExpiresAt: null,
+          },
+        });
+
+        const roomBuyerCancel = await db.chatRoom.findUnique({ where: { orderId: id } });
+        if (roomBuyerCancel) {
+          await db.chatMessage.create({
+            data: {
+              chatRoomId: roomBuyerCancel.id,
+              senderId: null,
+              type: "SYSTEM",
+              content: `Buyer cancelled the order. The listing is now open again on the marketplace.`,
+            },
+          });
+          await db.chatRoom.update({
+            where: { orderId: id },
+            data: { isActive: false, closedAt: new Date() },
+          });
+        }
+        break;
+      }
+
       case "timeout": {
         if (!isSeller)
           return NextResponse.json({ error: "Only seller can trigger timeout" }, { status: 403 });

@@ -647,6 +647,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </button>
                     <button onClick={() => run("cancel", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
+                      await fetch(`/api/orders/${order.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "buyerCancel" }) });
                     })} disabled={!!busy || !walletOk}
                       className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "cancel" ? "…" : "✕  Cancel Order"}
