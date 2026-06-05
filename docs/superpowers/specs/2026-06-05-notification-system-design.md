@@ -19,7 +19,7 @@ Add a dual-channel notification system (browser push + email) to alert buyers an
 | Buyer submits payment | `PATCH action:markPaid` | Seller (urgent), Buyer | Seller, Buyer |
 | Seller confirms / releases | `PATCH action:confirm` | Buyer, Seller | Buyer, Seller |
 | Dispute raised | `PATCH action:dispute` | Buyer, Seller | Buyer, Seller, admin (alert@cryptobazaar.co.in) |
-| Buyer cancels lock | `PATCH action:buyerCancel` (to be added) | Seller | Seller |
+| Buyer cancels lock | `PATCH action:buyerCancel` — frontend calls on-chain `buyerCancel()` first, then calls this API to update DB status back to LISTED and fire notification (same pattern as `timeout`) | Seller | Seller |
 | Order times out | `PATCH action:timeout` | Buyer | Buyer |
 | Chat message | `POST /api/orders/[id]/chat` | Counterparty (push only, no email) | None |
 
@@ -55,16 +55,16 @@ One React Email template file per event:
 
 ```
 src/lib/emails/
-  order-created.tsx
-  order-locked.tsx          (buyer → seller), (seller confirmation)
-  payment-submitted.tsx     (buyer → seller), (seller confirmation)
-  payment-confirmed.tsx     (seller → buyer)
-  dispute-raised.tsx
-  buyer-cancelled.tsx
-  order-timed-out.tsx
+  order-created.tsx          seller only
+  order-locked.tsx           role: "seller" | "buyer" — different subject/copy per role
+  payment-submitted.tsx      role: "seller" | "buyer" — different subject/copy per role
+  payment-confirmed.tsx      buyer only
+  dispute-raised.tsx         role: "seller" | "buyer" | "admin"
+  buyer-cancelled.tsx        seller only
+  order-timed-out.tsx        buyer only
 ```
 
-Each template receives typed `data` props and renders a consistent branded email with the CryptoBazaar name, event summary, and a CTA button linking to the trade page.
+Each template accepts `role` + typed `data` props and renders different subject lines and body copy per role. All templates share a consistent branded layout with the CryptoBazaar name, event summary, and a CTA button linking to the trade page. The `notify()` caller passes the correct role when sending to each recipient.
 
 ### Browser push: service worker + VAPID
 
