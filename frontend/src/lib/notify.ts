@@ -49,6 +49,7 @@ async function sendPush(payload: PushPayload) {
           msg
         )
         .catch(async (err) => {
+          console.error("[sendPush] webpush error", err.statusCode, err.message);
           if (err.statusCode === 410) {
             await db.pushSubscription.delete({ where: { endpoint: sub.endpoint } }).catch(() => {});
           }
