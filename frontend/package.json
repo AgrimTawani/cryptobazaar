@@ -33,7 +33,6 @@
     "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "resend": "^6.12.4",
     "thirdweb": "^5.119.4",
     "web-push": "^3.6.7"
   },
