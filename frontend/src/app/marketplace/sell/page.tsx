@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { EnableNotifications } from "@/components/EnableNotifications";
 import { txUrl } from "@/lib/explorer";
 
 const amoyChain = defineChain(80002);
@@ -217,6 +218,9 @@ export default function SellPage() {
       </header>
 
       <div className="max-w-[560px] mx-auto py-8 px-5">
+        <div className="mb-5">
+          <EnableNotifications variant="banner" />
+        </div>
         <h1 className="font-condensed text-[2.4rem] tracking-[1px] mb-1">SELL USDC</h1>
         <p className="font-sans text-sm text-[#888] mb-8">
           Tokens are held in escrow until you confirm the buyer&apos;s INR payment.
@@ -506,6 +510,7 @@ export default function SellPage() {
               if (err) { setErrorMsg(err); return; }
               setErrorMsg("");
               setStep("review");
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             disabled={!walletOk || !chainOk || isBusy || step === "done"}
             className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">

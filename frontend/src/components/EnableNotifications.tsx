@@ -32,7 +32,25 @@ export function EnableNotifications({ variant = "banner" }: Props) {
     }
   }, []);
 
-  if (permission === null || permission === "granted" || dismissed) return null;
+  if (permission === null || dismissed) return null;
+
+  if (permission === "granted") {
+    if (variant === "inline") {
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-[#22c55e]">
+          <span className="text-base">🔔</span>
+          <span>Alerts on</span>
+        </span>
+      );
+    }
+    return (
+      <div className="flex items-center gap-3 bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl px-4 py-3">
+        <span className="text-lg">🔔</span>
+        <p className="font-sans text-sm text-[#166534]">Trade notifications are enabled</p>
+        <button onClick={() => setDismissed(true)} className="ml-auto text-[#aaa] hover:text-[#666] text-lg leading-none">×</button>
+      </div>
+    );
+  }
 
   async function enable() {
     setLoading(true);
