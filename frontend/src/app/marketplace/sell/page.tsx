@@ -18,6 +18,7 @@ import {
 } from "thirdweb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
@@ -461,9 +462,19 @@ export default function SellPage() {
                   <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.ifscCode}</p>
                 </div>
                 {profilePayment.upiId && (
-                  <div className="col-span-2">
-                    <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-1">UPI ID</p>
-                    <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.upiId}</p>
+                  <div className="col-span-2 mt-2">
+                    <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-2">UPI ID</p>
+                    <div className="flex gap-4 items-center">
+                      <p className="font-mono text-sm font-semibold text-[#111] break-all">{profilePayment.upiId}</p>
+                      <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0">
+                        <QRCodeSVG 
+                          value={`upi://pay?pa=${profilePayment.upiId}&cu=INR`} 
+                          size={64} 
+                          level="M"
+                          includeMargin={false}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
