@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { UserActions } from "./UserActions";
+import { r2 } from "@/lib/r2";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +21,24 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   });
 
   if (!user) return notFound();
+
+  let statementUrl = null;
+  let jsonUrl = null;
+
+  const eddRecord = user.onboardingRecords.find((r) => r.layer === "EDD");
+  if (eddRecord?.result && typeof eddRecord.result === "object") {
+    const resultObj = eddRecord.result as any;
+    if (resultObj.r2Key) {
+      try {
+        statementUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: resultObj.r2Key }), { expiresIn: 3600 });
+      } catch (e) { console.error("Failed to sign R2 key:", resultObj.r2Key); }
+    }
+    if (resultObj.r2JsonKey) {
+      try {
+        jsonUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: resultObj.r2JsonKey }), { expiresIn: 3600 });
+      } catch (e) { console.error("Failed to sign R2 JSON key:", resultObj.r2JsonKey); }
+    }
+  }
 
   return (
     <div>
@@ -58,34 +79,50 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         </div>
 
         {/* Bank Analysis */}
-        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
-          <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Bank Statement Analysis</h2>
-          {user.bankStatementAnalysis ? (
-            <div className="flex flex-col gap-3">
-               <div className="flex justify-between">
-                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
-                  <span className="font-sans text-sm font-bold">{user.bankStatementAnalysis.status}</span>
-               </div>
-               <div className="flex justify-between">
-                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Monthly Balance</span>
-                  <span className="font-sans text-sm">₹{Number(user.bankStatementAnalysis.avgMonthlyBalance || 0).toLocaleString()}</span>
-               </div>
-               <div className="flex justify-between">
-                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Regular Income</span>
-                  <span className="font-sans text-sm">{user.bankStatementAnalysis.hasRegularIncome ? "Yes" : "No"}</span>
-               </div>
-               <div className="flex justify-between">
-                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Inflow Spike Ratio</span>
-                  <span className="font-sans text-sm">{user.bankStatementAnalysis.inflowSpikeRatio ?? "N/A"}</span>
-               </div>
-               {user.bankStatementAnalysis.errorMessage && (
-                 <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-sans">
-                   {user.bankStatementAnalysis.errorMessage}
+        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm flex flex-col justify-between">
+          <div>
+            <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Bank Statement Analysis</h2>
+            {user.bankStatementAnalysis ? (
+              <div className="flex flex-col gap-3">
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
+                    <span className="font-sans text-sm font-bold">{user.bankStatementAnalysis.status}</span>
                  </div>
-               )}
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Monthly Balance</span>
+                    <span className="font-sans text-sm">₹{Number(user.bankStatementAnalysis.avgMonthlyBalance || 0).toLocaleString()}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Regular Income</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.hasRegularIncome ? "Yes" : "No"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Inflow Spike Ratio</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.inflowSpikeRatio ?? "N/A"}</span>
+                 </div>
+                 {user.bankStatementAnalysis.errorMessage && (
+                   <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-sans">
+                     {user.bankStatementAnalysis.errorMessage}
+                   </div>
+                 )}
+              </div>
+            ) : (
+              <p className="font-sans text-sm text-[#888]">No bank statement analysis found for this user.</p>
+            )}
+          </div>
+          {(statementUrl || jsonUrl) && (
+            <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-[#eee]">
+              {statementUrl && (
+                <a href={statementUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-sans text-[#333] no-underline">
+                  View PDF Statement
+                </a>
+              )}
+              {jsonUrl && (
+                <a href={jsonUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-sans text-[#333] no-underline">
+                  View Extracted JSON
+                </a>
+              )}
             </div>
-          ) : (
-            <p className="font-sans text-sm text-[#888]">No bank statement analysis found for this user.</p>
           )}
         </div>
 
