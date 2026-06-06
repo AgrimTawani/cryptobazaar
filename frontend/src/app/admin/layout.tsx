@@ -38,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
 
         <div className="mt-auto pt-6 border-t border-[#333] flex items-center gap-3">
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
           <span className="font-sans text-xs text-[#888]">Super Admin</span>
         </div>
       </aside>
