@@ -461,7 +461,67 @@ export default function MarketplacePage() {
             )}
           </div>
         )}
+        {/* How to Buy / Sell Cards */}
+        <div className="mt-12 mb-8">
+          <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-4 uppercase">Guides</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/articles/how-to-buy-usdt" className="block bg-white border border-[#e8e8e8] rounded-xl p-5 cursor-pointer hover:shadow-sm hover:border-[#bbb] transition-all no-underline">
+              <div className="flex flex-col h-full">
+                <span className="font-sans text-xs font-bold text-[#7b3fe4] bg-[#f5f0ff] w-fit px-2 py-0.5 rounded-full mb-2">For Buyers</span>
+                <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Buy USDT on CryptoBazaar</h4>
+                <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">Learn how to securely purchase USDT using UPI or bank transfer. Follow our step-by-step guide to complete your first trade safely.</p>
+                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]">→</span></span>
+              </div>
+            </Link>
+            <Link href="/articles/how-to-sell-usdt" className="block bg-white border border-[#e8e8e8] rounded-xl p-5 cursor-pointer hover:shadow-sm hover:border-[#bbb] transition-all no-underline">
+              <div className="flex flex-col h-full">
+                <span className="font-sans text-xs font-bold text-[#b45309] bg-[#fef9ee] w-fit px-2 py-0.5 rounded-full mb-2">For Sellers</span>
+                <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Sell USDT on CryptoBazaar</h4>
+                <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">A comprehensive guide to posting sell orders, managing disputes, and verifying buyer payments before releasing your crypto.</p>
+                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]">→</span></span>
+              </div>
+            </Link>
+          </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-black text-white pt-12 pb-8 px-5 md:px-10 border-t border-[#222] mt-auto">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          <div className="col-span-1 md:col-span-2">
+            <h2 className="font-condensed text-2xl tracking-[1px] mb-4">CRYPTOBAZAAR</h2>
+            <p className="font-sans text-sm text-[#aaa] max-w-sm leading-relaxed">
+              The premier P2P crypto marketplace. Secure, fast, and reliable trading with built-in escrow protection and identity verification.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-sans text-sm font-semibold mb-4 text-[#ddd]">Platform</h4>
+            <ul className="flex flex-col gap-2 list-none p-0">
+              <li><Link href="/marketplace" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">Marketplace</Link></li>
+              <li><Link href="/marketplace/sell" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">Post an Order</Link></li>
+              <li><Link href="/dashboard" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">My Dashboard</Link></li>
+              <li><Link href="/onboarding" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">Get Verified</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-sans text-sm font-semibold mb-4 text-[#ddd]">Resources</h4>
+            <ul className="flex flex-col gap-2 list-none p-0">
+              <li><Link href="/articles" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">All Articles</Link></li>
+              <li><Link href="/articles/common-p2p-scams" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">Avoid P2P Scams</Link></li>
+              <li><Link href="/terms" className="font-sans text-sm text-[#888] hover:text-white transition-colors no-underline">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-[1200px] mx-auto border-t border-[#333] pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="font-sans text-xs text-[#666]">
+            © {new Date().getFullYear()} CryptoBazaar. All rights reserved.
+          </p>
+          <div className="flex gap-4">
+            <span className="font-sans text-xs text-[#666]">Secure Escrow</span>
+            <span className="font-sans text-xs text-[#666]">100% Verified Users</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
