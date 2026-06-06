@@ -1,0 +1,125 @@
+import { db } from "@/lib/db";
+import { notFound } from "next/navigation";
+import { UserActions } from "./UserActions";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const userId = parseInt(id, 10);
+  if (isNaN(userId)) return notFound();
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    include: {
+      bankStatementAnalysis: true,
+      onboardingRecords: true,
+    },
+  });
+
+  if (!user) return notFound();
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="font-condensed text-3xl uppercase tracking-[1px] mb-1">User Details</h1>
+          <p className="font-sans text-sm text-[#888]">ID: {user.id} · {user.email || user.clerkId}</p>
+        </div>
+        <UserActions userId={user.id} currentStatus={user.status} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Basic Info */}
+        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
+          <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Profile</h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Name</span>
+              <span className="font-sans text-sm">{user.name || "N/A"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
+              <span className="font-sans text-sm font-bold">{user.status}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Joined</span>
+              <span className="font-sans text-sm">{user.createdAt.toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Aadhaar (Last 4)</span>
+              <span className="font-sans text-sm">{user.aadhaarLast4 || "N/A"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">PAN</span>
+              <span className="font-sans text-sm">{user.panMasked || "N/A"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bank Analysis */}
+        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
+          <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Bank Statement Analysis</h2>
+          {user.bankStatementAnalysis ? (
+            <div className="flex flex-col gap-3">
+               <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
+                  <span className="font-sans text-sm font-bold">{user.bankStatementAnalysis.status}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Monthly Balance</span>
+                  <span className="font-sans text-sm">₹{Number(user.bankStatementAnalysis.avgMonthlyBalance || 0).toLocaleString()}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Regular Income</span>
+                  <span className="font-sans text-sm">{user.bankStatementAnalysis.hasRegularIncome ? "Yes" : "No"}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Inflow Spike Ratio</span>
+                  <span className="font-sans text-sm">{user.bankStatementAnalysis.inflowSpikeRatio ?? "N/A"}</span>
+               </div>
+               {user.bankStatementAnalysis.errorMessage && (
+                 <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-sans">
+                   {user.bankStatementAnalysis.errorMessage}
+                 </div>
+               )}
+            </div>
+          ) : (
+            <p className="font-sans text-sm text-[#888]">No bank statement analysis found for this user.</p>
+          )}
+        </div>
+
+        {/* Questionnaire / KYC Records */}
+        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm lg:col-span-2">
+          <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Onboarding Records (Questionnaire & KYC)</h2>
+          {user.onboardingRecords.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-sans text-sm">
+                <thead>
+                  <tr className="border-b border-[#eee]">
+                    <th className="py-2 font-semibold text-[#888] uppercase text-xs">Layer</th>
+                    <th className="py-2 font-semibold text-[#888] uppercase text-xs">Status</th>
+                    <th className="py-2 font-semibold text-[#888] uppercase text-xs">Score</th>
+                    <th className="py-2 font-semibold text-[#888] uppercase text-xs">Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {user.onboardingRecords.map(rec => (
+                    <tr key={rec.layer} className="border-b border-[#f5f5f5] last:border-0">
+                      <td className="py-3 font-semibold">{rec.layer}</td>
+                      <td className="py-3">{rec.status}</td>
+                      <td className="py-3">{rec.score ?? "-"}</td>
+                      <td className="py-3 text-[#555]">{rec.rejectionReason || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="font-sans text-sm text-[#888]">No onboarding records found.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
