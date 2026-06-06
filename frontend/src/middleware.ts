@@ -27,7 +27,7 @@ export const middleware = clerkMiddleware(async (auth, request) => {
   }
 
   // 3. Subdomain Rewrite
-  if (isAdminDomain && !request.nextUrl.pathname.startsWith('/admin')) {
+  if (isAdminDomain && !request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/api')) {
     url.pathname = `/admin${url.pathname === '/' ? '' : url.pathname}`;
     return NextResponse.rewrite(url);
   }
