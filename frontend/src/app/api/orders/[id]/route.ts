@@ -60,6 +60,10 @@ export async function GET(
     const isBuyer  = user.id === order.buyerId;
     const viewerRole = isSeller ? "seller" : isBuyer ? "buyer" : "observer";
 
+    if (viewerRole === "observer" && order.status !== "LISTED") {
+      return NextResponse.json({ error: "Access denied to private trade" }, { status: 403 });
+    }
+
     const SHOW_PAYMENT = ["BUYER_MATCHED", "BUYER_PAID", "COMPLETED", "DISPUTED",
       "DISPUTE_RESOLVED_BUYER", "DISPUTE_RESOLVED_SELLER"];
     const showPaymentDetails = isBuyer && SHOW_PAYMENT.includes(order.status);
