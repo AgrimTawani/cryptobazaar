@@ -51,16 +51,16 @@ function fmtRelease(secs: number | null): string | null {
 
 const CHAIN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
   POLYGON: { label: "Polygon", color: "#7b3fe4", bg: "#f0ebff" },
-  BSC:     { label: "BSC",     color: "#b45309", bg: "#fef9ee" },
-  SOLANA:  { label: "Solana",  color: "#9945ff", bg: "#f5f0ff" },
-  TRON:    { label: "Tron",    color: "#dc2626", bg: "#fff1f2" },
+  BSC: { label: "BSC", color: "#b45309", bg: "#fef9ee" },
+  SOLANA: { label: "Solana", color: "#9945ff", bg: "#f5f0ff" },
+  TRON: { label: "Tron", color: "#dc2626", bg: "#fff1f2" },
 };
 
 const MY_STATUS_COLOR: Record<string, { color: string; bg: string }> = {
-  LISTED:        { color: "#555",    bg: "#f5f5f5" },
+  LISTED: { color: "#555", bg: "#f5f5f5" },
   BUYER_MATCHED: { color: "#1e40af", bg: "#eff6ff" },
-  BUYER_PAID:    { color: "#92400e", bg: "#fffbeb" },
-  DISPUTED:      { color: "#991b1b", bg: "#fef2f2" },
+  BUYER_PAID: { color: "#92400e", bg: "#fffbeb" },
+  DISPUTED: { color: "#991b1b", bg: "#fef2f2" },
 };
 
 function ChainConfirmPopup({ order, onConfirm, onCancel }: {
@@ -116,17 +116,17 @@ export default function MarketplacePage() {
     const fetchData = (initial = false) => {
       const requests = initial
         ? [
-            isGuest ? Promise.resolve({}) : fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
-            fetch("/api/orders").then((r) => r.json()).catch(() => []),
-            isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
-            new Promise((resolve) => setTimeout(resolve, 1500)),
-          ]
+          isGuest ? Promise.resolve({}) : fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
+          fetch("/api/orders").then((r) => r.json()).catch(() => []),
+          isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+          new Promise((resolve) => setTimeout(resolve, 1500)),
+        ]
         : [
-            Promise.resolve(null),
-            fetch("/api/orders").then((r) => r.json()).catch(() => []),
-            isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
-            Promise.resolve(null),
-          ];
+          Promise.resolve(null),
+          fetch("/api/orders").then((r) => r.json()).catch(() => []),
+          isGuest ? Promise.resolve([]) : fetch("/api/orders?mine=true").then((r) => r.json()).catch(() => []),
+          Promise.resolve(null),
+        ];
 
       Promise.all(requests).then(([statusData, ordersData, myOrdersData]) => {
         if (statusData) setIsVerified(statusData?.userStatus === "VERIFIED");
@@ -212,7 +212,7 @@ export default function MarketplacePage() {
       <div className="max-w-[1200px] mx-auto py-6 px-4 md:px-6">
 
         {/* Scam Awareness Banner */}
-        <Link href="/articles/scams" className="block bg-white border border-[#e8e8e8] rounded-xl p-4 mb-6 cursor-pointer hover:shadow-sm transition-shadow no-underline">
+        <Link href="/articles/common-p2p-scams" className="block bg-white border border-[#e8e8e8] rounded-xl p-4 mb-6 cursor-pointer hover:shadow-sm transition-shadow no-underline">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-sans text-xs text-[#888] mb-1">The most popular P2P scams you should be aware</p>
@@ -272,18 +272,16 @@ export default function MarketplacePage() {
         <div className="flex gap-2 mb-4 flex-wrap">
           {ASSET_FILTERS.map((f) => (
             <button key={f} onClick={() => setAssetFilter(f)}
-              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${
-                assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
-              }`}>
+              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                }`}>
               {f}
             </button>
           ))}
           <div className="w-px bg-[#e5e5e5] mx-1" />
           {CHAIN_FILTERS.map((c) => (
             <button key={c} onClick={() => setChainFilter(c)}
-              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${
-                chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
-              }`}>
+              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                }`}>
               {c}
             </button>
           ))}
