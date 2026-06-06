@@ -13,4 +13,4 @@ jobs:
       - name: Ping Render Service
         # Replace the URL below with your actual Render service URL.
         # Alternatively, you can use a GitHub Secret: ${{ secrets.RENDER_SERVICE_URL }}
-        run: curl -s https://your-service-name.onrender.com > /dev/null
+        run: curl -s https://cryptobazaar-bank-analyzer.onrender.com > /dev/null

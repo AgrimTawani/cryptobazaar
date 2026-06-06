@@ -1,0 +1,4 @@
+{
+  "css.customData": [".vscode/css_custom_data.json"],
+  "python.defaultInterpreterPath": "${workspaceFolder}/bank-analyzer/venv/bin/python"
+}
