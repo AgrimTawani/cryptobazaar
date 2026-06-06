@@ -509,17 +509,19 @@ export default function SellPage() {
           )}
           <button type="button"
             onClick={() => {
+              if (!walletOk) {
+                reconnectWallet();
+                return;
+              }
               const err = validate();
               if (err) { setErrorMsg(err); return; }
               setErrorMsg("");
               setStep("review");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            disabled={!walletOk || !chainOk || isBusy || step === "done"}
+            disabled={walletOk && !chainOk}
             className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
-            {isBusy
-              ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
-              : "Review Order →"}
+            {!walletOk ? "Connect Wallet" : "Review Order →"}
           </button>
 
           <p className="font-sans text-sm text-[#999] text-center leading-relaxed">

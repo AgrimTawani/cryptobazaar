@@ -212,16 +212,16 @@ export default function MarketplacePage() {
       <div className="max-w-[1200px] mx-auto py-6 px-4 md:px-6">
 
         {/* Scam Awareness Banner */}
-        <Link href="/articles/common-p2p-scams" className="block bg-white border border-[#e8e8e8] rounded-xl p-4 mb-6 cursor-pointer hover:shadow-sm transition-shadow no-underline">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-sans text-xs text-[#888] mb-1">The most popular P2P scams you should be aware</p>
-              <div className="flex items-center gap-2">
-                <span className="font-sans text-sm font-bold text-[#111]">Avoid P2P Scams</span>
-                <span className="w-4 h-4 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-[10px] font-bold">›</span>
-              </div>
-            </div>
-            <Image src="/scam-illustration.png" alt="Avoid Scams" width={48} height={48} className="object-contain" />
+        <Link href="/articles/common-p2p-scams" className="group relative overflow-hidden flex items-center justify-between bg-black rounded-xl py-4 px-5 md:px-6 mb-8 cursor-pointer hover:bg-[#111] transition-colors no-underline shadow-sm">
+          <div className="relative z-10">
+            <p className="font-sans text-[0.65rem] text-lime tracking-[2px] uppercase mb-1 font-semibold">Platform Safety</p>
+            <h3 className="font-condensed text-2xl md:text-3xl tracking-[1px] text-white uppercase m-0 flex items-center gap-3">
+              Avoid P2P Scams
+              <span className="text-white/50 group-hover:text-lime group-hover:translate-x-1 transition-all">→</span>
+            </h3>
+          </div>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Image src="/hacker-no-scam-painted.png" alt="Avoid Scams" width={104} height={104} className="object-contain opacity-90 rounded-md" />
           </div>
         </Link>
 
