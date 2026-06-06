@@ -555,13 +555,7 @@ export default function Home() {
               <p className="font-sans text-sm text-[#666] leading-[1.7] mb-8">
                 Straight answers on verification, escrow and custody — the things that decide whether you trust a platform with your money.
               </p>
-              <a
-                href="mailto:support@cryptobazaar.co.in"
-                className="inline-flex items-center gap-2 font-sans text-sm font-semibold bg-black text-white px-5 py-3 rounded-full no-underline"
-              >
-                <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
-                We read every message
-              </a>
+
             </div>
 
             {/* Right — accordion */}

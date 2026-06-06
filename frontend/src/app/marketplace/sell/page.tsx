@@ -297,7 +297,7 @@ export default function SellPage() {
         )}
 
         {/* Review panel */}
-        {step === "review" && (
+        {(step === "review" || isBusy) && (
           <div className="bg-white border-2 border-black rounded-xl p-6 mb-6 space-y-5">
             <h2 className="font-condensed text-2xl tracking-[0.5px]">Confirm your listing</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -322,20 +322,23 @@ export default function SellPage() {
               </p>
             </div>
             <div className="flex gap-3 pt-1">
-              <button onClick={() => setStep("form")}
-                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
+              <button onClick={() => setStep("form")} disabled={isBusy}
+                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 ← Back to Edit
               </button>
-              <button onClick={handleSubmit}
-                className="flex-1 py-3 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer">
-                Confirm & Approve USDC →
+              <button onClick={handleSubmit} disabled={isBusy}
+                className="flex-1 py-3 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                {isBusy
+                  ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
+                  : "Confirm & Approve USDC →"}
               </button>
             </div>
           </div>
         )}
 
         {/* Form */}
-        <div className={`space-y-6 ${isBusy || step === "done" || step === "review" ? "opacity-50 pointer-events-none" : ""}`}>
+        {(step === "form" || step === "error") && (
+          <div className="space-y-6">
 
           <div>
             <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
@@ -523,6 +526,7 @@ export default function SellPage() {
             Your USDC moves to the escrow contract on submission. You release it after confirming INR payment.
           </p>
         </div>
+        )}
       </div>
     </div>
   );
