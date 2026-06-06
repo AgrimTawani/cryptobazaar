@@ -211,6 +211,20 @@ export default function MarketplacePage() {
 
       <div className="max-w-[1200px] mx-auto py-6 px-4 md:px-6">
 
+        {/* Scam Awareness Banner */}
+        <Link href="/articles/scams" className="block bg-white border border-[#e8e8e8] rounded-xl p-4 mb-6 cursor-pointer hover:shadow-sm transition-shadow no-underline">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-sans text-xs text-[#888] mb-1">The most popular P2P scams you should be aware</p>
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-sm font-bold text-[#111]">Avoid P2P Scams</span>
+                <span className="w-4 h-4 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-[10px] font-bold">›</span>
+              </div>
+            </div>
+            <Image src="/scam-illustration.png" alt="Avoid Scams" width={48} height={48} className="object-contain" />
+          </div>
+        </Link>
+
         {/* Active orders strip */}
         {myOrders.length > 0 && (
           <div className="mb-6">
