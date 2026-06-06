@@ -660,11 +660,11 @@ export default function Home() {
         </div>
 
         {/* Main footer grid */}
-        <div className="pt-10 md:pt-14 px-5 md:px-10 pb-10 max-w-[960px] mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-8 md:gap-10 mb-12">
+        <div className="pt-10 md:pt-14 px-5 md:px-10 pb-10 max-w-[1200px] mx-auto">
+          <div className="flex flex-col md:flex-row md:justify-between gap-10 mb-12">
             {/* Brand */}
-            <div>
-              <div className="font-condensed text-[1.4rem] tracking-[3px] text-white mb-3">
+            <div className="md:max-w-[360px]">
+              <div className="nav-logo text-white mb-3">
                 CRYPTOBAZAAR
               </div>
               <p className="font-sans text-[0.78rem] text-white/30 leading-[1.7] mb-5">
@@ -673,8 +673,6 @@ export default function Home() {
               <div className="flex flex-col gap-[6px]">
                 {[
                   { label: "General", email: "support@cryptobazaar.co.in" },
-                  { label: "Disputes", email: "disputes@cryptobazaar.co.in" },
-                  { label: "Legal", email: "legal@cryptobazaar.co.in" },
                 ].map((c) => (
                   <div key={c.label} className="flex gap-2 items-center">
                     <span className="font-sans text-[0.68rem] text-white/25 tracking-[1px] uppercase w-[50px]">{c.label}</span>

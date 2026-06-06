@@ -68,19 +68,12 @@ export default function ArticlesIndexPage() {
           >
             Home
           </Link>
-          <span className="text-zinc-200">·</span>
-          <Link
-            href="/login"
-            className="py-1 px-5 border border-zinc-300 rounded-full text-zinc-800 font-condensed hover:bg-black hover:text-white transition-all no-underline"
-          >
-            Sign In
-          </Link>
         </div>
       </header>
 
       {/* ── HERO ── */}
-      <div className="max-w-[1100px] mx-auto px-5 md:px-10 pt-16 pb-12 border-b border-zinc-200">
-        <span className="font-sans text-xs tracking-[4px] uppercase text-lime-dark font-bold">
+      <div className="max-w-[1400px] mx-auto px-5 md:px-10 pt-16 pb-12 border-b border-zinc-200">
+        <span className="font-sans text-sm tracking-[4px] uppercase text-black font-bold">
           CryptoBazaar
         </span>
         <h1 className="font-condensed text-[clamp(3rem,6vw,5.5rem)] leading-none tracking-[1px] text-black uppercase mt-3">
@@ -94,36 +87,36 @@ export default function ArticlesIndexPage() {
       </div>
 
       {/* ── CATEGORIES & ARTICLES GRID ── */}
-      <div className="max-w-[1100px] mx-auto px-5 md:px-10 py-12">
+      <div className="max-w-[1400px] mx-auto px-5 md:px-10 py-12">
         <div className="space-y-16">
           {ARTICLES_CATEGORIES.map((category) => (
             <section key={category.id}>
               {/* Category heading */}
-              <div className="mb-6 pb-4 border-b border-zinc-200">
-                <h2 className="font-condensed text-[1.8rem] tracking-[0.5px] text-black">
+              <div className="mb-8 pb-4 border-b border-zinc-200">
+                <h2 className="font-condensed text-[2.2rem] tracking-[0.5px] text-black">
                   {category.title}
                 </h2>
-                <p className="font-sans text-xs text-zinc-400 mt-1">
+                <p className="font-sans text-sm text-zinc-500 mt-1">
                   {category.articles.length} article
                   {category.articles.length !== 1 ? "s" : ""}
                 </p>
               </div>
 
               {/* Articles grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.articles.map((article) => (
                   <Link
                     key={article.id}
                     href={`/articles/${article.id}`}
-                    className="group flex flex-col gap-2 p-5 rounded-xl border border-zinc-200 hover:border-zinc-400 hover:shadow-sm transition-all duration-200 no-underline"
+                    className="group flex flex-col gap-3 p-8 rounded-2xl border border-zinc-200 hover:border-zinc-400 hover:shadow-md transition-all duration-200 no-underline"
                   >
-                    <h3 className="font-condensed text-[1rem] tracking-[0.3px] text-zinc-900 group-hover:text-black transition-colors leading-tight">
+                    <h3 className="font-condensed text-[1.4rem] tracking-[0.3px] text-zinc-900 group-hover:text-black transition-colors leading-tight">
                       {article.title}
                     </h3>
-                    <p className="font-sans text-xs text-zinc-500 leading-relaxed line-clamp-2">
+                    <p className="font-sans text-sm text-zinc-500 leading-relaxed line-clamp-3">
                       {article.shortDesc}
                     </p>
-                    <span className="font-sans text-xs text-lime-dark font-semibold mt-auto pt-2">
+                    <span className="font-sans text-sm text-black font-semibold mt-auto pt-4">
                       Read article →
                     </span>
                   </Link>
@@ -135,7 +128,7 @@ export default function ArticlesIndexPage() {
       </div>
 
       {/* ── FOOTER ── */}
-      <div className="max-w-[1100px] mx-auto px-5 md:px-10 py-10 border-t border-zinc-200">
+      <div className="max-w-[1400px] mx-auto px-5 md:px-10 py-10 border-t border-zinc-200">
         <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <p className="font-condensed text-lg tracking-[1px] text-zinc-900">

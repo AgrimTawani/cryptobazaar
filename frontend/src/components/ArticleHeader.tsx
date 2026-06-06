@@ -31,32 +31,27 @@ export function ArticleHeader() {
         </Link>
         <span className="text-zinc-200 hidden md:inline">·</span>
         <WalletNavWidget />
-        <span className="text-zinc-200 hidden md:inline">·</span>
-        {isSignedIn ? (
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 no-underline py-1.5 pr-3.5 pl-1.5 border border-zinc-200 rounded-full bg-zinc-50 hover:bg-zinc-100 transition-colors"
-          >
-            {user?.imageUrl && (
-              <Image
-                src={user.imageUrl}
-                alt="User profile picture"
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            )}
-            <span className="font-sans text-sm font-medium text-zinc-800">
-              Dashboard
-            </span>
-          </Link>
-        ) : (
-          <Link
-            href="/login"
-            className="btn-login py-1 px-5 border border-zinc-300 rounded-full text-zinc-800 font-condensed hover:bg-black hover:text-white transition-all"
-          >
-            Sign In
-          </Link>
+        {isSignedIn && (
+          <>
+            <span className="text-zinc-200 hidden md:inline">·</span>
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 no-underline py-1.5 pr-3.5 pl-1.5 border border-zinc-200 rounded-full bg-zinc-50 hover:bg-zinc-100 transition-colors"
+            >
+              {user?.imageUrl && (
+                <Image
+                  src={user.imageUrl}
+                  alt="User profile picture"
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+              )}
+              <span className="font-sans text-sm font-medium text-zinc-800">
+                Dashboard
+              </span>
+            </Link>
+          </>
         )}
       </div>
     </header>
