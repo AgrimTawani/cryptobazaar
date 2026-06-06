@@ -4,17 +4,19 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "@/lib/db";
 import { r2 } from "@/lib/r2";
 
-async function uploadToR2(buffer: Buffer, userId: number, name: string | null, attemptNumber: number): Promise<string> {
+async function uploadToR2(buffer: Buffer, userId: number, name: string | null, attemptNumber: number, isJson: boolean = false): Promise<string> {
   const safeName = (name ?? "unknown")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-  const key = `statements/${safeName}-${userId}/${Date.now()}-attempt${attemptNumber}.pdf`;
+  const ext = isJson ? "json" : "pdf";
+  const contentType = isJson ? "application/json" : "application/pdf";
+  const key = `statements/${safeName}-${userId}/${Date.now()}-attempt${attemptNumber}.${ext}`;
   await r2.send(new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
     Key: key,
     Body: buffer,
-    ContentType: "application/pdf",
+    ContentType: contentType,
   }));
   return key;
 }
@@ -179,11 +181,14 @@ export async function POST(req: NextRequest) {
     const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
     console.log(`[analyze-statement] Sending PDF to microservice at: ${microserviceUrl}`);
     let analysisData = null;
+    let r2JsonKey: string | null = null;
     try {
       const formDataService = new FormData();
       // Explicitly append as a blob with a guaranteed .pdf filename to prevent FastAPI 400 errors
       const blob = new Blob([buffer], { type: "application/pdf" });
       formDataService.append("file", blob, "statement.pdf");
+      if (bankAccount) formDataService.append("account_number", bankAccount);
+      if (ifscCode) formDataService.append("ifsc_code", ifscCode);
 
       const msResponse = await fetch(microserviceUrl, {
         method: "POST",
@@ -197,6 +202,36 @@ export async function POST(req: NextRequest) {
         const msResult = await msResponse.json();
         if (msResult.status === "LOCKED_PDF") {
            return NextResponse.json({ error: "PDF is password protected. Please upload an unlocked PDF." }, { status: 400 });
+        }
+        if (msResult.status === "VERIFICATION_FAILED") {
+          await db.onboardingRecord.upsert({
+            where: { userId_layer: { userId: user.id, layer: "EDD" } },
+            create: {
+              userId: user.id,
+              layer: "EDD",
+              status: "FAILED",
+              attemptNumber: attemptNumber + 1,
+              score: 0,
+              result: { forensic, r2Key } as object,
+              rejectionReason: msResult.error,
+              completedAt: new Date(),
+            },
+            update: {
+              status: "FAILED",
+              attemptNumber: { increment: 1 },
+              score: 0,
+              result: { forensic, r2Key } as object,
+              rejectionReason: msResult.error,
+              completedAt: new Date(),
+            },
+          });
+          return NextResponse.json({
+            passed: false,
+            score: 0,
+            flags: [msResult.error],
+            summary: "Document failed verification against provided bank account details.",
+            forensicFail: false,
+          });
         }
         if (msResult.status === "COMPLETED") {
           analysisData = msResult;
@@ -253,6 +288,11 @@ export async function POST(req: NextRequest) {
           positiveNetFlowMonths: analysisData.positiveNetFlowMonths,
         }
       });
+      
+      if (analysisData.extracted_data) {
+        const jsonBuffer = Buffer.from(JSON.stringify(analysisData.extracted_data));
+        r2JsonKey = await uploadToR2(jsonBuffer, user.id, user.name, attemptNumber, true);
+      }
     }
 
     // ── Step 4: Write result to DB — manual compliance review ────────────────
@@ -265,7 +305,7 @@ export async function POST(req: NextRequest) {
         status: "PASSED",
         attemptNumber,
         score,
-        result: { forensic, r2Key } as object,
+        result: { forensic, r2Key, r2JsonKey } as object,
         rejectionReason: null,
         completedAt: new Date(),
       },
@@ -273,7 +313,7 @@ export async function POST(req: NextRequest) {
         status: "PASSED",
         attemptNumber: { increment: 1 },
         score,
-        result: { forensic, r2Key } as object,
+        result: { forensic, r2Key, r2JsonKey } as object,
         rejectionReason: null,
         completedAt: new Date(),
       },

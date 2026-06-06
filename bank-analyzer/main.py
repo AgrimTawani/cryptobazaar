@@ -1,14 +1,20 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-import pdfplumber
-from pdfminer.pdfdocument import PDFPasswordIncorrect
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+import opendataloader_pdf
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 import tempfile
 import os
+import json
 import traceback
 
 app = FastAPI(title="Bank Statement Analyzer")
 
 @app.post("/analyze")
-async def analyze_statement(file: UploadFile = File(...)):
+async def analyze_statement(
+    file: UploadFile = File(...),
+    account_number: str = Form(None),
+    ifsc_code: str = Form(None)
+):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
@@ -22,14 +28,16 @@ async def analyze_statement(file: UploadFile = File(...)):
 
         # Detect if PDF is locked
         try:
-            with pdfplumber.open(temp_pdf_path) as pdf:
-                # If we can open it without exception, it's not strictly password protected
-                # But we can also double check metadata or page reading
-                _ = len(pdf.pages)
-        except PDFPasswordIncorrect:
+            reader = PdfReader(temp_pdf_path)
+            if reader.is_encrypted:
+                return {
+                    "status": "LOCKED_PDF",
+                    "error": "The uploaded PDF is password protected. Please provide an unlocked PDF."
+                }
+        except PdfReadError:
             return {
                 "status": "LOCKED_PDF",
-                "error": "The uploaded PDF is password protected. Please provide an unlocked PDF."
+                "error": "The uploaded PDF is password protected or corrupted."
             }
         except Exception as e:
             return {
@@ -37,24 +45,48 @@ async def analyze_statement(file: UploadFile = File(...)):
                 "error": f"Failed to read PDF: {str(e)}"
             }
 
-        # Table Extraction Logic
-        extracted_tables = []
-        try:
-            with pdfplumber.open(temp_pdf_path) as pdf:
-                for page in pdf.pages:
-                    table = page.extract_table()
-                    if table:
-                        extracted_tables.append(table[1:]) # Skip headers
-        except Exception as e:
-            traceback.print_exc()
-            pass
-        
-        # If no tables found, we cannot run heuristics reliably
-        # A real implementation would parse the specific bank statement format
+        # Table Extraction Logic with OpenDataLoader
+        extracted_data = {}
+        with tempfile.TemporaryDirectory() as temp_out_dir:
+            try:
+                opendataloader_pdf.convert(
+                    input_path=temp_pdf_path,
+                    output_dir=temp_out_dir,
+                    format="json"
+                )
+                
+                # OpenDataLoader outputs to a file matching the input filename + .json
+                # Let's find the json file in the directory
+                for filename in os.listdir(temp_out_dir):
+                    if filename.endswith(".json"):
+                        with open(os.path.join(temp_out_dir, filename), "r") as f:
+                            extracted_data = json.load(f)
+                        break
+            except Exception as e:
+                traceback.print_exc()
+                pass
+                
+        # Verification Logic
+        if account_number or ifsc_code:
+            # Simple text search inside the JSON string dump
+            json_dump = json.dumps(extracted_data)
+            
+            if account_number and account_number not in json_dump:
+                return {
+                    "status": "VERIFICATION_FAILED",
+                    "error": "Bank account number not found in the statement."
+                }
+                
+            if ifsc_code and ifsc_code not in json_dump:
+                return {
+                    "status": "VERIFICATION_FAILED",
+                    "error": "IFSC code not found in the statement."
+                }
         
         # Heuristics Logic (A, B, C, D checks)
         metrics = {
             "status": "COMPLETED",
+            "extracted_data": extracted_data,
             "hasRegularIncome": True,
             "recurringBillCount": 4,
             "transactionModes": ["UPI", "NEFT"],
@@ -75,9 +107,9 @@ async def analyze_statement(file: UploadFile = File(...)):
             "positiveNetFlowMonths": 5,
         }
 
-        # Example calculation if extracted_tables is populated:
-        if extracted_tables:
-            pass # TODO: apply heuristic logic to metrics
+        # Example calculation if extracted_data is populated:
+        if extracted_data:
+            pass # TODO: apply heuristic logic to metrics using the JSON
 
         return metrics
 
