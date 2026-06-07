@@ -570,7 +570,7 @@ export default function Home() {
                       {faq.q}
                     </span>
                     <span
-                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${openFaq === i ? "bg-lime text-black" : "bg-[#f0f0f0] text-black"
+                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-sans text-base transition-all duration-200 ${openFaq === i ? "bg-black text-lime" : "bg-[#f0f0f0] text-black"
                         }`}
                     >
                       {openFaq === i ? "−" : "+"}
