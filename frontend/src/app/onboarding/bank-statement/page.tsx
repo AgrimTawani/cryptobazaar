@@ -56,7 +56,25 @@ export default function BankStatementPage() {
         body: form,
       });
 
-      const data = await res.json();
+      let data;
+      let isJson = false;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+        isJson = true;
+      } else {
+        const text = await res.text();
+        console.error("Non-JSON response from server:", res.status, text);
+        if (res.status === 504) {
+          setError("The analysis server is starting up. Please wait 30 seconds and try again.");
+          return;
+        } else if (res.status === 413) {
+          setError("File is too large for the server to process.");
+          return;
+        }
+        setError(`Server error (${res.status}). Please try again.`);
+        return;
+      }
 
       if (!res.ok) {
         setError(data.error || "Analysis failed. Please try again.");
@@ -66,7 +84,8 @@ export default function BankStatementPage() {
       setResult(data);
 
       setTimeout(() => router.push("/onboarding/questionnaire"), 3000);
-    } catch {
+    } catch (err) {
+      console.error("Fetch error:", err);
       setError("Network error. Please check your connection and try again.");
     } finally {
       setAnalyzing(false);

@@ -100,6 +100,66 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                     <span className="font-sans text-xs font-semibold text-[#888] uppercase">Inflow Spike Ratio</span>
                     <span className="font-sans text-sm">{user.bankStatementAnalysis.inflowSpikeRatio ?? "N/A"}</span>
                  </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Recurring Bill Count</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.recurringBillCount ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Transaction Modes</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.transactionModes?.join(', ') || "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Merchant Spend</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.hasMerchantSpend !== null ? (user.bankStatementAnalysis.hasMerchantSpend ? "Yes" : "No") : "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Exchange Tx Count</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.exchangeTxCount ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Months With Crypto Trades</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.monthsWithCryptoTrades ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Bidirectional Crypto</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.hasBidirectionalCrypto !== null ? (user.bankStatementAnalysis.hasBidirectionalCrypto ? "Yes" : "No") : "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Max Volume Spike Ratio</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.maxVolumeSpikeRatio ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Unique Senders / Month</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.avgUniqueSendersPerMonth ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Sender Recurrence Rate</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.senderRecurrenceRate ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Credit to Debit Hours</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.avgCreditToDebitHours ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Round Number Ratio</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.roundNumberRatio ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Structuring Clusters</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.structuringClustersCount ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Balance Drops To Zero</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.balanceDropsToZero ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Returned Payments Count</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.returnedPaymentsCount ?? "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Positive Net Flow Months</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.positiveNetFlowMonths ?? "N/A"}</span>
+                 </div>
                  {user.bankStatementAnalysis.errorMessage && (
                    <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-sans">
                      {user.bankStatementAnalysis.errorMessage}
