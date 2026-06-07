@@ -14,4 +14,8 @@ if [ ! -d "jdk" ]; then
     rm jdk.tar.gz
 fi
 
+export PATH="${PWD}/jdk/bin:$PATH"
+echo "Pre-building PDFBox font cache..."
+python dummy.py
+
 echo "Build complete."

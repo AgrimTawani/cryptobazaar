@@ -21,7 +21,7 @@ async function uploadToR2(buffer: Buffer, userId: number, name: string | null, a
   return key;
 }
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 // Tools known to be used for image manipulation / document forgery
 const IMAGE_EDITING_TOOLS = [
