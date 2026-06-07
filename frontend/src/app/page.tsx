@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     q: "What happens during the 3-step verification?",
-    a: "Step 1 - Identity check: Aadhaar + PAN + a quick liveness selfie. Takes under 5 minutes.\nStep 2 - Bank statement review: Upload 6 months of statements. Our system checks for red flags.\nStep 3 - AI Questionnaire: 10 questions online, about 5 minutes, to understand your trading background.\nOnce all three pass, you're a Verified Member.",
+    a: "Step 1 - Identity check: Aadhaar + PAN + a quick liveness selfie. Takes under 5 minutes.\nStep 2 - Bank statement review: Upload 6 months of statements. Our system checks for red flags.\nStep 3 - Questionnaire: 10 questions online, about 5 minutes, to understand your trading background.\nOnce all three pass, you're a Verified Member.",
   },
   {
     q: "How does the escrow work?",
@@ -55,19 +55,19 @@ const HOW_IT_WORKS = [
   {
     step: "03",
     title: "Submit bank statement",
-    desc: "Upload 6 months of statements. ML reviews for red flags, then discards the data — never stored.",
+    desc: "Upload 6 months of statements. Automated review for red flags, then discards the data — never stored.",
     pill: "Discarded After Review",
   },
   {
     step: "04",
-    title: "Pass the AI screen",
-    desc: "Ten short questions on your trading background, scored by AI. Takes about five minutes.",
-    pill: "AI-Scored",
+    title: "Pass the screen",
+    desc: "Ten short questions on your trading background. Takes about five minutes.",
+    pill: "Automated Screen",
   },
   {
     step: "05",
-    title: "Connect wallet & plan",
-    desc: "Link MetaMask, Phantom or any compatible wallet and pick a membership tier for your monthly volume.",
+    title: "Connect wallet",
+    desc: "Link MetaMask, Phantom or any compatible wallet.",
     pill: "Self-Custody",
   },
   {
