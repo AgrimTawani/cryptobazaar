@@ -474,6 +474,11 @@ model BankStatementAnalysis {
   status          String
   errorMessage    String?  @map("error_message")
 
+  extractedName                String? @map("extracted_name")
+  extractedAccountNumber       String? @map("extracted_account_number")
+  extractedIfscCode            String? @map("extracted_ifsc_code")
+  metadataVerificationResult   Json?   @map("metadata_verification_result")
+
   hasRegularIncome       Boolean? @map("has_regular_income")
   recurringBillCount     Int?     @map("recurring_bill_count")
   transactionModes       String[] @map("transaction_modes")

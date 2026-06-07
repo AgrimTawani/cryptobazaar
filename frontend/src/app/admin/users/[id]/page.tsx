@@ -89,6 +89,26 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                     <span className="font-sans text-sm font-bold">{user.bankStatementAnalysis.status}</span>
                  </div>
                  <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Extracted Name</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.extractedName || "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Extracted Account No</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.extractedAccountNumber || "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Extracted IFSC</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.extractedIfscCode || "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Metadata Match Result</span>
+                    <span className="font-sans text-sm">
+                      {user.bankStatementAnalysis.metadataVerificationResult
+                        ? JSON.stringify(user.bankStatementAnalysis.metadataVerificationResult)
+                        : "N/A"}
+                    </span>
+                 </div>
+                 <div className="flex justify-between">
                     <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Monthly Balance</span>
                     <span className="font-sans text-sm">₹{Number(user.bankStatementAnalysis.avgMonthlyBalance || 0).toLocaleString()}</span>
                  </div>

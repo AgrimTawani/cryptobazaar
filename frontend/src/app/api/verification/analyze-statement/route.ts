@@ -205,6 +205,7 @@ export async function POST(req: NextRequest) {
       const formDataService = new FormData();
       const blob = new Blob([buffer], { type: "application/pdf" });
       formDataService.append("file", blob, "statement.pdf");
+      if (user.name) formDataService.append("expected_name", user.name);
       if (bankAccount) formDataService.append("account_number", bankAccount);
       if (ifscCode) formDataService.append("ifsc_code", ifscCode);
       formDataService.append("user_id", String(user.id));

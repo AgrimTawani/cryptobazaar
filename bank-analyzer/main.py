@@ -8,6 +8,7 @@ import json
 import traceback
 import boto3
 import requests
+import analyzer
 
 app = FastAPI(title="Bank Statement Analyzer")
 
@@ -23,6 +24,7 @@ R2_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME')
 
 def process_statement_background(
     file_bytes: bytes,
+    expected_name: str,
     account_number: str,
     ifsc_code: str,
     webhook_url: str,
@@ -69,7 +71,7 @@ def process_statement_background(
                 traceback.print_exc()
                 pass
                 
-        # Verification Logic
+        # Verification Logic (Quick pre-check)
         if account_number or ifsc_code:
             json_dump = json.dumps(extracted_data)
             
@@ -94,31 +96,46 @@ def process_statement_background(
                 )
             except Exception as e:
                 print(f"Failed to upload JSON to R2: {e}")
-                # We can still continue, just log it
 
-        # Heuristics Logic
+        # Advanced Analysis & Verification Logic
+        analysis_result = analyzer.analyze_bank_statement_json(
+            extracted_data, 
+            expected_name=expected_name, 
+            expected_account_number=account_number, 
+            expected_ifsc=ifsc_code
+        )
+
+        metadata = analysis_result["metadata"]
+        calc = analysis_result["metrics"]
+
         metrics = {
             "user_id": user_id,
             "status": "COMPLETED",
             "r2_json_key": r2_json_key,
-            "hasRegularIncome": True,
-            "recurringBillCount": 4,
-            "transactionModes": ["UPI", "NEFT"],
-            "hasMerchantSpend": True,
-            "exchangeTxCount": 2,
-            "monthsWithCryptoTrades": 1,
-            "hasBidirectionalCrypto": False,
-            "maxVolumeSpikeRatio": 1.2,
-            "avgUniqueSendersPerMonth": 5.5,
-            "senderRecurrenceRate": 60.0,
-            "avgCreditToDebitHours": 48.5,
-            "roundNumberRatio": 0.1,
-            "structuringClustersCount": 0,
-            "inflowSpikeRatio": 1.1,
-            "avgMonthlyBalance": 125000.50,
-            "balanceDropsToZero": 0,
-            "returnedPaymentsCount": 0,
-            "positiveNetFlowMonths": 5,
+            
+            "extractedName": metadata["extractedName"],
+            "extractedAccountNumber": metadata["extractedAccountNumber"],
+            "extractedIfscCode": metadata["extractedIfscCode"],
+            "metadataVerificationResult": metadata["verification"],
+            
+            "hasRegularIncome": calc["hasRegularIncome"],
+            "recurringBillCount": calc["recurringBillCount"],
+            "transactionModes": calc["transactionModes"],
+            "hasMerchantSpend": calc["hasMerchantSpend"],
+            "exchangeTxCount": calc["exchangeTxCount"],
+            "monthsWithCryptoTrades": calc["monthsWithCryptoTrades"],
+            "hasBidirectionalCrypto": calc["hasBidirectionalCrypto"],
+            "maxVolumeSpikeRatio": calc["maxVolumeSpikeRatio"],
+            "avgUniqueSendersPerMonth": calc["avgUniqueSendersPerMonth"],
+            "senderRecurrenceRate": calc["senderRecurrenceRate"],
+            "avgCreditToDebitHours": calc["avgCreditToDebitHours"],
+            "roundNumberRatio": calc["roundNumberRatio"],
+            "structuringClustersCount": calc["structuringClustersCount"],
+            "inflowSpikeRatio": calc["inflowSpikeRatio"],
+            "avgMonthlyBalance": calc["avgMonthlyBalance"],
+            "balanceDropsToZero": calc["balanceDropsToZero"],
+            "returnedPaymentsCount": calc["returnedPaymentsCount"],
+            "positiveNetFlowMonths": calc["positiveNetFlowMonths"],
         }
 
         # Send back to Next.js Webhook
@@ -137,6 +154,7 @@ def process_statement_background(
 async def analyze_statement(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    expected_name: str = Form(None),
     account_number: str = Form(None),
     ifsc_code: str = Form(None),
     webhook_url: str = Form(...),
@@ -151,6 +169,7 @@ async def analyze_statement(
     background_tasks.add_task(
         process_statement_background,
         file_bytes=contents,
+        expected_name=expected_name,
         account_number=account_number,
         ifsc_code=ifsc_code,
         webhook_url=webhook_url,

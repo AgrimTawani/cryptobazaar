@@ -6,3 +6,4 @@ pypdf
 python-dateutil
 boto3
 requests
+pandas

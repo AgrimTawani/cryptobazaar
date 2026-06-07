@@ -41,6 +41,10 @@ export async function POST(req: NextRequest) {
         create: {
           userId,
           status: data.status,
+          extractedName: data.extractedName,
+          extractedAccountNumber: data.extractedAccountNumber,
+          extractedIfscCode: data.extractedIfscCode,
+          metadataVerificationResult: data.metadataVerificationResult,
           hasRegularIncome: data.hasRegularIncome,
           recurringBillCount: data.recurringBillCount,
           transactionModes: data.transactionModes,
@@ -62,6 +66,10 @@ export async function POST(req: NextRequest) {
         },
         update: {
           status: data.status,
+          extractedName: data.extractedName,
+          extractedAccountNumber: data.extractedAccountNumber,
+          extractedIfscCode: data.extractedIfscCode,
+          metadataVerificationResult: data.metadataVerificationResult,
           hasRegularIncome: data.hasRegularIncome,
           recurringBillCount: data.recurringBillCount,
           transactionModes: data.transactionModes,
