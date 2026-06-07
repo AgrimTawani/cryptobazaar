@@ -701,9 +701,6 @@ export default function Home() {
               <Link href="/articles?topic=privacy" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
                 Privacy Policy
               </Link>
-              <Link href="/articles?topic=mpf-guide" className="block font-sans text-[0.82rem] text-white/[0.45] mb-[10px]">
-                Member Protection Fund
-              </Link>
             </div>
 
             {/* Contact */}
