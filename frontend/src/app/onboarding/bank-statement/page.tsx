@@ -101,7 +101,7 @@ export default function BankStatementPage() {
           Bank Statement Review
         </h1>
         <p className="font-sans text-sm text-[#666] mb-8 leading-[1.6]">
-          Upload your last 6 months of bank statements. Our AI checks for
+          Upload your last 6 months of bank statements. ML checks for
           income patterns and flags. PDF only, max 10MB.
         </p>
 
@@ -114,7 +114,7 @@ export default function BankStatementPage() {
                 Statement Received
               </span>
               <span className="ml-auto font-sans text-[0.8rem] font-bold px-2 py-0.5 rounded-full bg-[#e2e8f0] text-[#4a5568]">
-                AI Score {result.score}/100
+                ML Score {result.score}/100
               </span>
             </div>
             <p className="font-sans text-[0.82rem] text-[#555] leading-[1.6] mb-3">
@@ -252,7 +252,7 @@ export default function BankStatementPage() {
               {analyzing ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-fast" />
-                  Analysing with AI…
+                  Analysing…
                 </span>
               ) : (
                 "Submit Statement →"
@@ -262,7 +262,6 @@ export default function BankStatementPage() {
         )}
 
         <div className="flex items-center gap-2 mt-6 pt-5 border-t border-[#f0f0f0]">
-          <span>🔒</span>
           <span className="font-sans text-[0.72rem] text-[#bbb]">
             Analysed and discarded instantly. Only the score is retained.
           </span>
