@@ -3,11 +3,14 @@
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { WalletNavWidget } from "@/components/WalletNavWidget";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import { AnimatePresence, motion } from "framer-motion";
 
 const ASSET_FILTERS = ["All", "USDT", "USDC"];
 const CHAIN_FILTERS = ["All Chains", "Polygon", "Solana", "Tron", "BNB"];
@@ -112,6 +115,22 @@ export default function MarketplacePage() {
   const [myOrders, setMyOrders] = useState<OrderRow[]>([]);
   const [isLoadingDb, setIsLoadingDb] = useState(true);
 
+  // Sorting and filtering state
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [priceSort, setPriceSort] = useState<"default" | "asc" | "desc">("default");
+  const [ratingSort, setRatingSort] = useState<"default" | "asc" | "desc">("default");
+  const [priceRange, setPriceRange] = useState<[number, number]>([50, 150]);
+  const [priceBounds, setPriceBounds] = useState<[number, number]>([50, 150]);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setIsSortOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   useEffect(() => {
     const fetchData = (initial = false) => {
       const requests = initial
@@ -130,7 +149,21 @@ export default function MarketplacePage() {
 
       Promise.all(requests).then(([statusData, ordersData, myOrdersData]) => {
         if (statusData) setIsVerified(statusData?.userStatus === "VERIFIED");
-        if (Array.isArray(ordersData)) setOrders(ordersData);
+        if (Array.isArray(ordersData)) {
+          setOrders(ordersData);
+          if (ordersData.length > 0 && initial) {
+            const prices = ordersData.map((o: any) => parseFloat(o.pricePerUnit));
+            const min = Math.floor(Math.min(...prices));
+            const max = Math.ceil(Math.max(...prices));
+            if (min < max) {
+              setPriceBounds([min, max]);
+              setPriceRange([min, max]);
+            } else {
+              setPriceBounds([min - 10, max + 10]);
+              setPriceRange([min - 10, max + 10]);
+            }
+          }
+        }
         if (Array.isArray(myOrdersData)) setMyOrders(myOrdersData);
         if (initial) setIsLoadingDb(false);
       });
@@ -144,7 +177,24 @@ export default function MarketplacePage() {
   const filtered = orders.filter((o) => {
     const assetMatch = assetFilter === "All" || o.asset === assetFilter;
     const chainMatch = chainFilter === "All Chains" || o.chain === CHAIN_MAP[chainFilter];
-    return assetMatch && chainMatch;
+    const p = parseFloat(o.pricePerUnit);
+    const priceMatch = p >= priceRange[0] && p <= priceRange[1];
+    return assetMatch && chainMatch && priceMatch;
+  }).sort((a, b) => {
+    let priceDiff = 0;
+    if (priceSort === "asc") priceDiff = parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit);
+    else if (priceSort === "desc") priceDiff = parseFloat(b.pricePerUnit) - parseFloat(a.pricePerUnit);
+
+    let ratingDiff = 0;
+    if (ratingSort === "asc" || ratingSort === "desc") {
+      const rA = a.sellerAvgRating ?? 0;
+      const rB = b.sellerAvgRating ?? 0;
+      ratingDiff = ratingSort === "asc" ? rA - rB : rB - rA;
+    }
+
+    if (priceDiff !== 0) return priceDiff;
+    if (ratingDiff !== 0) return ratingDiff;
+    return 0; // default
   });
 
   if (isLoadingDb) return <LoadingSpinner />;
@@ -165,23 +215,27 @@ export default function MarketplacePage() {
           <Link href="/" className="hidden md:inline font-sans text-sm text-[#888] no-underline">Home</Link>
           <span className="text-[#ddd] hidden md:inline">·</span>
           <WalletNavWidget />
-          <span className="text-[#ddd] hidden md:inline">·</span>
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 no-underline py-1 pr-3 pl-1 border-[1.5px] border-[#e0e0e0] rounded-full bg-white"
-          >
-            {user?.imageUrl && (
-              <Image src={user.imageUrl} alt={user.firstName ? `${user.firstName}'s avatar` : "User avatar"} width={24} height={24} className="rounded-full" />
-            )}
-            <span className="font-sans text-sm font-medium text-[#111] hidden sm:inline">
-              {user?.firstName ?? "Dashboard"}
-            </span>
-            {isVerified && (
-              <span className="font-sans text-[0.65rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
-                ✓ VERIFIED
-              </span>
-            )}
-          </Link>
+          {!isGuest && (
+            <>
+              <span className="text-[#ddd] hidden md:inline">·</span>
+              <Link
+                href="/dashboard"
+                className={`flex items-center gap-2 no-underline py-1 pr-3 border-[1.5px] border-[#e0e0e0] rounded-full bg-white ${user?.imageUrl ? "pl-1" : "pl-3"}`}
+              >
+                {user?.imageUrl && (
+                  <Image src={user.imageUrl} alt={user.firstName ? `${user.firstName}'s avatar` : "User avatar"} width={24} height={24} className="rounded-full" />
+                )}
+                <span className="font-sans text-sm font-medium text-[#111] hidden sm:inline">
+                  {user?.firstName ?? "Dashboard"}
+                </span>
+                {isVerified && (
+                  <span className="font-sans text-[0.65rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
+                    ✓ VERIFIED
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -269,22 +323,120 @@ export default function MarketplacePage() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2 mb-4 flex-wrap">
-          {ASSET_FILTERS.map((f) => (
-            <button key={f} onClick={() => setAssetFilter(f)}
-              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
-                }`}>
-              {f}
+        <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+          <div className="flex gap-2 flex-wrap">
+            {ASSET_FILTERS.map((f) => (
+              <button key={f} onClick={() => setAssetFilter(f)}
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                  }`}>
+                {f}
+              </button>
+            ))}
+            <div className="w-px bg-[#e5e5e5] mx-1" />
+            {CHAIN_FILTERS.map((c) => (
+              <button key={c} onClick={() => setChainFilter(c)}
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                  }`}>
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {/* SORT / FILTER BUTTON */}
+          <div className="relative" ref={sortRef}>
+            <button 
+              onClick={() => setIsSortOpen(!isSortOpen)}
+              className="py-1.5 px-3 rounded-full border-[1.5px] border-[#e5e5e5] bg-white hover:bg-[#fafafa] font-sans text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              <span>Sort & Filter</span>
             </button>
-          ))}
-          <div className="w-px bg-[#e5e5e5] mx-1" />
-          {CHAIN_FILTERS.map((c) => (
-            <button key={c} onClick={() => setChainFilter(c)}
-              className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
-                }`}>
-              {c}
-            </button>
-          ))}
+            <AnimatePresence>
+              {isSortOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-2 w-[280px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#e5e5e5] p-5 z-50 origin-top-right"
+                >
+                  <div className="mb-5">
+                    <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Sort by Price</p>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        { label: "Default", val: "default" },
+                        { label: "Low to High", val: "asc" },
+                        { label: "High to Low", val: "desc" },
+                      ].map((opt) => (
+                        <label key={opt.val} className="flex items-center gap-2 cursor-pointer font-sans text-sm text-[#333]">
+                          <input 
+                            type="radio" 
+                            name="priceSort" 
+                            value={opt.val} 
+                            checked={priceSort === opt.val} 
+                            onChange={(e) => setPriceSort(e.target.value as any)} 
+                            className="accent-black"
+                          />
+                          {opt.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-5">
+                    <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Sort by Rating</p>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        { label: "Default", val: "default" },
+                        { label: "High to Low", val: "desc" },
+                        { label: "Low to High", val: "asc" },
+                      ].map((opt) => (
+                        <label key={opt.val} className="flex items-center gap-2 cursor-pointer font-sans text-sm text-[#333]">
+                          <input 
+                            type="radio" 
+                            name="ratingSort" 
+                            value={opt.val} 
+                            checked={ratingSort === opt.val} 
+                            onChange={(e) => setRatingSort(e.target.value as any)} 
+                            className="accent-black"
+                          />
+                          {opt.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-2">
+                    <div className="flex justify-between items-end mb-3">
+                      <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Price Range</p>
+                      <p className="font-mono text-xs text-[#111] font-semibold">₹{priceRange[0]} - ₹{priceRange[1]}</p>
+                    </div>
+                    <div className="px-2">
+                      <Slider
+                        range
+                        min={priceBounds[0]}
+                        max={priceBounds[1]}
+                        value={priceRange}
+                        onChange={(val) => setPriceRange(val as [number, number])}
+                        styles={{
+                          track: { backgroundColor: 'black', height: 4 },
+                          rail: { backgroundColor: '#e5e5e5', height: 4 },
+                          handle: { borderColor: 'black', backgroundColor: 'white', opacity: 1, border: 'solid 2px black', height: 16, width: 16, marginTop: -6 }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setIsSortOpen(false)}
+                    className="w-full mt-4 font-sans text-sm font-semibold bg-[#f5f5f5] text-[#333] hover:bg-[#e0e0e0] py-2 rounded-lg cursor-pointer transition-colors"
+                  >
+                    Done
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Table — white card */}
