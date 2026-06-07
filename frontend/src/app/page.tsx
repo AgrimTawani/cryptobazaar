@@ -55,7 +55,7 @@ const HOW_IT_WORKS = [
   {
     step: "03",
     title: "Submit bank statement",
-    desc: "Upload 6 months of statements. Automated review for red flags, then discards the data — never stored.",
+    desc: "Upload 6 months of statements. ML reviews for red flags, then discards the data — never stored.",
     pill: "Discarded After Review",
   },
   {

@@ -1598,7 +1598,7 @@ export const ARTICLES_CATEGORIES: ArticleCategory[] = [
           {
             id: "member-definitions",
             title: "Member and Trade Definitions",
-            content: "**Verified Member** - A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the AI-scored questionnaire.\n\n**Trade** - A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.\n\n**Escrow Contract** - A self-executing smart contract deployed on a public blockchain that holds the seller's crypto until the trade is confirmed or resolved.\n\n**Membership Plan** - A monthly subscription (Starter, Trader, or Pro) that grants trading access and defines monthly volume limits."
+            content: "**Verified Member** - A user who has successfully completed all three layers of verification: KYC, Enhanced Due Diligence (bank statement review), and the online questionnaire.\n\n**Trade** - A peer-to-peer transaction between a Verified Member seller and a Verified Member buyer, facilitated by the Platform's escrow smart contract.\n\n**Escrow Contract** - A self-executing smart contract deployed on a public blockchain that holds the seller's crypto until the trade is confirmed or resolved.\n\n**Membership Plan** - A monthly subscription (Starter, Trader, or Pro) that grants trading access and defines monthly volume limits."
           },
           {
             id: "technical-definitions",
@@ -1637,7 +1637,7 @@ export const ARTICLES_CATEGORIES: ArticleCategory[] = [
           {
             id: "three-layer-verification",
             title: "4.2 Three-Layer Verification",
-            content: "Before trading, you must complete:\n\n**Layer 1 (KYC):** Identity verification via Didit using Aadhaar, PAN, and a liveness check.\n\n**Layer 2 (EDD):** Upload of 6 months of bank statements, analysed by our ML system for red flags.\n\n**Layer 3 (AI Questionnaire):** A 10-question online interview scored by AI.\n\nAll three layers must pass for Verified Member status to be granted."
+            content: "Before trading, you must complete:\n\n**Layer 1 (KYC):** Identity verification via Didit using Aadhaar, PAN, and a liveness check.\n\n**Layer 2 (EDD):** Upload of 6 months of bank statements, analysed by our ML system for red flags.\n\n**Layer 3 (Questionnaire):** A 10-question online interview.\n\nAll three layers must pass for Verified Member status to be granted."
           },
           {
             id: "wallet-binding",
