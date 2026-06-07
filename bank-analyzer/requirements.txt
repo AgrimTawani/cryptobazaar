@@ -4,3 +4,5 @@ python-multipart==0.0.6
 opendataloader-pdf
 pypdf
 python-dateutil
+boto3
+requests

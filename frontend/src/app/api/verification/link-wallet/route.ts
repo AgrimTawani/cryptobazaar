@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
         walletAddress,
         walletChain,
         walletVerifiedAt: new Date(),
-        status: "VERIFIED",
+        // We do not set status to VERIFIED here. 
+        // The admin must manually approve the user in the dashboard.
       },
     });
 

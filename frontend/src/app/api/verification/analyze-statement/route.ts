@@ -199,160 +199,43 @@ export async function POST(req: NextRequest) {
     // ── Step 3: Send to Python Microservice for Analysis ──────────────────────
     const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
     console.log(`[analyze-statement] Sending PDF to microservice at: ${microserviceUrl}`);
-    let analysisData = null;
-    let r2JsonKey: string | null = null;
+    
+    // Fire and forget
     try {
       const formDataService = new FormData();
-      // Explicitly append as a blob with a guaranteed .pdf filename to prevent FastAPI 400 errors
       const blob = new Blob([buffer], { type: "application/pdf" });
       formDataService.append("file", blob, "statement.pdf");
       if (bankAccount) formDataService.append("account_number", bankAccount);
       if (ifscCode) formDataService.append("ifsc_code", ifscCode);
+      formDataService.append("user_id", String(user.id));
+      formDataService.append("attempt_number", String(attemptNumber));
+      
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cryptobazaar.co.in";
+      formDataService.append("webhook_url", `${appUrl}/api/webhooks/bank-analyzer`);
 
-      const msResponse = await fetch(microserviceUrl, {
+      fetch(microserviceUrl, {
         method: "POST",
         body: formDataService,
+      }).catch(err => {
+        console.error("Failed to connect to Bank Analyzer microservice", err);
       });
       
-      if (!msResponse.ok) {
-        const errorText = await msResponse.text();
-        console.error("Microservice returned error", msResponse.status, errorText);
-      } else {
-        const msResult = await msResponse.json();
-        if (msResult.status === "LOCKED_PDF") {
-           return NextResponse.json({ error: "PDF is password protected. Please upload an unlocked PDF." }, { status: 400 });
-        }
-        if (msResult.status === "VERIFICATION_FAILED") {
-          await db.onboardingRecord.upsert({
-            where: { userId_layer: { userId: user.id, layer: "EDD" } },
-            create: {
-              userId: user.id,
-              layer: "EDD",
-              status: "FAILED",
-              attemptNumber: attemptNumber + 1,
-              score: 0,
-              result: { forensic, r2Key } as object,
-              rejectionReason: msResult.error,
-              completedAt: new Date(),
-            },
-            update: {
-              status: "FAILED",
-              attemptNumber: { increment: 1 },
-              score: 0,
-              result: { forensic, r2Key } as object,
-              rejectionReason: msResult.error,
-              completedAt: new Date(),
-            },
-          });
-          return NextResponse.json({
-            passed: false,
-            score: 0,
-            flags: [msResult.error],
-            summary: "Document failed verification against provided bank account details.",
-            forensicFail: false,
-          });
-        }
-        if (msResult.status === "COMPLETED") {
-          analysisData = msResult;
-        }
-      }
     } catch (err) {
-      console.error("Failed to connect to Bank Analyzer microservice", err);
+      console.error("Error preparing request for Bank Analyzer microservice", err);
     }
 
-    if (analysisData) {
-      await db.bankStatementAnalysis.upsert({
-        where: { userId: user.id },
-        create: {
-          userId: user.id,
-          status: analysisData.status,
-          hasRegularIncome: analysisData.hasRegularIncome,
-          recurringBillCount: analysisData.recurringBillCount,
-          transactionModes: analysisData.transactionModes,
-          hasMerchantSpend: analysisData.hasMerchantSpend,
-          exchangeTxCount: analysisData.exchangeTxCount,
-          monthsWithCryptoTrades: analysisData.monthsWithCryptoTrades,
-          hasBidirectionalCrypto: analysisData.hasBidirectionalCrypto,
-          maxVolumeSpikeRatio: analysisData.maxVolumeSpikeRatio,
-          avgUniqueSendersPerMonth: analysisData.avgUniqueSendersPerMonth,
-          senderRecurrenceRate: analysisData.senderRecurrenceRate,
-          avgCreditToDebitHours: analysisData.avgCreditToDebitHours,
-          roundNumberRatio: analysisData.roundNumberRatio,
-          structuringClustersCount: analysisData.structuringClustersCount,
-          inflowSpikeRatio: analysisData.inflowSpikeRatio,
-          avgMonthlyBalance: analysisData.avgMonthlyBalance,
-          balanceDropsToZero: analysisData.balanceDropsToZero,
-          returnedPaymentsCount: analysisData.returnedPaymentsCount,
-          positiveNetFlowMonths: analysisData.positiveNetFlowMonths,
-        },
-        update: {
-          status: analysisData.status,
-          hasRegularIncome: analysisData.hasRegularIncome,
-          recurringBillCount: analysisData.recurringBillCount,
-          transactionModes: analysisData.transactionModes,
-          hasMerchantSpend: analysisData.hasMerchantSpend,
-          exchangeTxCount: analysisData.exchangeTxCount,
-          monthsWithCryptoTrades: analysisData.monthsWithCryptoTrades,
-          hasBidirectionalCrypto: analysisData.hasBidirectionalCrypto,
-          maxVolumeSpikeRatio: analysisData.maxVolumeSpikeRatio,
-          avgUniqueSendersPerMonth: analysisData.avgUniqueSendersPerMonth,
-          senderRecurrenceRate: analysisData.senderRecurrenceRate,
-          avgCreditToDebitHours: analysisData.avgCreditToDebitHours,
-          roundNumberRatio: analysisData.roundNumberRatio,
-          structuringClustersCount: analysisData.structuringClustersCount,
-          inflowSpikeRatio: analysisData.inflowSpikeRatio,
-          avgMonthlyBalance: analysisData.avgMonthlyBalance,
-          balanceDropsToZero: analysisData.balanceDropsToZero,
-          returnedPaymentsCount: analysisData.returnedPaymentsCount,
-          positiveNetFlowMonths: analysisData.positiveNetFlowMonths,
-        }
-      });
-      
-      if (analysisData.extracted_data) {
-        const jsonBuffer = Buffer.from(JSON.stringify(analysisData.extracted_data));
-        r2JsonKey = await uploadToR2(jsonBuffer, user.id, user.name, attemptNumber, true);
-      }
-    }
-
-    // ── Step 4: Write result to DB — manual compliance review ────────────────
-    const score = 75;
-    await db.onboardingRecord.upsert({
-      where: { userId_layer: { userId: user.id, layer: "EDD" } },
-      create: {
-        userId: user.id,
-        layer: "EDD",
-        status: "PASSED",
-        attemptNumber,
-        score,
-        result: { forensic, r2Key, r2JsonKey } as object,
-        rejectionReason: null,
-        completedAt: new Date(),
-      },
-      update: {
-        status: "PASSED",
-        attemptNumber: { increment: 1 },
-        score,
-        result: { forensic, r2Key, r2JsonKey } as object,
-        rejectionReason: null,
-        completedAt: new Date(),
-      },
-    });
-
-    // Advance — compliance team reviews uploaded statement manually
+    // ── Return immediately to let user proceed ────────────────
     await db.user.update({
       where: { id: user.id },
       data: { status: "ONBOARDING_PENDING", upiId, bankAccount, ifscCode },
     });
 
     return NextResponse.json({
-      passed: true,
-      score,
-      flags: [],
-      summary: "Statement submitted for manual compliance review.",
-      forensicFail: false,
+      processing: true,
+      summary: "Document submitted for analysis.",
     });
+
   } catch (err) {
-    console.error("[analyze-statement]", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

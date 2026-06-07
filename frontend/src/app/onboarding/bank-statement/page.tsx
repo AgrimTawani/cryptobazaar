@@ -132,12 +132,9 @@ export default function BankStatementPage() {
               <span className="font-condensed text-[1.3rem] tracking-[1px]">
                 Statement Received
               </span>
-              <span className="ml-auto font-sans text-[0.8rem] font-bold px-2 py-0.5 rounded-full bg-[#e2e8f0] text-[#4a5568]">
-                ML Score {result.score}/100
-              </span>
             </div>
             <p className="font-sans text-[0.82rem] text-[#555] leading-[1.6] mb-3">
-              Your statement has been submitted for manual review. Our compliance team will verify your account within 24–48 hours. You can continue the onboarding process below.
+              Your statement has been submitted for background analysis and manual review. Our compliance team will verify your account. You can continue the onboarding process below.
             </p>
             <p className="font-sans text-[0.78rem] text-[#38a169]">
               Redirecting to next step…
