@@ -11,17 +11,17 @@ export const middleware = clerkMiddleware(async (auth, request) => {
   const isTargetingAdmin = isAdminDomain || url.pathname.startsWith('/admin');
 
   if (isTargetingAdmin) {
-    // 1. IP Whitelist Check (if configured)
-    const allowedIps = process.env.ADMIN_ALLOWED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [];
-    if (allowedIps.length > 0) {
-      const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || request.headers.get('x-real-ip') || '127.0.0.1';
-      if (!allowedIps.includes(ip) && ip !== '127.0.0.1' && ip !== '::1') {
-         return new NextResponse('Access Denied: IP not whitelisted', { status: 403 });
+    // 2. Auth Protect (Custom Admin Cookie)
+    // Exclude the login page and auth API from the cookie check
+    if (!url.pathname.startsWith('/admin/login') && !url.pathname.startsWith('/api/admin/auth')) {
+      const adminCookie = request.cookies.get('admin_token')?.value;
+      const validToken = process.env.ADMIN_PASSWORD;
+      
+      if (validToken && adminCookie !== validToken) {
+        url.pathname = '/admin/login';
+        return NextResponse.redirect(url);
       }
     }
-    
-    // 2. Auth Protect (force login)
-    await auth.protect();
   } else if (!isPublicRoute(request)) {
     await auth.protect();
   }

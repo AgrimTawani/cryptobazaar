@@ -1,22 +1,8 @@
-import { requireAdmin, isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
+import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { AdminPasswordPrompt } from "./AdminPasswordPrompt";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const isAuthorized = await requireAdmin();
-  
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5]">
-        <div className="bg-white p-8 rounded-xl border border-red-200 shadow-sm text-center">
-          <h2 className="font-sans text-xl font-bold text-red-600 mb-2">Access Denied</h2>
-          <p className="font-sans text-sm text-[#555]">Your account is not authorized to view the admin dashboard.</p>
-        </div>
-      </div>
-    );
-  }
-
   const isUnlocked = await isSecondaryPasswordUnlocked();
 
   if (!isUnlocked) {
@@ -38,7 +24,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
 
         <div className="mt-auto pt-6 border-t border-[#333] flex items-center gap-3">
-          <UserButton />
           <span className="font-sans text-xs text-[#888]">Super Admin</span>
         </div>
       </aside>

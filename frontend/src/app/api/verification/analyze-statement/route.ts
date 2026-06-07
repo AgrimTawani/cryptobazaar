@@ -177,6 +177,25 @@ export async function POST(req: NextRequest) {
     const attemptNumber = existingRecord ? existingRecord.attemptNumber + 1 : 1;
     const r2Key = await uploadToR2(buffer, user.id, user.name, attemptNumber);
 
+    // Save the R2 key immediately so it's not lost if the Python service times out
+    await db.onboardingRecord.upsert({
+      where: { userId_layer: { userId: user.id, layer: "EDD" } },
+      create: {
+        userId: user.id,
+        layer: "EDD",
+        status: "PENDING",
+        attemptNumber,
+        score: 0,
+        result: { forensic, r2Key } as object,
+        completedAt: new Date(),
+      },
+      update: {
+        status: "PENDING",
+        attemptNumber,
+        result: { forensic, r2Key } as object,
+      },
+    });
+
     // ── Step 3: Send to Python Microservice for Analysis ──────────────────────
     const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
     console.log(`[analyze-statement] Sending PDF to microservice at: ${microserviceUrl}`);

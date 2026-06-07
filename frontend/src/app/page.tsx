@@ -130,6 +130,7 @@ function LotteryCounter({
 
   return (
     <motion.span
+      suppressHydrationWarning
       key={displayValue === value ? "settled" : "rolling"}
       initial={displayValue === value ? { scale: 1.1, filter: "blur(3px)", opacity: 0.7 } : {}}
       animate={displayValue === value ? { scale: 1, filter: "blur(0px)", opacity: 1 } : {}}
@@ -212,7 +213,7 @@ export default function Home() {
 
 
   return (
-    <div>
+    <div suppressHydrationWarning>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
