@@ -1657,38 +1657,6 @@ export const ARTICLES_CATEGORIES: ArticleCategory[] = [
         ]
       },
       {
-        id: "terms-membership",
-        title: "11.5 Membership Plans",
-        shortDesc: "Available membership tiers, pricing, volume caps, and refund policies.",
-        sections: [
-          {
-            id: "plan-tiers",
-            title: "5.1 Plan Tiers",
-            content: "Access to trading requires an active Membership Plan:\n\n**Starter:** Rs. 200/month, Rs. 5,00,000 monthly trade cap\n\n**Trader:** Rs. 500/month, Rs. 20,00,000 monthly trade cap\n\n**Pro:** Rs. 1,000/month, no trade cap"
-          },
-          {
-            id: "payment",
-            title: "5.2 Payment",
-            content: "Membership fees are currently collected via UPI transfer to our registered business account. Payment instructions are provided after verification is complete. Plans are month-to-month. No automatic renewals occur without your explicit confirmation and payment."
-          },
-          {
-            id: "cap-enforcement",
-            title: "5.3 Cap Enforcement",
-            content: "Your cumulative INR trade volume within a billing month is tracked. When you approach your cap, you will be notified. If you reach it, new trades are blocked until the next billing cycle or you upgrade your plan."
-          },
-          {
-            id: "refunds",
-            title: "5.4 Refunds",
-            content: "Membership fees are non-refundable once a billing period has begun, unless we are unable to provide access to the Platform for more than 72 consecutive hours due to a fault on our side. Any refund requests must be submitted to support@cryptobazaar.co.in within 7 days of the fee being paid."
-          },
-          {
-            id: "mpf-eligibility",
-            title: "5.5 Member Protection Fund Eligibility",
-            content: "An active Membership Plan at the time of a trade is a prerequisite for eligibility to request a disbursement from the Member Protection Fund. A lapsed subscription at the time of the relevant trade disqualifies a claim."
-          }
-        ]
-      },
-      {
         id: "terms-trade-rules",
         title: "11.6 Trade Rules and Escrow",
         shortDesc: "How trades work, escrow mechanics, payment and confirmation windows, and platform role.",
@@ -1759,53 +1727,6 @@ export const ARTICLES_CATEGORIES: ArticleCategory[] = [
             id: "finality",
             title: "7.6 Finality",
             content: "Dispute rulings are final. If you believe a ruling was made in error, you may appeal in writing to disputes@cryptobazaar.co.in within 7 days. Appeals are reviewed by a senior compliance officer. The appeal decision is final."
-          }
-        ]
-      },
-      {
-        id: "terms-member-protection-fund",
-        title: "11.8 Member Protection Fund",
-        shortDesc: "The Fund's nature, construction, eligibility criteria, disbursement tiers, anti-abuse rules, and limitations.",
-        sections: [
-          {
-            id: "nature-of-fund",
-            title: "8.1 Nature of the Fund",
-            content: "The Member Protection Fund (\"the Fund\") is a voluntary, discretionary benefit available to eligible Verified Members.\n\n**THE FUND IS NOT AN INSURANCE PRODUCT. IT IS NOT REGULATED AS ONE. IT DOES NOT CONSTITUTE A FINANCIAL GUARANTEE, POLICY, OR CONTRACT OF INDEMNITY. PAYOUTS FROM THE FUND ARE NOT GUARANTEED.**"
-          },
-          {
-            id: "fund-construction",
-            title: "8.2 Fund Construction",
-            content: "0.75% of the value of every completed trade is automatically transferred from the escrow contract to the Fund contract at settlement. The Fund is held on-chain. CryptoBazaar cannot spend it without multisig approval from a minimum of 3 of 5 designated signatories."
-          },
-          {
-            id: "nature-of-disbursements",
-            title: "8.3 Nature of Disbursements",
-            content: "Disbursements from the Fund are a contractual service remedy under the Indian Contract Act, 1872 (Sections 73-74) for CryptoBazaar's failure to deliver the service it promised - namely, that every counterparty on the Platform has been adequately screened. A disbursement is compensation for our screening failure, not a payment for an external risk event. The Fund does not operate as an insurance pool."
-          },
-          {
-            id: "eligibility-criteria",
-            title: "8.4 Eligibility to Request a Disbursement",
-            content: "All five conditions must be satisfied:\n\n(a) You had an active Membership Plan at the time of the trade that caused the freeze.\n\n(b) You had valid (unexpired) EDD and KYC credentials at the time of the trade.\n\n(c) The trade was executed through CryptoBazaar's escrow smart contract - on-chain verifiable.\n\n(d) The bank freeze is directly and demonstrably attributable to that specific CryptoBazaar trade, evidenced by a police notice or official bank freeze letter citing the transaction.\n\n(e) The freeze is attributable to a failure in CryptoBazaar's vetting process - specifically, that the counterparty to your trade was admitted to the Platform despite posing an identifiable risk that our screening should have caught. Freezes resulting from events unrelated to our screening failure are not eligible."
-          },
-          {
-            id: "disbursement-tiers",
-            title: "8.5 Disbursement Tiers",
-            content: "Subject to fund availability and approval:\n\n**Emergency:** Up to Rs. 10,000 within 24 hours. Requires: freeze notice + FIR/complaint number.\n\n**Standard:** Up to Rs. 1,00,000 within 7 days. Requires: above + proof of legal representation.\n\n**Full:** Up to Rs. 5,00,000 within 30 days. Requires: above + account unfrozen or NOC issued.\n\nDisbursement amounts are subject to the Fund's available balance at the time of approval. If the Fund cannot cover the full approved amount, a partial disbursement may be made."
-          },
-          {
-            id: "anti-abuse",
-            title: "8.6 Anti-Abuse Rules",
-            content: "Maximum 2 disbursement requests per member per 12-month period.\n\nA 90-day waiting period applies from the date of becoming a Verified Member before a first request may be submitted. This prevents \"join-and-claim\" abuse.\n\nAll requests are cross-checked against on-chain trade records. No on-chain trade record means no disbursement.\n\nFraudulent disbursement requests (fabricated freeze notices, false information) result in permanent suspension and may result in criminal complaint."
-          },
-          {
-            id: "scope-limitations",
-            title: "8.7 Scope Limitations",
-            content: "The Fund does not cover:\n\n- Losses from cryptocurrency price movements.\n- Bank freezes caused by transactions unrelated to CryptoBazaar.\n- Bank freezes where CryptoBazaar's vetting process functioned correctly and the risk was undetectable by reasonable screening methods.\n- Losses from your own negligence (e.g., sharing private keys, trading outside the Platform).\n- Tax liabilities arising from your trading activity.\n- Events of force majeure."
-          },
-          {
-            id: "no-fiduciary",
-            title: "8.8 No Fiduciary Duty",
-            content: "CryptoBazaar's administration of the Fund does not create a fiduciary duty, trust relationship, or any other special duty of care beyond what is expressly set out in these Terms."
           }
         ]
       },
