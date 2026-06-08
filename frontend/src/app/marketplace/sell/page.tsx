@@ -240,7 +240,7 @@ export default function SellPage() {
               <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
             </div>
             <button onClick={reconnectWallet}
-              className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
+              className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
               Reconnect →
             </button>
           </div>
@@ -323,11 +323,11 @@ export default function SellPage() {
             </div>
             <div className="flex gap-3 pt-1">
               <button onClick={() => setStep("form")} disabled={isBusy}
-                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-condensed text-[1.2rem] tracking-[1px] uppercase text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 ← Back to Edit
               </button>
               <button onClick={handleSubmit} disabled={isBusy}
-                className="flex-1 py-3 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-[1.2rem] tracking-[1px] uppercase cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 {isBusy
                   ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
                   : "Confirm & Approve USDC →"}

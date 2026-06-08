@@ -36,7 +36,7 @@ export function UserActions({ userId, currentStatus }: { userId: number; current
         <button
           disabled={loading}
           onClick={() => updateStatus("REJECTED")}
-          className="font-sans text-sm font-semibold bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 px-4 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+          className="font-condensed text-[1.1rem] tracking-[1px] uppercase bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 px-4 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
         >
           Reject User
         </button>
@@ -45,7 +45,7 @@ export function UserActions({ userId, currentStatus }: { userId: number; current
         <button
           disabled={loading}
           onClick={() => updateStatus("VERIFIED")}
-          className="font-sans text-sm font-semibold bg-lime text-black py-2 px-4 rounded-lg hover:bg-[#a3e635] transition-colors disabled:opacity-50 cursor-pointer"
+          className="font-condensed text-[1.1rem] tracking-[1px] uppercase bg-lime text-black py-2 px-4 rounded-lg hover:bg-[#a3e635] transition-colors disabled:opacity-50 cursor-pointer"
         >
           Approve User
         </button>

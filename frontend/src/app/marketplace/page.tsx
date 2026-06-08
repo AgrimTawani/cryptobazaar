@@ -89,12 +89,12 @@ function ChainConfirmPopup({ order, onConfirm, onCancel }: {
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl border border-[#e5e5e5] text-[#666] cursor-pointer bg-white hover:bg-[#f5f5f5] transition-colors">
+            className="flex-1 font-condensed text-[1.1rem] tracking-[1px] uppercase py-2.5 rounded-xl border border-[#e5e5e5] text-[#666] cursor-pointer bg-white hover:bg-[#f5f5f5] transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-colors">
+            className="flex-1 font-condensed text-[1.1rem] tracking-[1px] uppercase py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-colors">
             Continue →
           </button>
         </div>
@@ -245,7 +245,7 @@ export default function MarketplacePage() {
           <p className="font-sans text-sm text-white/70">
             <strong className="text-white">Guest view.</strong> Seller names are hidden. Sign in to buy, sell, and see full details.
           </p>
-          <Link href="/login" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
+          <Link href="/login" className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-black bg-lime py-1.5 px-4 rounded-full no-underline">
             Sign In to Trade →
           </Link>
         </div>
@@ -257,7 +257,7 @@ export default function MarketplacePage() {
           <p className="font-sans text-sm text-white/70">
             <strong className="text-white">View only.</strong> Complete verification to buy or sell.
           </p>
-          <Link href="/onboarding" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
+          <Link href="/onboarding" className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-black bg-lime py-1.5 px-4 rounded-full no-underline">
             Complete Verification →
           </Link>
         </div>
@@ -500,18 +500,18 @@ export default function MarketplacePage() {
               <div className="flex flex-col items-start gap-1">
                 {isGuest ? (
                   <Link href="/login"
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg text-center no-underline hover:bg-[#333] transition-colors">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-black py-1.5 px-4 rounded-lg text-center no-underline hover:bg-[#333] transition-colors">
                     Sign In
                   </Link>
                 ) : order.isMine ? (
                   <Link href={`/marketplace/${order.id}`}
-                    className="font-sans text-sm font-semibold text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-lg text-center no-underline hover:bg-[#ede9fe] transition-colors">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-lg text-center no-underline hover:bg-[#ede9fe] transition-colors">
                     Yours →
                   </Link>
                 ) : (
                   <button
                     onClick={() => setPendingOrder(order)}
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
                     Buy
                   </button>
                 )}
@@ -573,17 +573,17 @@ export default function MarketplacePage() {
                 </div>
                 {isGuest ? (
                   <Link href="/login"
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg no-underline hover:bg-[#333] transition-colors">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-black py-1.5 px-4 rounded-lg no-underline hover:bg-[#333] transition-colors">
                     Sign In
                   </Link>
                 ) : order.isMine ? (
-                  <span className="font-sans text-sm font-semibold py-1.5 px-4 rounded-lg text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]">
+                  <span className="font-condensed text-[1.1rem] tracking-[1px] uppercase py-1.5 px-4 rounded-lg text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]">
                     Yours →
                   </span>
                 ) : (
                   <button
                     onClick={(e) => { e.preventDefault(); setPendingOrder(order); }}
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
                     Buy
                   </button>
                 )}

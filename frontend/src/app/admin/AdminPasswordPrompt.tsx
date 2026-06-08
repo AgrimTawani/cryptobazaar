@@ -55,7 +55,7 @@ export function AdminPasswordPrompt() {
           <button
             type="submit"
             disabled={loading || !password}
-            className="w-full bg-black text-white font-sans text-sm font-semibold py-2.5 rounded-lg disabled:opacity-50"
+            className="w-full bg-black text-white font-condensed text-[1.2rem] tracking-[1px] uppercase py-2.5 rounded-lg disabled:opacity-50"
           >
             {loading ? "Verifying..." : "Unlock"}
           </button>

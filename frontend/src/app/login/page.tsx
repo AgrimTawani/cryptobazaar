@@ -98,7 +98,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading || !clerk.client}
-            className={`flex items-center justify-center gap-3 w-full py-[13px] px-5 border-[1.5px] border-solid border-[#e0e0e0] rounded-[10px] font-sans text-[0.925rem] font-medium text-[#111] transition-all duration-150 shadow-sm hover:border-[#bbb] hover:shadow-md ${loading ? "bg-[#fafafa] cursor-wait" : "bg-white cursor-pointer"}`}
+            className={`flex items-center justify-center gap-3 w-full py-[13px] px-5 border-[1.5px] border-solid border-[#e0e0e0] rounded-[10px] font-condensed text-[1.3rem] tracking-[1px] uppercase text-[#111] transition-all duration-150 shadow-sm hover:border-[#bbb] hover:shadow-md ${loading ? "bg-[#fafafa] cursor-wait" : "bg-white cursor-pointer"}`}
           >
             {loading ? (
               <span className="opacity-50">Redirecting…</span>

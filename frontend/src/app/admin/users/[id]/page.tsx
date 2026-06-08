@@ -61,7 +61,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             </div>
             <div className="flex justify-between">
               <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
-              <span className="font-sans text-sm font-bold">{user.status}</span>
+              <span className="font-condensed text-[1.1rem] tracking-[1px] uppercase">{user.status}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-sans text-xs font-semibold text-[#888] uppercase">Joined</span>
@@ -86,7 +86,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <div className="flex flex-col gap-3">
                  <div className="flex justify-between">
                     <span className="font-sans text-xs font-semibold text-[#888] uppercase">Status</span>
-                    <span className="font-sans text-sm font-bold">{user.bankStatementAnalysis.status}</span>
+                    <span className="font-condensed text-[1.1rem] tracking-[1px] uppercase">{user.bankStatementAnalysis.status}</span>
                  </div>
                  <div className="flex justify-between">
                     <span className="font-sans text-xs font-semibold text-[#888] uppercase">Extracted Name</span>
@@ -193,12 +193,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           {(statementUrl || jsonUrl) && (
             <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-[#eee]">
               {statementUrl && (
-                <a href={statementUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-sans text-[#333] no-underline">
+                <a href={statementUrl} target="_blank" rel="noopener noreferrer" className="text-[1rem] bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-condensed tracking-[1px] uppercase text-[#333] no-underline">
                   View PDF Statement
                 </a>
               )}
               {jsonUrl && (
-                <a href={jsonUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-sans text-[#333] no-underline">
+                <a href={jsonUrl} target="_blank" rel="noopener noreferrer" className="text-[1rem] bg-[#f5f5f5] hover:bg-[#ebebeb] px-4 py-2 rounded-md transition-colors font-condensed tracking-[1px] uppercase text-[#333] no-underline">
                   View Extracted JSON
                 </a>
               )}

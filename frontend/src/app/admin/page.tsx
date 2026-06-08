@@ -25,20 +25,20 @@ export default async function AdminDashboard() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
-          <p className="font-sans text-xs text-[#888] font-semibold uppercase tracking-widest mb-2">Total Users</p>
-          <p className="font-mono text-3xl font-bold">{totalUsers}</p>
+          <p className="font-sans text-[0.7rem] font-bold text-black/60 tracking-[2px] uppercase mb-2">Total Users</p>
+          <p className="font-condensed text-[3.5rem] text-black leading-none tracking-wide">{totalUsers}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
-          <p className="font-sans text-xs text-[#888] font-semibold uppercase tracking-widest mb-2">Pending Approvals</p>
-          <p className="font-mono text-3xl font-bold text-[#b45309]">{pendingUsers}</p>
+          <p className="font-sans text-[0.7rem] font-bold text-black/60 tracking-[2px] uppercase mb-2">Pending Approvals</p>
+          <p className="font-condensed text-[3.5rem] text-[#b45309] leading-none tracking-wide">{pendingUsers}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
-          <p className="font-sans text-xs text-[#888] font-semibold uppercase tracking-widest mb-2">Active Disputes</p>
-          <p className="font-mono text-3xl font-bold text-[#991b1b]">{activeDisputes}</p>
+          <p className="font-sans text-[0.7rem] font-bold text-black/60 tracking-[2px] uppercase mb-2">Active Disputes</p>
+          <p className="font-condensed text-[3.5rem] text-[#991b1b] leading-none tracking-wide">{activeDisputes}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
-          <p className="font-sans text-xs text-[#888] font-semibold uppercase tracking-widest mb-2">Total Volume (INR)</p>
-          <p className="font-mono text-3xl font-bold text-[#16a34a]">₹{totalVolume.toLocaleString("en-IN")}</p>
+          <p className="font-sans text-[0.7rem] font-bold text-black/60 tracking-[2px] uppercase mb-2">Total Volume (INR)</p>
+          <p className="font-condensed text-[3.5rem] text-[#16a34a] leading-none tracking-wide">₹{totalVolume.toLocaleString("en-IN")}</p>
         </div>
       </div>
 
@@ -46,8 +46,8 @@ export default async function AdminDashboard() {
         <h2 className="font-condensed text-xl mb-4">Quick Actions</h2>
         <div className="flex gap-4">
            {/* Add more quick links if needed */}
-           <a href="/admin/users" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Review Pending Users</a>
-           <a href="/admin/disputes" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Handle Disputes</a>
+           <a href="/admin/users" className="font-condensed text-[1.1rem] uppercase tracking-[1px] bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-5 rounded-lg border border-[#e0e0e0] text-[#111] no-underline">Review Pending Users</a>
+           <a href="/admin/disputes" className="font-condensed text-[1.1rem] uppercase tracking-[1px] bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-5 rounded-lg border border-[#e0e0e0] text-[#111] no-underline">Handle Disputes</a>
         </div>
       </div>
     </div>

@@ -112,7 +112,7 @@ export default function KYCPage() {
         transition={{ duration: 0.35 }}
         className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-10"
       >
-        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1 px-[14px] font-sans text-[0.72rem] font-semibold tracking-[1px] uppercase mb-5">
+        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1.5 px-4 font-condensed text-[1.1rem] tracking-[1px] uppercase mb-5 text-black">
           Step 01 of 04
         </div>
 
@@ -178,7 +178,7 @@ export default function KYCPage() {
             ) : (
               <button
                 onClick={pollStatus === "FAILED" ? retry : startKYC}
-                className="w-full py-[14px] bg-black text-white border-0 rounded-[10px] font-sans text-[0.925rem] font-semibold cursor-pointer"
+                className="w-full py-[14px] bg-black text-white border-0 rounded-[10px] font-condensed text-[1.3rem] tracking-[1px] uppercase cursor-pointer"
               >
                 {pollStatus === "FAILED" ? "Try Again" : "Verify with Didit"}
               </button>

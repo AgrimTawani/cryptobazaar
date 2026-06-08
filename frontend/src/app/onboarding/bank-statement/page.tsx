@@ -112,7 +112,7 @@ export default function BankStatementPage() {
         transition={{ duration: 0.35 }}
         className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-10"
       >
-        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1 px-[14px] font-sans text-[0.72rem] font-semibold tracking-[1px] uppercase mb-5">
+        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1.5 px-4 font-condensed text-[1.1rem] tracking-[1px] uppercase mb-5 text-black">
           Step 02 of 04
         </div>
 
@@ -197,9 +197,9 @@ export default function BankStatementPage() {
 
             {/* Payment details */}
             <div className="space-y-3 mb-5">
-              <p className="font-sans text-[0.72rem] font-semibold text-[#999] uppercase tracking-[1px]">
+              <h2 className="font-condensed text-[1.4rem] tracking-[1px] text-[#111] uppercase m-0 mb-1">
                 Your Payment Details
-              </p>
+              </h2>
               <div>
                 <label className="font-sans text-[0.75rem] font-semibold text-[#333] block mb-1">
                   Bank Account Number <span className="text-[#e53e3e]">*</span>
@@ -259,7 +259,7 @@ export default function BankStatementPage() {
             <button
               onClick={handleSubmit}
               disabled={!canSubmit || analyzing}
-              className={`w-full py-[14px] border-0 rounded-[10px] font-sans text-[0.925rem] font-semibold transition-colors duration-200 ${
+              className={`w-full py-[14px] border-0 rounded-[10px] font-condensed text-[1.3rem] tracking-[1px] uppercase transition-colors duration-200 ${
                 canSubmit && !analyzing
                   ? "bg-black text-white cursor-pointer"
                   : "bg-[#f0f0f0] text-[#aaa] cursor-not-allowed"

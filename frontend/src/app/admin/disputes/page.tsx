@@ -39,7 +39,7 @@ export default async function AdminDisputesPage() {
               <p className="font-sans text-xs text-[#888]">{Number(d.order.amount)} {d.order.asset}</p>
             </div>
             <div>
-              <span className={`font-sans text-[0.65rem] font-bold px-2 py-1 rounded-full ${
+              <span className={`font-condensed text-[1rem] tracking-[1px] uppercase px-2.5 py-1 rounded-full ${
                 d.status === "OPEN" || d.status === "EVIDENCE_SUBMITTED" || d.status === "UNDER_REVIEW" 
                   ? "bg-[#fef2f2] text-[#991b1b]" 
                   : "bg-[#f5f5f5] text-[#555]"
@@ -48,7 +48,7 @@ export default async function AdminDisputesPage() {
               </span>
             </div>
             <div>
-              <Link href={`/admin/disputes/${d.id}`} className="font-sans text-sm font-semibold text-[#7b3fe4] hover:underline">
+              <Link href={`/admin/disputes/${d.id}`} className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#7b3fe4] hover:underline no-underline">
                 Review →
               </Link>
             </div>

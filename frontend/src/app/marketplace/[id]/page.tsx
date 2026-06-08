@@ -512,7 +512,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
                   </div>
                   <button onClick={reconnectWallet}
-                    className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
                     Reconnect →
                   </button>
                 </div>
@@ -577,7 +577,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     placeholder="Type a message…"
                     className="flex-1 font-sans text-sm border border-[#e5e5e5] bg-[#fafafa] rounded-lg px-4 py-2 outline-none focus:border-[#7b3fe4] transition-colors" />
                   <button onClick={sendMessage} disabled={sendingMsg || !chatInput.trim()}
-                    className="font-sans text-sm font-semibold bg-black text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
+                    className="font-condensed text-[1.1rem] tracking-[1px] uppercase bg-black text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
                     {sendingMsg ? "…" : "Send"}
                   </button>
                 </div>
@@ -644,14 +644,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <button onClick={() => run("markPaid", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function markPaid(uint256 id)", params: [onChainId] }));
                     })} disabled={!!busy || !walletOk || !utrInput.trim() || !screenshotUploaded}
-                      className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer disabled:opacity-40">
+                      className="py-3 bg-lime text-black font-condensed text-[1.2rem] tracking-[1px] uppercase rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
                     <button onClick={() => run("cancel", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
                       await fetch(`/api/orders/${order.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "buyerCancel" }) });
                     })} disabled={!!busy || !walletOk}
-                      className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer disabled:opacity-40">
+                      className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-condensed text-[1.2rem] tracking-[1px] uppercase rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "cancel" ? "…" : "✕  Cancel Order"}
                     </button>
                   </div>
@@ -667,7 +667,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <button onClick={() => run("timeout", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function timeoutCancel(uint256 id)", params: [onChainId] }));
                     })} disabled={!!busy || !walletOk}
-                      className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
+                      className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "timeout" ? "Cancelling…" : "Reclaim (Timeout)"}
                     </button>
                   )}
@@ -704,13 +704,13 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       <button onClick={() => run("confirm", async () => {
                         await sendTx(prepareContractCall({ contract: escrowContract, method: "function confirmPayment(uint256 id)", params: [onChainId] }));
                       })} disabled={!!busy || !walletOk || !chainOk}
-                        className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer disabled:opacity-40">
+                        className="flex-1 py-3 bg-black text-white rounded-lg font-condensed text-[1.2rem] tracking-[1px] uppercase cursor-pointer disabled:opacity-40">
                         {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
                       </button>
                       <button onClick={() => run("dispute", async () => {
                         await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
                       })} disabled={!!busy || !walletOk}
-                        className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-sans text-sm font-semibold cursor-pointer disabled:opacity-40">
+                        className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-condensed text-[1.2rem] tracking-[1px] uppercase cursor-pointer disabled:opacity-40">
                         {busy === "dispute" ? "…" : "⚡ Dispute"}
                       </button>
                     </div>
@@ -720,7 +720,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <button onClick={() => run("dispute", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
                     })} disabled={!!busy || !walletOk}
-                      className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
+                      className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "dispute" ? "Raising dispute…" : "⚡ Raise Dispute"}
                     </button>
                   )}
@@ -854,7 +854,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <div className="text-center">
                   <button onClick={() => run("dispute", async () => {
                     await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
-                  })} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
+                  })} className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
                     Something wrong? Raise a dispute
                   </button>
                 </div>
@@ -981,7 +981,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
               </div>
               <button onClick={reconnectWallet}
-                className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
+                className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
                 Reconnect →
               </button>
             </div>
@@ -1004,7 +1004,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   <button onClick={() => run("cancel", async () => {
                     await sendTx(prepareContractCall({ contract: escrowContract, method: "function cancelOrder(uint256 id)", params: [onChainId] }));
                   })} disabled={!!busy || !walletOk}
-                    className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
+                    className="font-condensed text-[1.2rem] tracking-[1px] uppercase text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
                     {busy === "cancel" ? "Cancelling…" : "Cancel Order"}
                   </button>
                 </div>
@@ -1082,7 +1082,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   )}
                   <div className="flex gap-3">
                     <button onClick={() => { setShowBuyConfirm(false); setTcAgreed(false); }}
-                      className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
+                      className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-condensed text-[1.2rem] tracking-[1px] uppercase text-[#555] cursor-pointer bg-white">
                       Cancel
                     </button>
                     <button onClick={() => run("lock", async () => {
