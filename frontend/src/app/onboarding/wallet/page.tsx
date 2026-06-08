@@ -76,7 +76,7 @@ export default function WalletPage() {
         transition={{ duration: 0.35 }}
         className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-10"
       >
-        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1.5 px-4 font-condensed text-[1.1rem] tracking-[1px] uppercase mb-5 text-black">
+        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1 px-3.5 font-sans text-[0.72rem] font-semibold tracking-[1px] uppercase mb-5">
           Step 04 of 04
         </div>
 
@@ -113,7 +113,7 @@ export default function WalletPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="bg-[#f6fff9] border-[1.5px] border-[#68d391] rounded-xl py-4 px-5 mb-5">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-condensed text-[1.2rem] text-[#38a169] uppercase tracking-[1px]">
+                <span className="font-sans text-[0.75rem] text-[#38a169] font-semibold uppercase tracking-[1px]">
                   Wallet Connected
                 </span>
                 <button
@@ -131,7 +131,7 @@ export default function WalletPage() {
             <button
               onClick={handleSave}
               disabled={!acknowledged || saving}
-              className={`w-full py-3.5 border-0 rounded-[10px] font-condensed text-[1.3rem] tracking-[1px] uppercase transition-colors duration-200 ${
+              className={`w-full py-3.5 border-0 rounded-[10px] font-sans text-[0.925rem] font-bold transition-colors duration-200 ${
                 acknowledged && !saving
                   ? "bg-black text-white cursor-pointer"
                   : "bg-[#f0f0f0] text-[#aaa] cursor-not-allowed"

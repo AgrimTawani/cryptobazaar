@@ -191,7 +191,7 @@ export default function QuestionnairePage() {
         transition={{ duration: 0.35 }}
         className="bg-white border-[1.5px] border-solid border-[#e5e5e5] rounded-[20px] p-12"
       >
-        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-1.5 px-4 font-condensed text-[1.1rem] tracking-[1px] uppercase mb-6 text-black">
+        <div className="inline-flex items-center gap-2 bg-lime rounded-full py-[6px] px-4 font-sans text-[0.78rem] font-semibold tracking-[1px] uppercase mb-6">
           Step 03 of 04
         </div>
 
@@ -209,7 +209,7 @@ export default function QuestionnairePage() {
               <span className="font-condensed text-[1.8rem] tracking-[1px]">
                 Questionnaire Received
               </span>
-              <span className="ml-auto font-condensed text-[1.2rem] px-3 py-1 rounded-full bg-[#e2e8f0] text-[#4a5568] tracking-[1px] uppercase">
+              <span className="ml-auto font-sans text-sm font-bold px-3 py-1 rounded-full bg-[#e2e8f0] text-[#4a5568]">
                 AI Score {result.score}/100
               </span>
             </div>
@@ -353,7 +353,7 @@ export default function QuestionnairePage() {
             <button
               onClick={handleSubmit}
               disabled={!allAnswered || submitting}
-              className={`w-full py-5 border-0 rounded-xl font-condensed text-[1.3rem] tracking-[1px] uppercase transition-colors duration-200 ${
+              className={`w-full py-5 border-0 rounded-xl font-sans text-[1rem] font-semibold transition-colors duration-200 ${
                 allAnswered && !submitting
                   ? "bg-black text-white cursor-pointer"
                   : "bg-[#f0f0f0] text-[#aaa] cursor-not-allowed"

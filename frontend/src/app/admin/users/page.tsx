@@ -31,7 +31,7 @@ export default async function AdminUsersPage() {
               <p className="font-sans text-xs text-[#888] truncate">{u.email || u.clerkId}</p>
             </div>
             <div>
-              <span className={`font-condensed text-[1rem] tracking-[1px] uppercase px-2.5 py-1 rounded-full ${
+              <span className={`font-sans text-[0.65rem] font-bold px-2 py-1 rounded-full ${
                 u.status === "VERIFIED" ? "bg-lime text-black" : 
                 u.status === "VERIFICATION_PENDING" ? "bg-[#fef9ee] text-[#b45309]" : 
                 "bg-[#f5f5f5] text-[#555]"
@@ -41,7 +41,7 @@ export default async function AdminUsersPage() {
             </div>
             <div>
               {u.bankStatementAnalysis ? (
-                <span className={`font-condensed text-[1.1rem] tracking-[1px] uppercase ${u.bankStatementAnalysis.status === "APPROVED" ? "text-green-600" : "text-amber-600"}`}>
+                <span className={`font-sans text-xs font-semibold ${u.bankStatementAnalysis.status === "APPROVED" ? "text-green-600" : "text-amber-600"}`}>
                   {u.bankStatementAnalysis.status}
                 </span>
               ) : (
@@ -50,7 +50,7 @@ export default async function AdminUsersPage() {
             </div>
             <span className="font-mono text-sm">₹{Number(u.totalTradeVolumeInr).toLocaleString("en-IN")}</span>
             <div>
-              <Link href={`/admin/users/${u.id}`} className="font-condensed text-[1.1rem] tracking-[1px] uppercase text-[#7b3fe4] hover:underline no-underline">
+              <Link href={`/admin/users/${u.id}`} className="font-sans text-sm font-semibold text-[#7b3fe4] hover:underline">
                 View →
               </Link>
             </div>

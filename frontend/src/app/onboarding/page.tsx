@@ -166,12 +166,12 @@ function StepCard({
       </div>
 
       {status === "active" && (
-        <div className="shrink-0 font-condensed text-[1.1rem] tracking-[0.5px] uppercase text-black">
+        <div className="shrink-0 font-sans text-[0.8rem] font-semibold text-black">
           Start →
         </div>
       )}
       {status === "done" && (
-        <div className="shrink-0 font-condensed text-[1rem] tracking-[0.5px] uppercase text-[#999]">
+        <div className="shrink-0 font-sans text-[0.75rem] text-[#999]">
           Complete
         </div>
       )}
