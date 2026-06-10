@@ -329,7 +329,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
             <div className="flex justify-between items-center mb-4">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
-              <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline">View marketplace →</Link>
+              <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history →</Link>
             </div>
             {!stats || stats.activity.length === 0 ? (
               <div className="text-center py-10">
@@ -337,7 +337,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="flex flex-col divide-y divide-[#f5f5f5]">
-                {stats.activity.map((row) => (
+                {stats.activity.slice(0, 4).map((row) => (
                   <Link key={row.id} href={`/marketplace/${row.id}`}
                     className="flex items-center justify-between py-3 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
                     <div>

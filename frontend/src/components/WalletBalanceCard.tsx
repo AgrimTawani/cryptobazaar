@@ -66,8 +66,6 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
   const [symbol, setSymbol]       = useState<string | null>(null);
   const [loading, setLoading]     = useState(true);
   const [copied, setCopied]       = useState(false);
-  const [unlinking, setUnlinking] = useState(false);
-  const [confirmUnlink, setConfirmUnlink] = useState(false);
 
   const meta      = CHAIN_META[chainKey] ?? CHAIN_META.POLYGON;
   const fixedToken = CHAIN_FIXED_TOKEN[chainKey] ?? null;
@@ -100,16 +98,7 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleUnlink = async () => {
-    if (!confirmUnlink) { setConfirmUnlink(true); return; }
-    setUnlinking(true);
-    try {
-      await fetch("/api/verification/unlink-wallet", { method: "POST" });
-      router.push("/onboarding/wallet");
-    } finally {
-      setUnlinking(false);
-    }
-  };
+
 
   return (
     <div
@@ -118,11 +107,8 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-lg leading-none" style={{ color: meta.color }}>{meta.icon}</span>
-          <span
-            className="font-sans text-[0.78rem] font-bold uppercase tracking-[1.2px]"
-            style={{ color: meta.color }}
-          >
+          <span className="text-lg leading-none text-[#888]">{meta.icon}</span>
+          <span className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">
             {meta.label}
           </span>
         </div>
@@ -138,7 +124,7 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
                   className="font-sans text-[0.65rem] font-semibold px-2 py-0.75 rounded-full cursor-pointer transition-all"
                   style={
                     token === t
-                      ? { background: meta.color, color: "#fff" }
+                      ? { background: "#111", color: "#fff" }
                       : { background: "transparent", color: "#888" }
                   }
                 >
@@ -148,10 +134,7 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
             </div>
           )}
 
-          <span
-            className="font-sans text-[0.68rem] font-semibold px-2.5 py-0.75 rounded-full"
-            style={{ background: meta.color + "1a", color: meta.color, border: `1px solid ${meta.color}33` }}
-          >
+          <span className="font-sans text-[0.68rem] font-semibold px-2.5 py-0.75 rounded-full bg-[#f5f5f5] text-[#888] border border-[#e0e0e0]">
             Connected
           </span>
         </div>
@@ -164,48 +147,30 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
         </span>
         <button
           onClick={handleCopy}
-          className="font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
+          className="ml-auto font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
         >
           {copied ? "✓ Copied" : "Copy"}
-        </button>
-        <button
-          onClick={handleUnlink}
-          disabled={unlinking}
-          className="ml-auto font-sans text-[0.68rem] shrink-0 cursor-pointer border rounded-full px-2 py-0.5 transition-colors disabled:opacity-50"
-          style={
-            confirmUnlink
-              ? { color: "#991b1b", borderColor: "#fca5a5", background: "#fff1f2" }
-              : { color: "#999", borderColor: "#e0e0e0", background: "white" }
-          }
-        >
-          {unlinking ? "Unlinking…" : confirmUnlink ? "Tap again to confirm" : "Disconnect"}
         </button>
       </div>
 
       {/* Balance */}
       <div>
-        <p className="font-sans text-[0.68rem] text-[#999] uppercase tracking-[1.2px] mb-1.5">
+        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-1.5">
           Token Balance
         </p>
         {loading ? (
           <div className="flex items-center gap-2.5">
-            <span
-              className="w-4.5 h-4.5 rounded-full border-[2.5px] animate-spin"
-              style={{ borderColor: `${meta.color}40`, borderTopColor: meta.color }}
-            />
+            <span className="w-4.5 h-4.5 rounded-full border-[2.5px] border-[#e0e0e0] border-t-[#888] animate-spin" />
             <span className="font-sans text-[0.8rem] text-[#999]">Fetching balance…</span>
           </div>
         ) : (
           <div className="flex items-baseline gap-2">
-            <span
-              className="font-condensed text-[2.8rem] tracking-[0.5px] leading-none"
-              style={{ color: meta.color }}
-            >
+            <span className="font-condensed text-[2.2rem] tracking-[0.5px] leading-none text-[#111]">
               {balance && balance !== "-"
                 ? parseFloat(balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
                 : balance}
             </span>
-            <span className="font-sans text-[0.9rem] font-semibold" style={{ color: meta.color + "99" }}>
+            <span className="font-sans text-[0.9rem] font-semibold text-[#888]">
               {symbol}
             </span>
           </div>
