@@ -317,7 +317,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
       if (res.ok) {
         const data: ChatMsg[] = await res.json();
         setMessages(data);
-        setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       }
     } catch { /* transient */ }
   }, [id]);

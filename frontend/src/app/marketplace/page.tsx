@@ -229,7 +229,7 @@ export default function MarketplacePage() {
                   {user?.firstName ?? "Dashboard"}
                 </span>
                 {isVerified && (
-                  <span className="font-sans text-[0.65rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
+                  <span className="hidden sm:inline font-sans text-[0.65rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
                     ✓ VERIFIED
                   </span>
                 )}
