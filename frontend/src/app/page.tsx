@@ -382,11 +382,9 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            {isSignedIn ? (
-              <Link href="/dashboard" className="cta-primary">Dashboard</Link>
-            ) : (
-              <Link href="/login" className="cta-primary">Get Started</Link>
-            )}
+            <Link href={isSignedIn ? "/dashboard" : "/login"} className="cta-primary">
+              Get Started
+            </Link>
             <button onClick={() => setShowPreview(true)} className="cta-secondary">Have a Peek</button>
           </motion.div>
 
