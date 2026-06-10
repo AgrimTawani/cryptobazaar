@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { TopNav } from "@/components/TopNav";
-import { Footer } from "@/components/Footer";
 
 function activityBadge(status: string) {
   if (status === "COMPLETED") return "bg-[#e8f5e9] text-[#2e7d32]";
@@ -40,9 +38,16 @@ export default function OrdersHistoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafafa]">
-      <TopNav />
-      <div className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 mt-16 sm:mt-0">
+    <div className="min-h-screen bg-[#f5f5f5]">
+      <header className="bg-white border-b border-[#f2f2f2] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
+        <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="font-sans text-sm text-[#555] no-underline">Dashboard</Link>
+          <Link href="/marketplace" className="font-sans text-sm text-[#555] no-underline">Marketplace</Link>
+        </div>
+      </header>
+      
+      <div className="max-w-[960px] mx-auto py-6 px-4 md:px-6 mt-16 sm:mt-0">
         <div className="mb-6">
           <Link href="/dashboard" className="font-sans text-sm text-[#888] no-underline hover:text-[#111]">
             ← Back to Dashboard
@@ -89,7 +94,6 @@ export default function OrdersHistoryPage() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
