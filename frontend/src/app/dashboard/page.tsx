@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight } from "lucide-react";
 
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
@@ -196,7 +197,7 @@ export default function DashboardPage() {
           ) : (
             <Link href="/onboarding"
               className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0">
-              {userStatus === "LOGIN_DONE" ? "Start Verification →" : "Continue →"}
+              {userStatus === "LOGIN_DONE" ? (<span className="flex items-center justify-center gap-1">Start Verification <ArrowRight className="w-4 h-4" /></span>) : (<span className="flex items-center justify-center gap-1">Continue <ArrowRight className="w-4 h-4" /></span>)}
             </Link>
           )}
         </div>
@@ -229,7 +230,7 @@ export default function DashboardPage() {
             ) : (
               <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
                  <p className="font-sans text-sm text-[#888]">No wallet connected</p>
-                 <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet →</Link>
+                 <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
               </div>
             )}
           </div>
@@ -371,7 +372,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
             <div className="flex justify-between items-center mb-4">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
-              <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history →</Link>
+              <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
             </div>
             {!stats || stats.activity.length === 0 ? (
               <div className="text-center py-10">

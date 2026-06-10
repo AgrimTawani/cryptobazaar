@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import {
@@ -205,7 +206,7 @@ export default function SellPage() {
         <p className="font-sans text-sm text-[#666] max-w-xs leading-relaxed">
           Your wallet is on {chainLabel}. Sell orders are currently only supported on Polygon.
         </p>
-        <Link href="/marketplace" className="mt-6 font-sans text-sm text-[#7b3fe4] underline">← Back to marketplace</Link>
+        <Link href="/marketplace" className="mt-6 font-sans text-sm text-[#7b3fe4] underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
       </div>
     );
   }
@@ -214,7 +215,7 @@ export default function SellPage() {
     <div className="min-h-screen bg-[#f5f5f5]">
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
-        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline">← Back to marketplace</Link>
+        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
       </header>
 
       <div className="max-w-[560px] mx-auto py-8 px-5">
@@ -272,7 +273,7 @@ export default function SellPage() {
                   <span className={`font-sans text-sm ${active ? "text-[#7b3fe4] font-semibold" : "text-[#999]"}`}>
                     {label}
                   </span>
-                  {i < STEPS.length - 1 && <span className="text-[#ddd]">→</span>}
+                  {i < STEPS.length - 1 && <span className="text-[#ddd]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>}
                 </div>
               );
             })}
@@ -330,7 +331,7 @@ export default function SellPage() {
                 className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 {isBusy
                   ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
-                  : "Confirm & Approve USDC →"}
+                  : (<span className="flex items-center justify-center gap-1">Confirm & Approve USDC <ArrowRight className="w-4 h-4" /></span>)}
               </button>
             </div>
           </div>
@@ -521,7 +522,7 @@ export default function SellPage() {
             }}
             disabled={walletOk && !chainOk}
             className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
-            {!walletOk ? "Connect Wallet" : "Review Order →"}
+            {!walletOk ? "Connect Wallet" : (<span className="flex items-center justify-center gap-1">Review Order <ArrowRight className="w-4 h-4" /></span>)}
           </button>
 
           <p className="font-sans text-sm text-[#999] text-center leading-relaxed">

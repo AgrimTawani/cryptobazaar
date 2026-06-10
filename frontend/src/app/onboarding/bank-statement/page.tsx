@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
@@ -271,7 +272,7 @@ export default function BankStatementPage() {
                   Analysing…
                 </span>
               ) : (
-                "Submit Statement →"
+                <span className="flex items-center justify-center gap-1">Submit Statement <ArrowRight className="w-4 h-4" /></span>
               )}
             </button>
           </>

@@ -1,4 +1,5 @@
 "use client";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -272,7 +273,7 @@ export default function MarketplacePage() {
             <p className="font-sans text-[0.65rem] text-lime tracking-[2px] uppercase mb-1 font-semibold">Platform Safety</p>
             <h3 className="font-condensed text-2xl md:text-3xl tracking-[1px] text-white uppercase m-0 flex items-center gap-3">
               Avoid P2P Scams
-              <span className="text-white/50 group-hover:text-lime group-hover:translate-x-1 transition-all">→</span>
+              <span className="text-white/50 group-hover:text-lime group-hover:translate-x-1 transition-all"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>
             </h3>
           </div>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -301,7 +302,7 @@ export default function MarketplacePage() {
                       <span className="font-sans text-xs font-semibold px-2.5 py-1 rounded-full" style={{ color: cfg.color, background: cfg.bg }}>
                         {o.statusLabel}
                       </span>
-                      <span className="font-sans text-sm text-[#7b3fe4] font-semibold">Manage →</span>
+                      <span className="font-sans text-sm text-[#7b3fe4] font-semibold">Manage <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>
                     </div>
                   </Link>
                 );
@@ -314,7 +315,7 @@ export default function MarketplacePage() {
         <div className="flex justify-between items-center mb-5 flex-wrap gap-4">
           <div>
             <h1 className="font-condensed text-[2.2rem] tracking-[1px] leading-none">LIVE LISTINGS</h1>
-            <p className="font-sans text-sm text-[#888] mt-1">{filtered.length} active orders · INR ↔ USDT / USDC</p>
+            <p className="font-sans text-sm text-[#888] mt-1">{filtered.length} active orders · INR <ArrowLeftRight className="inline-block w-4 h-4 mx-1" /> USDT / USDC</p>
           </div>
           {isVerified && (
             <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
@@ -625,7 +626,7 @@ export default function MarketplacePage() {
                 <span className="font-sans text-xs font-bold text-[#7b3fe4] bg-[#f5f0ff] w-fit px-2 py-0.5 rounded-full mb-2">For Buyers</span>
                 <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Buy USDT on CryptoBazaar</h4>
                 <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">Learn how to securely purchase USDT using UPI or bank transfer. Follow our step-by-step guide to complete your first trade safely.</p>
-                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]">→</span></span>
+                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span></span>
               </div>
             </Link>
             <Link href="/articles/how-to-sell-usdt" className="block bg-white border border-[#e8e8e8] rounded-xl p-5 cursor-pointer hover:shadow-sm hover:border-[#bbb] transition-all no-underline">
@@ -633,7 +634,7 @@ export default function MarketplacePage() {
                 <span className="font-sans text-xs font-bold text-[#b45309] bg-[#fef9ee] w-fit px-2 py-0.5 rounded-full mb-2">For Sellers</span>
                 <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Sell USDT on CryptoBazaar</h4>
                 <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">A comprehensive guide to posting sell orders, managing disputes, and verifying buyer payments before releasing your crypto.</p>
-                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]">→</span></span>
+                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span></span>
               </div>
             </Link>
           </div>

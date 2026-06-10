@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -143,7 +144,7 @@ export default function WalletPage() {
                   Saving wallet…
                 </span>
               ) : (
-                "Confirm & Enter CryptoBazaar →"
+                (<span className="flex items-center justify-center gap-1">Confirm & Enter CryptoBazaar <ArrowRight className="w-4 h-4" /></span>)
               )}
             </button>
           </motion.div>

@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -391,7 +392,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center gap-3">
         <p className="font-sans text-[#666]">Order not found.</p>
-        <Link href="/marketplace" className="font-sans text-sm text-[#7b3fe4] underline">← Back to marketplace</Link>
+        <Link href="/marketplace" className="font-sans text-sm text-[#7b3fe4] underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
       </div>
     );
   }
@@ -432,7 +433,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
         <div className="flex items-center gap-4">
-          <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline">← Marketplace</Link>
+          <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Marketplace</Link>
           <Link href="/dashboard" className="font-sans text-sm font-semibold text-black border border-[#e0e0e0] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors">Dashboard</Link>
         </div>
       </header>
@@ -941,7 +942,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     }}
                     className="w-full py-3 bg-black text-white font-condensed text-xl tracking-[1px] rounded-xl cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
                   >
-                    {ratingSubmitting ? "Submitting…" : "Submit Rating →"}
+                    {ratingSubmitting ? "Submitting…" : (<span className="flex items-center justify-center gap-1">Submit Rating <ArrowRight className="w-4 h-4" /></span>)}
                   </button>
                   <button onClick={() => setShowRatingModal(false)} className="w-full font-sans text-xs text-[#bbb] cursor-pointer bg-transparent border-0 pb-1">Skip for now</button>
                 </div>
@@ -1097,7 +1098,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       parseFloat(buyAmount) > availableAmount
                     ))}
                       className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer disabled:opacity-40">
-                      {busy === "lock" ? "Locking…" : "Lock Order & Start Timer →"}
+                      {busy === "lock" ? "Locking…" : (<span className="flex items-center justify-center gap-1">Lock Order & Start Timer <ArrowRight className="w-4 h-4" /></span>)}
                     </button>
                   </div>
                 </div>
@@ -1122,7 +1123,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             <div className="bg-[#f5f5f5] border border-[#e5e5e5] rounded-2xl p-6 mb-5 text-center space-y-2">
               <p className="font-condensed text-[1.8rem] text-[#555]">{order.status === "CANCELLED" ? "Order Cancelled" : "Order Expired"}</p>
               <p className="font-sans text-sm text-[#888]">Tokens have been returned to the seller.</p>
-              <Link href="/marketplace" className="font-sans text-sm text-[#7b3fe4] underline block">Back to marketplace →</Link>
+              <Link href="/marketplace" className="font-sans text-sm text-[#7b3fe4] underline block">Back to marketplace <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
             </div>
           )}
 
