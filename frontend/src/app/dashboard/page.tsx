@@ -44,6 +44,22 @@ interface OnboardingStatus {
   ifscCode?: string | null;
 }
 
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="font-sans text-[0.65rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
+    >
+      {copied ? "✓ Copied" : "Copy"}
+    </button>
+  );
+}
+
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
@@ -217,18 +233,29 @@ export default function DashboardPage() {
               {/* UPI Section */}
               <div>
                 {dbStatus?.upiId ? (
-                  <div className="flex gap-4 items-center">
-                    <div>
-                      <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
-                      <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
-                    </div>
-                    <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0 ml-auto">
+                  <div className="flex flex-col gap-4">
+                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] self-start">
                       <QRCodeSVG 
                         value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
-                        size={56} 
-                        level="M"
+                        size={120} 
+                        level="H"
                         includeMargin={false}
+                        imageSettings={{
+                          src: "/icon.png",
+                          x: undefined,
+                          y: undefined,
+                          height: 28,
+                          width: 28,
+                          excavate: true,
+                        }}
                       />
+                    </div>
+                    <div>
+                      <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                        <CopyButton text={dbStatus.upiId} />
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -258,8 +285,16 @@ export default function DashboardPage() {
                 {dbStatus?.bankAccount ? (
                   <div>
                     <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
-                    <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
-                    {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
+                    <div className="flex items-center gap-2">
+                      <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
+                      <CopyButton text={dbStatus.bankAccount} />
+                    </div>
+                    {dbStatus.ifscCode && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <p className="font-sans text-xs text-[#666]">IFSC: {dbStatus.ifscCode}</p>
+                        <CopyButton text={dbStatus.ifscCode} />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   showAddBank ? (
