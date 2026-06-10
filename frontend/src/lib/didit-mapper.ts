@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapDiditDecisionToUser(decision: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {};
   
   if (!decision) return data;
