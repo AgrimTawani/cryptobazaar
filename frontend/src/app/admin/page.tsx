@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -6,13 +7,11 @@ export default async function AdminDashboard() {
   const [
     totalUsers,
     pendingUsers,
-    totalOrders,
     activeDisputes,
     totalVolumeRow
   ] = await Promise.all([
     db.user.count(),
     db.user.count({ where: { status: "VERIFICATION_PENDING" } }),
-    db.order.count(),
     db.dispute.count({ where: { status: { notIn: ["RESOLVED_BUYER", "RESOLVED_SELLER"] } } }),
     db.user.aggregate({ _sum: { totalTradeVolumeInr: true } }),
   ]);
