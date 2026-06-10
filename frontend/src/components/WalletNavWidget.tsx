@@ -77,14 +77,15 @@ export function WalletNavWidget() {
   return (
     <Link
       href="/dashboard"
-      className="flex items-center gap-1.5 border border-[#e5e5e5] bg-[#fafafa] rounded-full px-2.5 py-1.25 no-underline hover:border-[#ccc] transition-colors"
+      className="flex items-center gap-1.5 border border-[#e5e5e5] bg-[#fafafa] rounded-full px-2.5 py-1 no-underline hover:border-[#ccc] transition-colors"
     >
       <span className="text-[8px] leading-none" style={{ color: meta.color }}>●</span>
       <span className="font-sans text-[0.7rem] font-semibold" style={{ color: meta.color }}>
         {meta.label}
       </span>
-      <span className="text-[#e0e0e0] select-none">|</span>
-      <span className="font-mono text-[0.7rem] text-[#444]">{short(info.address)}</span>
+      {/* Address is hidden on mobile to keep the nav uncramped — it lives on the dashboard. */}
+      <span className="hidden sm:inline text-[#e0e0e0] select-none">|</span>
+      <span className="hidden sm:inline font-mono text-[0.7rem] text-[#444]">{short(info.address)}</span>
       {info.balance !== null && (
         <>
           <span className="text-[#e0e0e0] select-none">|</span>

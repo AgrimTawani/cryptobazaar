@@ -443,8 +443,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
         <div className="max-w-[1200px] mx-auto py-5 px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_300px] gap-4 items-start">
 
-            {/* LEFT: Steps + order summary */}
-            <div className="flex flex-col gap-4">
+            {/* LEFT: Steps + order summary.
+                On mobile this column moves to the bottom (reference info) and the
+                status banner is pulled to the very top. */}
+            <div className="flex flex-col gap-4 order-3 lg:order-none">
+              <div className="rounded-lg px-3 py-2.5 order-first lg:order-last" style={{ background: statusCfg.bg, border: `1px solid ${statusCfg.border}` }}>
+                <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
+              </div>
+
               <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Trade Steps</p>
                 <TradeSteps status={order.status} />
@@ -473,14 +479,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   </a>
                 )}
               </div>
-
-              <div className="rounded-lg px-3 py-2.5" style={{ background: statusCfg.bg, border: `1px solid ${statusCfg.border}` }}>
-                <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
-              </div>
             </div>
 
-            {/* MIDDLE: Chat (dominant) */}
-            <div className="bg-white border border-[#e8e8e8] rounded-xl flex flex-col lg:sticky lg:top-[68px]" style={{ height: "calc(100vh - 88px)", maxHeight: "740px" }}>
+            {/* MIDDLE: Chat (dominant). On mobile it sits between the actionable
+                payment panel (above) and the reference info (below), and is
+                height-capped so it doesn't swallow the whole viewport. */}
+            <div className="bg-white border border-[#e8e8e8] rounded-xl flex flex-col order-2 lg:order-none h-[70vh] max-h-[560px] lg:h-[calc(100vh-88px)] lg:max-h-[740px] lg:sticky lg:top-[68px]">
 
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#ebebeb] shrink-0">
                 <div className="flex items-center gap-2">
@@ -744,8 +748,9 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               )}
             </div>
 
-            {/* RIGHT: Sidebar */}
-            <div className="flex flex-col gap-4">
+            {/* RIGHT: Sidebar. Pulled to the top on mobile — it holds the trade
+                summary and the seller's payment details (UPI/QR/bank). */}
+            <div className="flex flex-col gap-4 order-1 lg:order-none">
 
               <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Trade Summary</p>

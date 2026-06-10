@@ -298,9 +298,9 @@ export default function SellPage() {
 
         {/* Review panel */}
         {(step === "review" || isBusy) && (
-          <div className="bg-white border-2 border-black rounded-xl p-6 mb-6 space-y-5">
+          <div className="bg-white border-2 border-black rounded-xl p-5 sm:p-6 mb-6 space-y-5">
             <h2 className="font-condensed text-2xl tracking-[0.5px]">Confirm your listing</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5">
               {[
                 ["Amount", `${amount} USDC`],
                 ["Price per USDC", `₹${pricePerUnit}`],
@@ -310,9 +310,9 @@ export default function SellPage() {
                 ...(profilePayment?.upiId ? [["UPI ID", profilePayment.upiId]] : []),
                 ...(profilePayment?.bankAccount ? [["Bank account", profilePayment.bankAccount], ["IFSC", profilePayment.ifscCode ?? ""]] : []),
               ].map(([k, v]) => (
-                <div key={k}>
+                <div key={k} className="min-w-0">
                   <p className="font-sans text-xs text-[#999] uppercase tracking-widest">{k}</p>
-                  <p className="font-sans text-sm font-semibold text-[#111]">{v}</p>
+                  <p className="font-sans text-sm font-semibold text-[#111] break-words">{v}</p>
                 </div>
               ))}
             </div>
@@ -321,13 +321,13 @@ export default function SellPage() {
                 MetaMask will ask you to approve exactly <strong>{amount} USDC</strong> for the escrow — not unlimited.
               </p>
             </div>
-            <div className="flex gap-3 pt-1">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-1">
               <button onClick={() => setStep("form")} disabled={isBusy}
-                className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="sm:flex-1 py-3 px-4 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity whitespace-nowrap">
                 ← Back to Edit
               </button>
               <button onClick={handleSubmit} disabled={isBusy}
-                className="flex-1 py-3 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 {isBusy
                   ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
                   : "Confirm & Approve USDC →"}

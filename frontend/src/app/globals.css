@@ -576,6 +576,13 @@
     display: none !important;
   }
 
+  /* On mobile the desktop right-side actions live in the hamburger menu,
+     so hide them here (the .nav-right CSS rule otherwise beats Tailwind's
+     `hidden` utility and crowds the logo + hamburger). */
+  .nav-right {
+    display: none !important;
+  }
+
   .shader-hero-content {
     padding: 80px 20px 40px;
   }
@@ -606,7 +613,7 @@
   }
 
   .nav-logo {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 }
 
