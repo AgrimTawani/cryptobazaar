@@ -53,9 +53,19 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="font-sans text-[0.65rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
+      className="text-[#888] bg-transparent border-0 p-1 rounded hover:bg-[#f0f0f0] hover:text-[#333] cursor-pointer transition-colors flex items-center justify-center"
+      title="Copy"
     >
-      {copied ? "✓ Copied" : "Copy"}
+      {copied ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      )}
     </button>
   );
 }
@@ -234,7 +244,7 @@ export default function DashboardPage() {
               <div>
                 {dbStatus?.upiId ? (
                   <div className="flex flex-col gap-4">
-                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] self-start">
+                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] self-center">
                       <QRCodeSVG 
                         value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
                         size={120} 
@@ -283,15 +293,16 @@ export default function DashboardPage() {
               {/* Bank Section */}
               <div>
                 {dbStatus?.bankAccount ? (
-                  <div>
-                    <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
+                  <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2">
+                      <p className="font-sans text-sm text-[#888]">Bank Account:</p>
                       <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
                       <CopyButton text={dbStatus.bankAccount} />
                     </div>
                     {dbStatus.ifscCode && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <p className="font-sans text-xs text-[#666]">IFSC: {dbStatus.ifscCode}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-sans text-sm text-[#888]">IFSC:</p>
+                        <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.ifscCode}</p>
                         <CopyButton text={dbStatus.ifscCode} />
                       </div>
                     )}
