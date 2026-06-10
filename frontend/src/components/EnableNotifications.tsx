@@ -45,13 +45,7 @@ export function EnableNotifications({ variant = "banner" }: Props) {
         </span>
       );
     }
-    return (
-      <div className="flex items-center gap-3 bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl px-4 py-3">
-        <span className="text-lg">🔔</span>
-        <p className="font-sans text-sm text-[#166534]">Trade notifications are enabled</p>
-        <button onClick={() => setDismissed(true)} className="ml-auto text-[#aaa] hover:text-[#666] text-lg leading-none">×</button>
-      </div>
-    );
+    return null;
   }
 
   async function enable() {
