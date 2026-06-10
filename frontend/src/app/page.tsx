@@ -630,14 +630,18 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
-                className="group relative bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 flex flex-col gap-4 hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-200"
+                className="group relative overflow-hidden bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 flex flex-col gap-4 transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-white/[0.05] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]"
               >
-                {/* Number badge */}
-                <span className="self-start font-sans text-[0.68rem] font-bold text-white/25 tracking-[2px] bg-white/[0.06] px-2.5 py-1 rounded-full">
+                {/* Watermark number */}
+                <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/12">
+                  {item.num}
+                </span>
+                
+                <span className="self-start font-sans text-xs text-lime tracking-widest uppercase font-semibold">
                   {item.num}
                 </span>
                 <div>
-                  <h3 className="font-sans text-[1rem] font-bold text-white leading-snug mb-2">
+                  <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight mb-2">
                     {item.title}
                   </h3>
                   <p className="font-sans text-[0.84rem] text-white/50 leading-[1.7]">
