@@ -3,7 +3,7 @@
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCode } from "react-qrcode-logo";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
@@ -245,19 +245,17 @@ export default function DashboardPage() {
                 {dbStatus?.upiId ? (
                   <div className="flex flex-col gap-3">
                     <div className="bg-white p-1.5 rounded-xl border border-[#e5e5e5] self-center">
-                      <QRCodeSVG 
+                      <QRCode 
                         value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
                         size={96} 
-                        level="H"
-                        includeMargin={false}
-                        imageSettings={{
-                          src: "/icon.png",
-                          x: undefined,
-                          y: undefined,
-                          height: 22,
-                          width: 22,
-                          excavate: true,
-                        }}
+                        ecLevel="H"
+                        quietZone={0}
+                        logoImage="/icon.png"
+                        logoWidth={22}
+                        logoHeight={22}
+                        removeQrCodeBehindLogo={true}
+                        qrStyle="dots"
+                        eyeRadius={10}
                       />
                     </div>
                     <div>
