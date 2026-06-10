@@ -601,32 +601,134 @@ export default function Home() {
       </section>
 
       {/* ── TERMS SUMMARY ── */}
-      <section id="terms" className="bg-white py-16 md:py-20 px-5 md:px-10">
-        <div className="max-w-[720px] mx-auto">
-          <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
-            Terms of Use
-          </p>
-          <h2 className="font-condensed text-[clamp(2.4rem,5vw,4rem)] text-black leading-none tracking-[1px] mb-4">
-            THE KEY <em className="font-playfair italic lowercase">points</em>.
-          </h2>
-          <p className="font-sans text-[0.9rem] text-[#888] mb-10 leading-[1.6]">
-            Here are the things that matter most. Read the full terms before trading.
+      <section id="terms" className="bg-black py-16 md:py-[100px] px-5 md:px-10">
+        <div className="max-w-[1100px] mx-auto">
+
+          {/* Header */}
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] rounded-full px-4 py-1.5 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-lime inline-block" />
+              <span className="font-sans text-[0.7rem] font-semibold text-white/60 tracking-[2px] uppercase">Terms of Use</span>
+            </div>
+            <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px]">
+              THE KEY <em className="font-playfair italic lowercase text-lime">points</em>.
+            </h2>
+            <p className="font-sans text-[0.9rem] text-white/40 mt-4 leading-[1.7] max-w-[420px]">
+              Here are the things that matter most. Read the full terms before trading.
+            </p>
+          </div>
+
+          {/* 2×2 card grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+            {[
+              { num: "01", title: "Indian residents only", body: "You must be 18+ and a resident of India. You must trade on your own behalf, not as an agent for someone else." },
+              { num: "02", title: "Verification is mandatory and recurring", body: "All 3 layers must be completed and renewed every 6 months. Providing false information during verification may result in a criminal complaint." },
+              { num: "03", title: "We never hold your crypto", body: <>Your crypto is locked in a smart contract — not our wallets. CryptoBazaar cannot access it. <strong className="text-white">The code controls release, not us.</strong></> },
+              { num: "04", title: "Fraud has serious consequences", body: <>Submitting forged bank statements or fabricated freeze notices results in <strong className="text-white">permanent suspension</strong> and may be reported to law enforcement. All users are Aadhaar-linked.</> },
+            ].map((item) => (
+              <motion.div
+                key={item.num}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                className="group relative bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 flex flex-col gap-4 hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-200"
+              >
+                {/* Number badge */}
+                <span className="self-start font-sans text-[0.68rem] font-bold text-white/25 tracking-[2px] bg-white/[0.06] px-2.5 py-1 rounded-full">
+                  {item.num}
+                </span>
+                <div>
+                  <h3 className="font-sans text-[1rem] font-bold text-white leading-snug mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="font-sans text-[0.84rem] text-white/50 leading-[1.7]">
+                    {item.body}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Footer note */}
+          <p className="font-sans text-[0.78rem] text-white/25 leading-relaxed">
+            This is a summary, not a substitute.{" "}
+            <Link href="/articles?topic=terms" className="text-white/50 underline underline-offset-2 hover:text-white transition-colors">
+              Read the full Terms of Use →
+            </Link>
           </p>
 
-          <div className="flex flex-col gap-4 mb-10">
+        </div>
+      </section>
+
+      {/* ── WHAT'S NEXT ── */}
+      <section className="bg-[#f7f7f5] py-16 md:py-[100px] px-5 md:px-10">
+        <div className="max-w-[1100px] mx-auto">
+
+          {/* Header */}
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 bg-black rounded-full px-4 py-1.5 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-lime inline-block animate-pulse" />
+              <span className="font-sans text-[0.7rem] font-semibold text-white tracking-[2px] uppercase">Launching Soon — Membership</span>
+            </div>
+            <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-black leading-none tracking-[1px]">
+              WHAT&apos;S <em className="font-playfair italic lowercase">next</em>.
+            </h2>
+            <p className="font-sans text-[0.9rem] text-[#666] mt-4 leading-[1.7] max-w-[460px]">
+              Two announcements we&apos;re building toward. Membership is coming — and it changes what trading here costs you.
+            </p>
+          </div>
+
+          {/* 2-col benefit cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             {[
-              { title: "Indian residents only", body: "You must be 18+ and a resident of India. You must trade on your own behalf, not as an agent for someone else." },
-              { title: "Verification is mandatory and recurring", body: "All 3 layers must be completed and renewed every 6 months. Providing false information during verification may result in a criminal complaint." },
-              { title: "We never hold your crypto", body: "Your crypto is locked in a smart contract - not our wallets. CryptoBazaar cannot access it. The code controls release, not us." },
-              { title: "Fraud has serious consequences", body: "Submitting forged bank statements or fabricated freeze notices results in permanent suspension and may be reported to law enforcement. All users are Aadhaar-linked." },
-            ].map((item) => (
-              <div key={item.title} className="flex gap-4 items-start py-5 px-5 bg-[#fafafa] rounded-xl border border-[#f0f0f0]">
-                <div>
-                  <div className="font-condensed text-[1.1rem] tracking-[0.5px] mb-1">{item.title}</div>
-                  <div className="font-sans text-[0.82rem] text-[#666] leading-[1.6]">{item.body}</div>
-                </div>
-              </div>
+              {
+                no: "No. 1",
+                title: <>ZERO TRANSACTION <em className="font-playfair italic lowercase font-normal">fee</em></>,
+                body: "Members pay no transaction fee on any trade. Buy or sell USDT and USDC against INR — the price you see is the price you settle.",
+              },
+              {
+                no: "No. 2",
+                title: <>MEMBERSHIP BENEFIT <em className="font-playfair italic lowercase font-normal">fund</em></>,
+                body: "Members get access to the Membership Benefit Fund — a pooled remedy fund that backs our screening and stands behind verified trades.",
+              },
+            ].map((card) => (
+              <motion.div
+                key={card.no}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                className="bg-white border border-[#e8e8e8] rounded-2xl p-7 flex flex-col gap-4 hover:shadow-[0_4px_24px_rgba(0,0,0,0.07)] transition-shadow duration-200"
+              >
+                <span className="font-playfair italic text-[0.85rem] text-[#bbb]">{card.no}</span>
+                <h3 className="font-condensed text-[1.55rem] tracking-[0.5px] text-black leading-tight">
+                  {card.title}
+                </h3>
+                <p className="font-sans text-[0.84rem] text-[#666] leading-[1.75]">
+                  {card.body}
+                </p>
+              </motion.div>
             ))}
+          </div>
+
+          {/* Disclaimer box */}
+          <div className="border border-dashed border-[#d0d0d0] bg-white rounded-xl px-5 py-4 flex items-start gap-3 mb-8">
+            <span className="shrink-0 w-5 h-5 rounded-full border border-[#bbb] flex items-center justify-center font-sans text-[0.65rem] font-bold text-[#888] mt-0.5">!</span>
+            <p className="font-sans text-[0.8rem] text-[#666] leading-[1.65]">
+              <strong className="text-black">The Membership Benefit Fund is not an insurance policy.</strong> It is not issued or backed by an insurer, and it does not guarantee compensation. Payouts are discretionary and subject to the fund&apos;s terms.
+            </p>
+          </div>
+
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-3 bg-black text-white font-condensed text-[1.1rem] tracking-[1.5px] px-8 py-4 rounded-full hover:bg-lime hover:text-black transition-all duration-300 no-underline"
+            >
+              JOIN THE WAITLIST
+            </Link>
+            <p className="font-sans text-[0.82rem] text-[#999]">Be first to know when membership opens.</p>
           </div>
 
         </div>
