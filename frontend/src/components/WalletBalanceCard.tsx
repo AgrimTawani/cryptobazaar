@@ -113,8 +113,7 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
 
   return (
     <div
-      className={`rounded-[20px] p-6 border-[1.5px] transition-colors duration-300 ${className || ""}`}
-      style={{ background: meta.bg, borderColor: meta.border }}
+      className={`bg-white border border-[#e8e8e8] rounded-xl p-5 transition-colors duration-300 ${className || ""}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
