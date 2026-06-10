@@ -26,9 +26,9 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Expand the category of the current article when slug changes
-  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => {
     if (currentCategoryId && !expandedCategories.includes(currentCategoryId)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpandedCategories((prev) => [...prev, currentCategoryId]);
     }
     if (sections.length > 0) {

@@ -46,8 +46,8 @@ export default async function AdminDashboard() {
         <h2 className="font-condensed text-xl mb-4">Quick Actions</h2>
         <div className="flex gap-4">
            {/* Add more quick links if needed */}
-           <a href="/admin/users" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Review Pending Users</a>
-           <a href="/admin/disputes" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Handle Disputes</a>
+           <Link href="/admin/users" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Review Pending Users</Link>
+           <Link href="/admin/disputes" className="font-sans text-sm font-semibold bg-[#f5f5f5] hover:bg-[#e5e5e5] transition-colors py-2 px-4 rounded-lg border border-[#e0e0e0]">Handle Disputes</Link>
         </div>
       </div>
     </div>

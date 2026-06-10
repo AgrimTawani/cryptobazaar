@@ -7,6 +7,7 @@ import { QRCode } from "react-qrcode-logo";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "@/components/WalletBalanceCard";
+import { AvatarPicker } from "@/components/AvatarPicker";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EnableNotifications } from "@/components/EnableNotifications";
 
@@ -170,10 +171,7 @@ export default function DashboardPage() {
 
         {/* Profile card */}
         <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">
-          {user?.imageUrl && (
-            <Image src={user.imageUrl} alt={user.fullName ? `${user.fullName}'s avatar` : "User avatar"} width={56} height={56}
-              className="rounded-full shrink-0 border-2 border-[#f0f0f0]" />
-          )}
+          <AvatarPicker currentImageUrl={user?.imageUrl} userName={user?.fullName} />
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h1 className="font-condensed text-[1.8rem] tracking-[0.5px] leading-none">
