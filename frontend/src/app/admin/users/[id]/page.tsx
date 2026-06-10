@@ -27,16 +27,19 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
   const eddRecord = user.onboardingRecords.find((r) => r.layer === "EDD");
   if (eddRecord?.result && typeof eddRecord.result === "object") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const resultObj = eddRecord.result as any;
     if (resultObj.r2Key) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         statementUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: resultObj.r2Key }), { expiresIn: 3600 });
-      } catch (e) { console.error("Failed to sign R2 key:", resultObj.r2Key); }
+      } catch { console.error("Failed to sign R2 key:", resultObj.r2Key); }
     }
     if (resultObj.r2JsonKey) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         jsonUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: resultObj.r2JsonKey }), { expiresIn: 3600 });
-      } catch (e) { console.error("Failed to sign R2 JSON key:", resultObj.r2JsonKey); }
+      } catch { console.error("Failed to sign R2 JSON key:", resultObj.r2JsonKey); }
     }
   }
 

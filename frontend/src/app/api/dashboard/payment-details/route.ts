@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const updates: any = {};
+    const updates: Record<string, string | null> = {};
 
     // Only allow setting if currently null
     if (upiId && !user.upiId) {

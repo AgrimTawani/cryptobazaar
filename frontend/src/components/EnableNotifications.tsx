@@ -15,6 +15,7 @@ export function EnableNotifications({ variant = "banner" }: Props) {
   useEffect(() => {
     if (typeof Notification === "undefined") return;
     const perm = Notification.permission;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPermission(perm);
     if (perm === "granted") {
       navigator.serviceWorker.register("/sw.js").then(async (reg) => {

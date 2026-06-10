@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare updated result object, preserving the r2Key
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const currentResult = existingRecord.result as any || {};
     const updatedResult = { ...currentResult, r2JsonKey: data.r2_json_key };
 

@@ -8,8 +8,7 @@ interface Props {
   orderId: string;
 }
 
-export default function OrderTimedOutEmail({ buyerName, amount, asset, orderId }: Props) {
-  const url = `https://cryptobazaar.co.in/marketplace/${orderId}`;
+export default function OrderTimedOutEmail({ buyerName, amount, asset }: Props) {
   return (
     <BaseEmail
       previewText="Your payment window expired — order has been cancelled"

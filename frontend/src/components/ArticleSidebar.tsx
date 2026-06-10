@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ARTICLES_CATEGORIES } from "@/data/articlesData";
 import type { Article } from "@/data/articlesData";
@@ -13,8 +12,6 @@ interface ArticleSidebarProps {
 }
 
 export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
-  const pathname = usePathname();
-
   // Find which category owns the current article
   const currentCategoryId = ARTICLES_CATEGORIES.find((cat) =>
     cat.articles.some((a) => a.id === currentSlug)
@@ -29,6 +26,7 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Expand the category of the current article when slug changes
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => {
     if (currentCategoryId && !expandedCategories.includes(currentCategoryId)) {
       setExpandedCategories((prev) => [...prev, currentCategoryId]);

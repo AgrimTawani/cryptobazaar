@@ -1,5 +1,5 @@
 import {
-  Html, Head, Body, Container, Section, Text, Button, Hr, Img,
+  Html, Head, Body, Container, Section, Text, Button, Hr, Preview,
 } from "@react-email/components";
 import type { ReactNode } from "react";
 
@@ -14,6 +14,7 @@ export function BaseEmail({ previewText, children, ctaLabel, ctaUrl }: BaseEmail
   return (
     <Html>
       <Head />
+      <Preview>{previewText}</Preview>
       <Body style={{ backgroundColor: "#f5f5f5", fontFamily: "Arial, sans-serif", margin: 0, padding: 0 }}>
         <Container style={{ backgroundColor: "#ffffff", margin: "40px auto", maxWidth: 560, borderRadius: 8, overflow: "hidden" }}>
           {/* Header */}

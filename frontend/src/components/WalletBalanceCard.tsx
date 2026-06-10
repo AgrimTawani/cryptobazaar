@@ -53,7 +53,6 @@ interface Props {
 }
 
 export function WalletBalanceCard({ walletAddress, className }: Props) {
-  const router = useRouter();
   const evmChainKey = useMetaMaskChainKey();
 
   const addressType = detectAddressType(walletAddress);
@@ -82,6 +81,7 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
   }, [token, fixedToken, addressType, evmChainKey]);
 
   // Refetch when token changes or when MetaMask switches chain (evmChainKey changes)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchBalance(); }, [fetchBalance]);
 
   const switchToken = (newToken: TokenPref) => {

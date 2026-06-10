@@ -152,6 +152,7 @@ export default function MarketplacePage() {
         if (Array.isArray(ordersData)) {
           setOrders(ordersData);
           if (ordersData.length > 0 && initial) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const prices = ordersData.map((o: any) => parseFloat(o.pricePerUnit));
             const min = Math.floor(Math.min(...prices));
             const max = Math.ceil(Math.max(...prices));
@@ -374,6 +375,7 @@ export default function MarketplacePage() {
                             name="priceSort" 
                             value={opt.val} 
                             checked={priceSort === opt.val} 
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e) => setPriceSort(e.target.value as any)} 
                             className="accent-black"
                           />
@@ -397,6 +399,7 @@ export default function MarketplacePage() {
                             name="ratingSort" 
                             value={opt.val} 
                             checked={ratingSort === opt.val} 
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e) => setRatingSort(e.target.value as any)} 
                             className="accent-black"
                           />

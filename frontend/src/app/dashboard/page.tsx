@@ -239,23 +239,23 @@ export default function DashboardPage() {
           {/* Card 3: Payment Details */}
           <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col h-full">
             <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
-            <div className="flex flex-col gap-6 flex-1 justify-center">
+            <div className="flex flex-col gap-4 flex-1 justify-center">
               {/* UPI Section */}
               <div>
                 {dbStatus?.upiId ? (
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] self-center">
+                  <div className="flex flex-col gap-3">
+                    <div className="bg-white p-1.5 rounded-xl border border-[#e5e5e5] self-center">
                       <QRCodeSVG 
                         value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
-                        size={120} 
+                        size={96} 
                         level="H"
                         includeMargin={false}
                         imageSettings={{
                           src: "/icon.png",
                           x: undefined,
                           y: undefined,
-                          height: 28,
-                          width: 28,
+                          height: 22,
+                          width: 22,
                           excavate: true,
                         }}
                       />
