@@ -392,7 +392,7 @@ export default function Home() {
 
           {/* ── Stats ── */}
           <motion.div
-            className="flex flex-nowrap justify-center gap-10 mt-10 w-full"
+            className="grid grid-cols-2 gap-x-6 gap-y-8 sm:flex sm:flex-nowrap justify-center sm:gap-10 mt-10 w-full"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -426,7 +426,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.65 + i * 0.07 }}
                 className="flex flex-col items-center shrink-0"
               >
-                <span className="text-center font-condensed text-[4rem] text-black leading-none tracking-wide [-webkit-text-stroke:1.5px_#000] whitespace-nowrap">
+                <span className="text-center font-condensed text-[2.6rem] sm:text-[4rem] text-black leading-none tracking-wide [-webkit-text-stroke:1.5px_#000] whitespace-nowrap">
                   {stat.type ? (
                     <LotteryCounter value={stat.value} type={stat.type} />
                   ) : (

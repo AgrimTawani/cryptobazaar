@@ -18,7 +18,8 @@ export default async function AdminDisputesPage() {
     <div>
       <h1 className="font-condensed text-3xl mb-8 uppercase tracking-[1px]">Disputes</h1>
 
-      <div className="bg-white border border-[#e8e8e8] rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#e8e8e8] rounded-xl overflow-x-auto shadow-sm">
+        <div className="min-w-[680px]">
         <div className="grid grid-cols-[100px_1fr_150px_150px_100px] gap-4 py-3 px-6 bg-[#f8f8f8] border-b border-[#ebebeb] font-sans text-xs text-[#888] font-semibold uppercase tracking-widest">
           <span>Order ID</span>
           <span>Raised By</span>
@@ -57,6 +58,7 @@ export default async function AdminDisputesPage() {
         {disputes.length === 0 && (
           <div className="p-8 text-center text-[#888] font-sans text-sm">No active disputes found.</div>
         )}
+        </div>
       </div>
     </div>
   );

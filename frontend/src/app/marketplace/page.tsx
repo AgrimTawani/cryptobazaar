@@ -358,7 +358,7 @@ export default function MarketplacePage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-[280px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#e5e5e5] p-5 z-50 origin-top-right"
+                  className="absolute right-0 top-full mt-2 w-[280px] max-w-[calc(100vw-2.5rem)] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#e5e5e5] p-5 z-50 origin-top-right"
                 >
                   <div className="mb-5">
                     <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Sort by Price</p>

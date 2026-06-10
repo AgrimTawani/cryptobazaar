@@ -580,6 +580,15 @@
     padding: 80px 20px 40px;
   }
 
+  .shader-title {
+    font-size: clamp(2.6rem, 12vw, 4rem);
+  }
+
+  .shader-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
   .hero-spotlight {
     max-width: 340px;
   }
