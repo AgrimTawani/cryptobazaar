@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
+import { mapDiditDecisionToUser } from "@/lib/didit-mapper";
 
 const MAX_AGE_SECS = 300; // reject webhooks older than 5 minutes
 
@@ -85,9 +86,12 @@ export async function POST(req: NextRequest) {
     });
 
     if (passed) {
+      const mappedData = mapDiditDecisionToUser(decision);
+      
       await db.user.update({
         where: { id: userId },
         data: {
+          ...mappedData,
           kycSessionId: session_id,
           kycVerifiedAt: new Date(),
           status: "WALLET_PENDING",

@@ -49,9 +49,10 @@ function detectAddressType(address: string): "EVM" | "TRON" | "SOLANA" {
 
 interface Props {
   walletAddress: string;
+  className?: string;
 }
 
-export function WalletBalanceCard({ walletAddress }: Props) {
+export function WalletBalanceCard({ walletAddress, className }: Props) {
   const router = useRouter();
   const evmChainKey = useMetaMaskChainKey();
 
@@ -112,7 +113,7 @@ export function WalletBalanceCard({ walletAddress }: Props) {
 
   return (
     <div
-      className="rounded-[20px] p-6 border-[1.5px] transition-colors duration-300"
+      className={`rounded-[20px] p-6 border-[1.5px] transition-colors duration-300 ${className || ""}`}
       style={{ background: meta.bg, borderColor: meta.border }}
     >
       {/* Header */}

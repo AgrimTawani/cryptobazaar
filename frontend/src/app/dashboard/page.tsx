@@ -177,32 +177,123 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          {[
-            { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
-            { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
-            {
-              label: "Rating",
-              value: stats?.avgSellerRating != null
-                ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
-                : "—",
-            },
-          ].map((s) => (
-            <div key={s.label} className="bg-white border border-[#e8e8e8] rounded-xl py-4 px-5">
-              <div className="font-condensed text-[2rem] tracking-[0.5px] mb-1">{s.value}</div>
-              <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
+        {/* Three-column Dashboard Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-stretch">
+          {/* Card 1: Stats (Vertical) */}
+          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col justify-between gap-4">
+            {[
+              { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
+              { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
+              {
+                label: "Rating",
+                value: stats?.avgSellerRating != null
+                  ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
+                  : "—",
+              },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="font-condensed text-[2.2rem] tracking-[0.5px] mb-1 leading-none">{s.value}</div>
+                <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Card 2: Wallet Details */}
+          <div className="h-full">
+            {dbStatus?.walletAddress ? (
+              <WalletBalanceCard walletAddress={dbStatus.walletAddress} className="h-full flex flex-col justify-between" />
+            ) : (
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
+                 <p className="font-sans text-sm text-[#888]">No wallet connected</p>
+                 <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet →</Link>
+              </div>
+            )}
+          </div>
+
+          {/* Card 3: Payment Details */}
+          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col h-full">
+            <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
+            <div className="flex flex-col gap-6 flex-1 justify-center">
+              {/* UPI Section */}
+              <div>
+                {dbStatus?.upiId ? (
+                  <div className="flex gap-4 items-center">
+                    <div>
+                      <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
+                      <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
+                    </div>
+                    <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0 ml-auto">
+                      <QRCodeSVG 
+                        value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
+                        size={56} 
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  showAddUpi ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="font-sans text-xs text-[#888]">Add UPI ID</p>
+                      <input 
+                        type="text" 
+                        placeholder="Enter UPI ID" 
+                        value={upiInput} 
+                        onChange={e => setUpiInput(e.target.value)}
+                        className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleAddPaymentDetail("upi")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
+                        <button onClick={() => setShowAddUpi(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowAddUpi(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add UPI ID</button>
+                  )
+                )}
+              </div>
+
+              {/* Bank Section */}
+              <div>
+                {dbStatus?.bankAccount ? (
+                  <div>
+                    <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
+                    <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
+                    {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
+                  </div>
+                ) : (
+                  showAddBank ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="font-sans text-xs text-[#888]">Add Bank Account</p>
+                      <input 
+                        type="text" 
+                        placeholder="Account Number" 
+                        value={bankAccInput} 
+                        onChange={e => setBankAccInput(e.target.value)}
+                        className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="IFSC Code" 
+                        value={ifscInput} 
+                        onChange={e => setIfscInput(e.target.value.toUpperCase())}
+                        className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black uppercase"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleAddPaymentDetail("bank")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
+                        <button onClick={() => setShowAddBank(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowAddBank(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add Bank Account</button>
+                  )
+                )}
+              </div>
             </div>
-          ))}
+          </div>
         </div>
 
-        {dbStatus?.walletAddress && (
-          <div className="mb-4">
-            <WalletBalanceCard walletAddress={dbStatus.walletAddress} />
-          </div>
-        )}
-
-        {/* Two-column: checklist + activity */}
+        {/* Bottom Section: Checklist + Activity */}
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-3">
 
           <div className="flex flex-col gap-3">
@@ -233,89 +324,6 @@ export default function DashboardPage() {
               </Link>
             )}
             </div>
-
-            {(dbStatus?.upiId || dbStatus?.bankAccount || !dbStatus?.upiId || !dbStatus?.bankAccount) && (
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 mt-3">
-                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
-                <div className="flex flex-col gap-4">
-                  {/* UPI Section */}
-                  <div>
-                    {dbStatus?.upiId ? (
-                      <div className="flex gap-4 items-center">
-                        <div>
-                          <p className="font-sans text-xs text-[#888] mb-0.5">UPI ID</p>
-                          <p className="font-sans text-sm font-medium text-[#111] break-all">{dbStatus.upiId}</p>
-                        </div>
-                        <div className="bg-white p-1.5 rounded-lg border border-[#e5e5e5] shrink-0">
-                          <QRCodeSVG 
-                            value={`upi://pay?pa=${dbStatus.upiId}&cu=INR`} 
-                            size={64} 
-                            level="M"
-                            includeMargin={false}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      showAddUpi ? (
-                        <div className="flex flex-col gap-2">
-                          <p className="font-sans text-xs text-[#888]">Add UPI ID</p>
-                          <input 
-                            type="text" 
-                            placeholder="Enter UPI ID" 
-                            value={upiInput} 
-                            onChange={e => setUpiInput(e.target.value)}
-                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
-                          />
-                          <div className="flex gap-2">
-                            <button onClick={() => handleAddPaymentDetail("upi")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
-                            <button onClick={() => setShowAddUpi(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button onClick={() => setShowAddUpi(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add UPI ID</button>
-                      )
-                    )}
-                  </div>
-
-                  {/* Bank Section */}
-                  <div>
-                    {dbStatus?.bankAccount ? (
-                      <div>
-                        <p className="font-sans text-xs text-[#888] mb-0.5">Bank Account</p>
-                        <p className="font-sans text-sm font-medium text-[#111]">{dbStatus.bankAccount}</p>
-                        {dbStatus.ifscCode && <p className="font-sans text-xs text-[#666] mt-0.5">IFSC: {dbStatus.ifscCode}</p>}
-                      </div>
-                    ) : (
-                      showAddBank ? (
-                        <div className="flex flex-col gap-2">
-                          <p className="font-sans text-xs text-[#888]">Add Bank Account</p>
-                          <input 
-                            type="text" 
-                            placeholder="Account Number" 
-                            value={bankAccInput} 
-                            onChange={e => setBankAccInput(e.target.value)}
-                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black"
-                          />
-                          <input 
-                            type="text" 
-                            placeholder="IFSC Code" 
-                            value={ifscInput} 
-                            onChange={e => setIfscInput(e.target.value.toUpperCase())}
-                            className="font-sans text-sm p-2 border border-[#ccc] rounded-md focus:outline-none focus:border-black uppercase"
-                          />
-                          <div className="flex gap-2">
-                            <button onClick={() => handleAddPaymentDetail("bank")} disabled={isSubmittingPayment} className="font-sans text-xs bg-black text-white px-3 py-1.5 rounded-md cursor-pointer disabled:opacity-50">Save</button>
-                            <button onClick={() => setShowAddBank(false)} className="font-sans text-xs bg-transparent text-[#888] px-3 py-1.5 cursor-pointer border-0">Cancel</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button onClick={() => setShowAddBank(true)} className="font-sans text-sm text-[#7b3fe4] font-medium border-0 bg-transparent cursor-pointer p-0 underline hover:text-[#5e2db8]">+ Add Bank Account</button>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">

@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { mapDiditDecisionToUser } from "@/lib/didit-mapper";
 
 export async function GET() {
   try {
@@ -49,9 +50,15 @@ export async function GET() {
       });
 
       if (passed) {
+        const mappedData = mapDiditDecisionToUser(decision);
+        
         await db.user.update({
           where: { id: user.id },
-          data: { kycVerifiedAt: new Date(), status: "WALLET_PENDING" },
+          data: { 
+            ...mappedData,
+            kycVerifiedAt: new Date(), 
+            status: "WALLET_PENDING" 
+          },
         });
       }
     }
