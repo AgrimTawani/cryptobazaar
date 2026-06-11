@@ -22,6 +22,7 @@ export default function AdminLogin() {
       });
 
       if (res.ok) {
+        sessionStorage.setItem("admin_session_active", "true");
         // Hard refresh to re-run middleware and load admin layout
         window.location.href = "/admin";
       } else {

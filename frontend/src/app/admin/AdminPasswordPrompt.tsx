@@ -22,6 +22,7 @@ export function AdminPasswordPrompt() {
       });
 
       if (res.ok) {
+        sessionStorage.setItem("admin_session_active", "true");
         router.refresh(); // Refresh the layout to re-evaluate the cookie on the server
       } else {
         const data = await res.json();
