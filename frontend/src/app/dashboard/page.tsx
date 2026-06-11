@@ -191,12 +191,12 @@ export default function DashboardPage() {
           </div>
           {isVerified ? (
             <Link href="/marketplace"
-              className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0">
+              className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
               Marketplace <ArrowRight className="inline-block w-4 h-4 ml-1" />
             </Link>
           ) : (
             <Link href="/onboarding"
-              className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0">
+              className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
               {userStatus === "LOGIN_DONE" ? (<span className="flex items-center justify-center gap-1">Start Verification <ArrowRight className="w-4 h-4" /></span>) : (<span className="flex items-center justify-center gap-1">Continue <ArrowRight className="w-4 h-4" /></span>)}
             </Link>
           )}

@@ -8,7 +8,7 @@ export const middleware = clerkMiddleware(async (auth, request) => {
   const host = request.headers.get('host');
   
   const isAdminDomain = host === 'admin.cryptobazaar.co.in' || host?.startsWith('admin.localhost');
-  const isTargetingAdmin = isAdminDomain || url.pathname.startsWith('/admin');
+  const isTargetingAdmin = isAdminDomain || url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/admin');
 
   if (isTargetingAdmin) {
     // 2. Auth Protect (Custom Admin Cookie)

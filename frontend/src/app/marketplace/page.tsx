@@ -318,7 +318,7 @@ export default function MarketplacePage() {
             <p className="font-sans text-sm text-[#888] mt-1">{filtered.length} active orders · INR <ArrowLeftRight className="inline-block w-4 h-4 mx-1" /> USDT / USDC</p>
           </div>
           {isVerified && (
-            <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
+            <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
               + Post Order
             </Link>
           )}
@@ -329,7 +329,7 @@ export default function MarketplacePage() {
           <div className="flex gap-2 flex-wrap">
             {ASSET_FILTERS.map((f) => (
               <button key={f} onClick={() => setAssetFilter(f)}
-                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
                   }`}>
                 {f}
               </button>
@@ -337,7 +337,7 @@ export default function MarketplacePage() {
             <div className="w-px bg-[#e5e5e5] mx-1" />
             {CHAIN_FILTERS.map((c) => (
               <button key={c} onClick={() => setChainFilter(c)}
-                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
                   }`}>
                 {c}
               </button>
@@ -607,7 +607,7 @@ export default function MarketplacePage() {
                 : "Be the first to post a sell order."}
             </p>
             {isVerified ? (
-              <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
+              <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
                 Post First Order <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             ) : (
