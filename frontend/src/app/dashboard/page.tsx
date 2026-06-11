@@ -340,39 +340,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Bottom Section: Checklist + Activity */}
-        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-3">
+        {/* Bottom Section: Activity + Checklist */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
 
-          <div className="flex flex-col gap-3">
-            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
-              <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
-            {[
-              { label: "Google Login",       done: true },
-              { label: "KYC — Identity",     done: dbStatus?.kyc === "PASSED" },
-              { label: "Bank Statement",     done: dbStatus?.edd === "PASSED" },
-              { label: "AI Questionnaire",   done: dbStatus?.interview === "PASSED" },
-              { label: "Wallet Connection",  done: !!dbStatus?.walletAddress },
-            ].map((step) => (
-              <div key={step.label} className="flex items-center gap-3 py-2.5 border-b border-[#f5f5f5] last:border-b-0">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
-                  step.done ? "bg-lime" : "bg-[#f2f2f2]"
-                }`}>
-                  {step.done ? "✓" : ""}
-                </div>
-                <span className={`font-sans text-sm ${step.done ? "text-black" : "text-[#bbb]"}`}>
-                  {step.label}
-                </span>
-              </div>
-            ))}
-            {!isVerified && (
-              <Link href="/onboarding"
-                className="mt-4 block text-center font-sans text-sm font-semibold text-black bg-lime py-2 rounded-lg no-underline">
-                Continue verification <ArrowRight className="inline-block w-4 h-4 ml-1" />
-              </Link>
-            )}
-            </div>
-          </div>
-
+          {/* Left: Recent Activity */}
           <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
             <div className="flex justify-between items-center mb-4">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
@@ -404,6 +375,38 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Right: Verification */}
+          <div className="flex flex-col gap-3">
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+              <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
+            {[
+              { label: "Google Login",       done: true },
+              { label: "KYC — Identity",     done: dbStatus?.kyc === "PASSED" },
+              { label: "Bank Statement",     done: dbStatus?.edd === "PASSED" },
+              { label: "AI Questionnaire",   done: dbStatus?.interview === "PASSED" },
+              { label: "Wallet Connection",  done: !!dbStatus?.walletAddress },
+            ].map((step) => (
+              <div key={step.label} className="flex items-center gap-3 py-2.5 border-b border-[#f5f5f5] last:border-b-0">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                  step.done ? "bg-lime" : "bg-[#f2f2f2]"
+                }`}>
+                  {step.done ? "✓" : ""}
+                </div>
+                <span className={`font-sans text-sm ${step.done ? "text-black" : "text-[#bbb]"}`}>
+                  {step.label}
+                </span>
+              </div>
+            ))}
+            {!isVerified && (
+              <Link href="/onboarding"
+                className="mt-4 block text-center font-sans text-sm font-semibold text-black bg-lime py-2 rounded-lg no-underline">
+                Continue verification <ArrowRight className="inline-block w-4 h-4 ml-1" />
+              </Link>
+            )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
