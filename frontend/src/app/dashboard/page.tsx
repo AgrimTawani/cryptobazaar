@@ -202,37 +202,41 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Three-column Dashboard Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-stretch">
-          {/* Card 1: Stats (Vertical) */}
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col justify-between gap-4">
-            {[
-              { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
-              { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
-              {
-                label: "Rating",
-                value: stats?.avgSellerRating != null
-                  ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
-                  : "—",
-              },
-            ].map((s) => (
-              <div key={s.label}>
-                <div className="font-condensed text-[2.2rem] tracking-[0.5px] mb-1 leading-none">{s.value}</div>
-                <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
-              </div>
-            ))}
-          </div>
+        {/* Two-column Dashboard Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-stretch">
+          
+          {/* Left Column: Stats & Wallet */}
+          <div className="flex flex-col gap-4 h-full">
+            {/* Card 1: Stats (Vertical) */}
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col justify-between gap-4 flex-1">
+              {[
+                { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
+                { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
+                {
+                  label: "Rating",
+                  value: stats?.avgSellerRating != null
+                    ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
+                    : "—",
+                },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div className="font-condensed text-[2.2rem] tracking-[0.5px] mb-1 leading-none">{s.value}</div>
+                  <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
+                </div>
+              ))}
+            </div>
 
-          {/* Card 2: Wallet Details */}
-          <div className="h-full">
-            {dbStatus?.walletAddress ? (
-              <WalletBalanceCard walletAddress={dbStatus.walletAddress} className="h-full flex flex-col justify-between" />
-            ) : (
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
-                 <p className="font-sans text-sm text-[#888]">No wallet connected</p>
-                 <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
-              </div>
-            )}
+            {/* Card 2: Wallet Details */}
+            <div className="flex-1">
+              {dbStatus?.walletAddress ? (
+                <WalletBalanceCard walletAddress={dbStatus.walletAddress} className="h-full flex flex-col justify-between" />
+              ) : (
+                <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
+                   <p className="font-sans text-sm text-[#888]">No wallet connected</p>
+                   <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Card 3: Payment Details */}
