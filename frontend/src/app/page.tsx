@@ -520,7 +520,7 @@ export default function Home() {
                   <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
                     {item.title}
                   </h3>
-                  <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1">
+                  <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
                     {item.desc}
                   </p>
                   <div className="mt-1">
@@ -633,18 +633,18 @@ export default function Home() {
                 className="group relative overflow-hidden bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 flex flex-col gap-4 transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-white/[0.05] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]"
               >
                 {/* Watermark number */}
-                <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/12">
+                <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.05] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/12 z-0">
                   {item.num}
                 </span>
                 
-                <span className="self-start font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                <span className="self-start font-sans text-xs text-lime tracking-widest uppercase font-semibold relative z-10">
                   {item.num}
                 </span>
-                <div>
+                <div className="relative z-10">
                   <h3 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight mb-2">
                     {item.title}
                   </h3>
-                  <p className="font-sans text-[0.84rem] text-white/50 leading-[1.7]">
+                  <p className="font-sans text-[0.84rem] text-white/50 leading-[1.7] pr-16">
                     {item.body}
                   </p>
                 </div>
