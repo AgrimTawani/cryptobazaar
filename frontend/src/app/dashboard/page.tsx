@@ -237,6 +237,39 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
+
+            {/* Card 3: Recent Activity */}
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+              <div className="flex justify-between items-center mb-4">
+                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
+                <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
+              </div>
+              {!stats || stats.activity.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="font-sans text-sm text-[#bbb]">No trades yet. Complete verification to start trading.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col divide-y divide-[#f5f5f5]">
+                  {stats.activity.slice(0, 4).map((row) => (
+                    <Link key={row.id} href={`/marketplace/${row.id}`}
+                      className="flex items-center justify-between py-3 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
+                      <div>
+                        <p className="font-sans text-sm font-semibold text-[#111]">
+                          {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
+                        </p>
+                        <p className="font-sans text-xs text-[#888] mt-0.5">
+                          {row.counterpartyName ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · ` : ""}
+                          ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                        </p>
+                      </div>
+                      <span className={`font-sans text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${activityBadge(row.status)}`}>
+                        {row.statusLabel}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Column: Payment & Verification */}
