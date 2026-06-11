@@ -42,6 +42,9 @@ const ANIMAL_AVATARS = [
 const POKEMON_AVATARS = [
   "/avatars/pokemon_avatar_1.png",
   "/avatars/pokemon_avatar_2.png",
+  "/avatars/pokemon_avatar_3.png",
+  "/avatars/pokemon_avatar_4.png",
+  "/avatars/pokemon_avatar_5.png",
 ];
 
 const ALL_AVATARS = [...MALE_AVATARS, ...FEMALE_AVATARS, ...ANIMAL_AVATARS, ...POKEMON_AVATARS];
