@@ -202,10 +202,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Two-column Dashboard Row */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 mb-4 items-start">
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 items-start">
           
-          {/* Left Column: Stats & Wallet */}
+          {/* Left Column: Stats, Wallet, Activity */}
           <div className="flex flex-col gap-4">
             {/* Card 1: Stats (Horizontal) */}
             <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -239,9 +239,11 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 3: Payment Details */}
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col">
-            <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
+          {/* Right Column: Payment & Verification */}
+          <div className="flex flex-col gap-4">
+            {/* Card 4: Payment Details */}
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col">
+              <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
             <div className="flex flex-col gap-4 flex-1 justify-center">
               {/* UPI Section */}
               <div>
@@ -337,47 +339,9 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Bottom Section: Activity + Checklist */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-
-          {/* Left: Recent Activity */}
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
-            <div className="flex justify-between items-center mb-4">
-              <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
-              <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
             </div>
-            {!stats || stats.activity.length === 0 ? (
-              <div className="text-center py-10">
-                <p className="font-sans text-sm text-[#bbb]">No trades yet. Complete verification to start trading.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col divide-y divide-[#f5f5f5]">
-                {stats.activity.slice(0, 4).map((row) => (
-                  <Link key={row.id} href={`/marketplace/${row.id}`}
-                    className="flex items-center justify-between py-3 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
-                    <div>
-                      <p className="font-sans text-sm font-semibold text-[#111]">
-                        {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
-                      </p>
-                      <p className="font-sans text-xs text-[#888] mt-0.5">
-                        {row.counterpartyName ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · ` : ""}
-                        ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                      </p>
-                    </div>
-                    <span className={`font-sans text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${activityBadge(row.status)}`}>
-                      {row.statusLabel}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Right: Verification */}
-          <div className="flex flex-col gap-3">
+            
+            {/* Card 5: Verification */}
             <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
             {[
