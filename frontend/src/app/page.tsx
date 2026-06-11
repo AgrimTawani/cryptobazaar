@@ -604,12 +604,11 @@ export default function Home() {
 
           {/* Header */}
           <div className="mb-12">
-            <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] rounded-full px-4 py-1.5 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-lime inline-block" />
-              <span className="font-sans text-[0.7rem] font-semibold text-white/60 tracking-[2px] uppercase">Terms of Use</span>
-            </div>
+            <p className="font-sans text-[0.75rem] font-medium text-lime tracking-[4px] uppercase mb-4">
+              Terms of Use
+            </p>
             <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-white leading-none tracking-[1px]">
-              THE KEY <em className="font-playfair italic lowercase text-lime">points</em>.
+              THE KEY <em className="font-playfair italic lowercase text-white">points</em>.
             </h2>
             <p className="font-sans text-[0.9rem] text-white/40 mt-4 leading-[1.7] max-w-[420px]">
               Here are the things that matter most. Read the full terms before trading.
@@ -669,10 +668,9 @@ export default function Home() {
 
           {/* Header */}
           <div className="mb-12">
-            <div className="inline-flex items-center gap-2 bg-black rounded-full px-4 py-1.5 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-lime inline-block animate-pulse" />
-              <span className="font-sans text-[0.7rem] font-semibold text-white tracking-[2px] uppercase">Launching Soon — Membership</span>
-            </div>
+            <p className="font-sans text-[0.75rem] text-[#999] tracking-[3px] uppercase mb-4">
+              Launching Soon — Membership
+            </p>
             <h2 className="font-condensed text-[clamp(2.8rem,6vw,5rem)] text-black leading-none tracking-[1px]">
               WHAT&apos;S <em className="font-playfair italic lowercase">next</em>.
             </h2>
