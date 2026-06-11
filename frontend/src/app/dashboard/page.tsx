@@ -202,43 +202,46 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Dashboard Cards Row */}
-        <div className="flex flex-col md:flex-row gap-4 mb-4 items-stretch">
+        {/* Two-column Dashboard Row */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 mb-4 items-stretch">
           
-          {/* Card 1: Stats (Vertical) */}
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col justify-between gap-4 flex-1">
-            {[
-              { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
-              { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
-              {
-                label: "Rating",
-                value: stats?.avgSellerRating != null
-                  ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
-                  : "—",
-              },
-            ].map((s) => (
-              <div key={s.label}>
-                <div className="font-condensed text-[2.2rem] tracking-[0.5px] mb-1 leading-none">{s.value}</div>
-                <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
-              </div>
-            ))}
-          </div>
+          {/* Left Column: Stats & Wallet */}
+          <div className="flex flex-col gap-4 h-full">
+            {/* Card 1: Stats (Horizontal) */}
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4 flex-1">
+              {[
+                { label: "Total Trades", value: stats ? String(stats.totalTrades) : "—" },
+                { label: "Trade Volume", value: stats ? `₹${stats.totalVolumeInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—" },
+                {
+                  label: "Rating",
+                  value: stats?.avgSellerRating != null
+                    ? `★ ${stats.avgSellerRating.toFixed(1)} (${stats.sellerRatingCount})`
+                    : "—",
+                },
+              ].map((s) => (
+                <div key={s.label} className="flex flex-col items-center sm:items-start w-full sm:w-1/3">
+                  <div className="font-condensed text-[2.4rem] tracking-[0.5px] mb-1 leading-none">{s.value}</div>
+                  <div className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">{s.label}</div>
+                </div>
+              ))}
+            </div>
 
-          {/* Card 2: Wallet Details */}
-          <div className="flex-1 flex flex-col">
-            {dbStatus?.walletAddress ? (
-              <WalletBalanceCard walletAddress={dbStatus.walletAddress} className="h-full flex flex-col justify-between" />
-            ) : (
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
-                 <p className="font-sans text-sm text-[#888]">No wallet connected</p>
-                 <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
-              </div>
-            )}
+            {/* Card 2: Wallet Details */}
+            <div className="flex-1">
+              {dbStatus?.walletAddress ? (
+                <WalletBalanceCard walletAddress={dbStatus.walletAddress} className="h-full" />
+              ) : (
+                <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 h-full flex flex-col justify-center items-center text-center">
+                   <p className="font-sans text-sm text-[#888]">No wallet connected</p>
+                   <Link href="/onboarding/wallet" className="mt-2 font-sans text-sm font-semibold text-[#7b3fe4] no-underline">Connect Wallet <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Card 3: Payment Details */}
-          <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col w-full md:w-[320px] self-start shrink-0">
-            <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
+          <div className="bg-white border border-[#e8e8e8] rounded-xl p-6 flex flex-col h-full">
+            <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-6">Payment Details</p>
             <div className="flex flex-col gap-4 flex-1 justify-center">
               {/* UPI Section */}
               <div>

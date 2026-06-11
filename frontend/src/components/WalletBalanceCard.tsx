@@ -104,77 +104,82 @@ export function WalletBalanceCard({ walletAddress, className }: Props) {
     <div
       className={`bg-white border border-[#e8e8e8] rounded-xl p-5 transition-colors duration-300 ${className || ""}`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-lg leading-none text-[#888]">{meta.icon}</span>
-          <span className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">
-            {meta.label}
-          </span>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-6 h-full w-full">
+        {/* Left Section: Network & Address */}
+        <div className="flex flex-col justify-between h-full gap-4 w-full sm:w-auto">
+          {/* Header */}
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-lg leading-none text-[#888]">{meta.icon}</span>
+              <span className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">
+                {meta.label}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Token switcher */}
+              {!fixedToken && (
+                <div className="flex items-center gap-0.5 bg-white border border-[#e0e0e0] rounded-full p-0.75">
+                  {EVM_TOKENS.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => switchToken(t)}
+                      className="font-sans text-[0.65rem] font-semibold px-2 py-0.75 rounded-full cursor-pointer transition-all"
+                      style={
+                        token === t
+                          ? { background: "#111", color: "#fff" }
+                          : { background: "transparent", color: "#888" }
+                      }
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <span className="font-sans text-[0.68rem] font-semibold px-2.5 py-0.75 rounded-full bg-[#f5f5f5] text-[#888] border border-[#e0e0e0]">
+                Connected
+              </span>
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-mono text-[0.88rem] text-[#111] tracking-tight">
+              {truncate(walletAddress)}
+            </span>
+            <button
+              onClick={handleCopy}
+              className="ml-auto sm:ml-2 font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
+            >
+              {copied ? "✓ Copied" : "Copy"}
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Token switcher — EVM and TRON; hidden for Solana (USDC-only) */}
-          {!fixedToken && (
-            <div className="flex items-center gap-0.5 bg-white border border-[#e0e0e0] rounded-full p-0.75">
-              {EVM_TOKENS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => switchToken(t)}
-                  className="font-sans text-[0.65rem] font-semibold px-2 py-0.75 rounded-full cursor-pointer transition-all"
-                  style={
-                    token === t
-                      ? { background: "#111", color: "#fff" }
-                      : { background: "transparent", color: "#888" }
-                  }
-                >
-                  {t}
-                </button>
-              ))}
+        {/* Right Section: Balance */}
+        <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+          <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-1.5">
+            Token Balance
+          </p>
+          {loading ? (
+            <div className="flex items-center gap-2.5">
+              <span className="w-4.5 h-4.5 rounded-full border-[2.5px] border-[#e0e0e0] border-t-[#888] animate-spin" />
+              <span className="font-sans text-[0.8rem] text-[#999]">Fetching balance…</span>
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-2">
+              <span className="font-condensed text-[2.4rem] tracking-[0.5px] leading-none text-[#111]">
+                {balance && balance !== "-"
+                  ? parseFloat(balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
+                  : balance}
+              </span>
+              <span className="font-sans text-[0.9rem] font-semibold text-[#888]">
+                {symbol}
+              </span>
             </div>
           )}
-
-          <span className="font-sans text-[0.68rem] font-semibold px-2.5 py-0.75 rounded-full bg-[#f5f5f5] text-[#888] border border-[#e0e0e0]">
-            Connected
-          </span>
         </div>
-      </div>
-
-      {/* Address */}
-      <div className="flex items-center gap-2 mb-5 flex-wrap">
-        <span className="font-mono text-[0.88rem] text-[#111] tracking-tight">
-          {truncate(walletAddress)}
-        </span>
-        <button
-          onClick={handleCopy}
-          className="ml-auto font-sans text-[0.68rem] text-[#666] bg-white border border-[#e0e0e0] px-2 py-0.5 rounded-full cursor-pointer shrink-0 transition-colors hover:border-[#bbb]"
-        >
-          {copied ? "✓ Copied" : "Copy"}
-        </button>
-      </div>
-
-      {/* Balance */}
-      <div>
-        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-1.5">
-          Token Balance
-        </p>
-        {loading ? (
-          <div className="flex items-center gap-2.5">
-            <span className="w-4.5 h-4.5 rounded-full border-[2.5px] border-[#e0e0e0] border-t-[#888] animate-spin" />
-            <span className="font-sans text-[0.8rem] text-[#999]">Fetching balance…</span>
-          </div>
-        ) : (
-          <div className="flex items-baseline gap-2">
-            <span className="font-condensed text-[2.2rem] tracking-[0.5px] leading-none text-[#111]">
-              {balance && balance !== "-"
-                ? parseFloat(balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
-                : balance}
-            </span>
-            <span className="font-sans text-[0.9rem] font-semibold text-[#888]">
-              {symbol}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
