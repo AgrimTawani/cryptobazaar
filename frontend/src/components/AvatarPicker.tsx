@@ -11,6 +11,11 @@ const MALE_AVATARS = [
   "/avatars/male_avatar_3.png",
   "/avatars/male_avatar_4.png",
   "/avatars/male_avatar_5.png",
+  "/avatars/male_avatar_6.png",
+  "/avatars/male_avatar_7.png",
+  "/avatars/male_avatar_8.png",
+  "/avatars/male_avatar_9.png",
+  "/avatars/male_avatar_10.png",
 ];
 
 const FEMALE_AVATARS = [
@@ -19,9 +24,27 @@ const FEMALE_AVATARS = [
   "/avatars/female_avatar_3.png",
   "/avatars/female_avatar_4.png",
   "/avatars/female_avatar_5.png",
+  "/avatars/female_avatar_6.png",
+  "/avatars/female_avatar_7.png",
+  "/avatars/female_avatar_8.png",
+  "/avatars/female_avatar_9.png",
+  "/avatars/female_avatar_10.png",
 ];
 
-const ALL_AVATARS = [...MALE_AVATARS, ...FEMALE_AVATARS];
+const ANIMAL_AVATARS = [
+  "/avatars/animal_avatar_1.png",
+  "/avatars/animal_avatar_2.png",
+  "/avatars/animal_avatar_3.png",
+  "/avatars/animal_avatar_4.png",
+  "/avatars/animal_avatar_5.png",
+];
+
+const POKEMON_AVATARS = [
+  "/avatars/pokemon_avatar_1.png",
+  "/avatars/pokemon_avatar_2.png",
+];
+
+const ALL_AVATARS = [...MALE_AVATARS, ...FEMALE_AVATARS, ...ANIMAL_AVATARS, ...POKEMON_AVATARS];
 
 export function AvatarPicker({ currentImageUrl, userName }: { currentImageUrl?: string; userName?: string | null }) {
   const { user } = useUser();
