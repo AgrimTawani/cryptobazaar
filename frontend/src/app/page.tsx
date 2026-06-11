@@ -725,7 +725,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link
               href="/login"
-              className="inline-flex items-center gap-3 bg-black text-white font-condensed text-[1.1rem] tracking-[1.5px] px-8 py-4 rounded-full hover:bg-lime hover:text-black transition-all duration-300 no-underline"
+              className="cta-primary"
             >
               JOIN THE WAITLIST
             </Link>
