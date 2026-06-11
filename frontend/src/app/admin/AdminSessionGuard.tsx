@@ -3,23 +3,24 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { AdminPasswordPrompt } from "./AdminPasswordPrompt";
+
 export function AdminSessionGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!sessionStorage.getItem("admin_session_active")) {
-      // The tab was closed, or it's a new tab without session storage.
-      // Clear the cookie so the user is forced to log in.
-      fetch("/api/admin/logout", { method: "POST" }).then(() => {
-        window.location.href = "/admin/login";
-      });
-    } else {
+    setMounted(true);
+    if (sessionStorage.getItem("admin_password")) {
       setChecked(true);
     }
   }, []);
 
-  if (!checked) return null; // Prevent flash of protected content
+  if (!mounted) return null; // Wait for client-side hydration
+
+  if (!checked) {
+    return <AdminPasswordPrompt onLogin={() => setChecked(true)} />;
+  }
 
   return <>{children}</>;
 }

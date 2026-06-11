@@ -12,9 +12,13 @@ export function UserActions({ userId, currentStatus }: { userId: number; current
     
     setLoading(true);
     try {
+      const pwd = sessionStorage.getItem("admin_password");
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${pwd || ""}`
+        },
         body: JSON.stringify({ status }),
       });
       if (res.ok) {

@@ -16,9 +16,13 @@ export function DisputeActions({ disputeId, currentStatus }: { disputeId: string
     
     setLoading(true);
     try {
+      const pwd = sessionStorage.getItem("admin_password");
       const res = await fetch(`/api/admin/disputes/${disputeId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${pwd || ""}`
+        },
         body: JSON.stringify({ action }),
       });
       if (res.ok) {

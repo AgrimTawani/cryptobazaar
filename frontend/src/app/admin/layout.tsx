@@ -1,15 +1,7 @@
-import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
-import { AdminPasswordPrompt } from "./AdminPasswordPrompt";
 import Link from "next/link";
 import { AdminSessionGuard } from "./AdminSessionGuard";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const isUnlocked = await isSecondaryPasswordUnlocked();
-
-  if (!isUnlocked) {
-    return <AdminPasswordPrompt />;
-  }
-
   return (
     <AdminSessionGuard>
       <div className="min-h-screen bg-[#f5f5f5] flex flex-col md:flex-row">

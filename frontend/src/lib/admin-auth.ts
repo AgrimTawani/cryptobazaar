@@ -1,5 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function requireAdmin() {
@@ -22,8 +22,9 @@ export async function requireAdmin() {
 export async function isSecondaryPasswordUnlocked() {
   if (!process.env.ADMIN_PASSWORD) return true; // if no password set, skip this check
   
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
+  const headersList = await headers();
+  const authHeader = headersList.get("authorization");
+  const token = authHeader?.replace("Bearer ", "");
   
   return token === process.env.ADMIN_PASSWORD;
 }

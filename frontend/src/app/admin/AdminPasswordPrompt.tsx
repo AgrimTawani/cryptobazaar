@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function AdminPasswordPrompt() {
+export function AdminPasswordPrompt({ onLogin }: { onLogin?: () => void }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +21,12 @@ export function AdminPasswordPrompt() {
       });
 
       if (res.ok) {
-        sessionStorage.setItem("admin_session_active", "true");
-        router.refresh(); // Refresh the layout to re-evaluate the cookie on the server
+        sessionStorage.setItem("admin_password", password);
+        if (onLogin) {
+          onLogin();
+        } else {
+          window.location.reload();
+        }
       } else {
         const data = await res.json();
         setError(data.error || "Invalid password");

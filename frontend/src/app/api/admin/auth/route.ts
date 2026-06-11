@@ -11,13 +11,6 @@ export async function POST(req: Request) {
     }
 
     if (password === process.env.ADMIN_PASSWORD) {
-      const cookieStore = await cookies();
-      cookieStore.set("admin_token", password, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
       return NextResponse.json({ success: true });
     }
 
