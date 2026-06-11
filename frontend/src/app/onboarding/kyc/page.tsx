@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -103,7 +104,7 @@ export default function KYCPage() {
         onClick={() => router.back()}
         className="font-sans text-[0.8rem] text-[#999] flex items-center gap-[6px] mb-7 bg-transparent border-0 cursor-pointer p-0"
       >
-        ← Back
+        <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back
       </button>
 
       <motion.div

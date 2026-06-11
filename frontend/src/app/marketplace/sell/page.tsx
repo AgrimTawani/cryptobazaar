@@ -242,7 +242,7 @@ export default function SellPage() {
             </div>
             <button onClick={reconnectWallet}
               className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
-              Reconnect →
+              Reconnect <ArrowRight className="inline-block w-4 h-4 ml-1" />
             </button>
           </div>
         )}
@@ -325,7 +325,7 @@ export default function SellPage() {
             <div className="flex flex-col-reverse sm:flex-row gap-3 pt-1">
               <button onClick={() => setStep("form")} disabled={isBusy}
                 className="sm:flex-1 py-3 px-4 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity whitespace-nowrap">
-                ← Back to Edit
+                <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to Edit
               </button>
               <button onClick={handleSubmit} disabled={isBusy}
                 className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">

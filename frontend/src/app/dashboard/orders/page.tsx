@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -50,7 +51,7 @@ export default function OrdersHistoryPage() {
       <div className="max-w-[960px] mx-auto py-6 px-4 md:px-6 mt-16 sm:mt-0">
         <div className="mb-6">
           <Link href="/dashboard" className="font-sans text-sm text-[#888] no-underline hover:text-[#111]">
-            ← Back to Dashboard
+            <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to Dashboard
           </Link>
         </div>
         

@@ -517,7 +517,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   </div>
                   <button onClick={reconnectWallet}
                     className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
-                    Reconnect →
+                    Reconnect <ArrowRight className="inline-block w-4 h-4 ml-1" />
                   </button>
                 </div>
               )}
@@ -987,7 +987,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               </div>
               <button onClick={reconnectWallet}
                 className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
-                Reconnect →
+                Reconnect <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </button>
             </div>
           )}
@@ -1112,7 +1112,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   )}
                   <button onClick={() => setShowBuyConfirm(true)} disabled={!!busy || !walletOk || !chainOk}
                     className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40">
-                    {`Buy → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
+                    <>Buy <ArrowRight className="inline-block w-4 h-4 mx-1" /> Pay ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")}</>
                   </button>
                 </div>
               )}

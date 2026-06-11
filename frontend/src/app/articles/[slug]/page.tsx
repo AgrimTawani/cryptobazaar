@@ -1,3 +1,4 @@
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -184,7 +185,7 @@ export default async function ArticlePage({
                 className="group flex flex-col gap-1 p-5 rounded-xl border border-zinc-200 hover:border-zinc-400 transition-colors no-underline"
               >
                 <span className="font-sans text-xs text-zinc-400 uppercase tracking-widest">
-                  ← Previous
+                  <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Previous
                 </span>
                 <span className="font-condensed text-base text-zinc-800 group-hover:text-black transition-colors">
                   {prev.title}
@@ -199,7 +200,7 @@ export default async function ArticlePage({
                 className="group flex flex-col gap-1 p-5 rounded-xl border border-zinc-200 hover:border-zinc-400 transition-colors no-underline text-right"
               >
                 <span className="font-sans text-xs text-zinc-400 uppercase tracking-widest">
-                  Next →
+                  Next <ArrowRight className="inline-block w-4 h-4 ml-1" />
                 </span>
                 <span className="font-condensed text-base text-zinc-800 group-hover:text-black transition-colors">
                   {next.title}

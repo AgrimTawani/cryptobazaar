@@ -96,7 +96,7 @@ function ChainConfirmPopup({ order, onConfirm, onCancel }: {
           <button
             onClick={onConfirm}
             className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-colors">
-            Continue →
+            Continue <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </button>
         </div>
       </div>
@@ -248,7 +248,7 @@ export default function MarketplacePage() {
             <strong className="text-white">Guest view.</strong> Seller names are hidden. Sign in to buy, sell, and see full details.
           </p>
           <Link href="/login" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
-            Sign In to Trade →
+            Sign In to Trade <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </Link>
         </div>
       )}
@@ -260,7 +260,7 @@ export default function MarketplacePage() {
             <strong className="text-white">View only.</strong> Complete verification to buy or sell.
           </p>
           <Link href="/onboarding" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
-            Complete Verification →
+            Complete Verification <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </Link>
         </div>
       )}
@@ -268,12 +268,12 @@ export default function MarketplacePage() {
       <div className="max-w-[1200px] mx-auto py-6 px-4 md:px-6">
 
         {/* Scam Awareness Banner */}
-        <Link href="/articles/common-p2p-scams" className="group relative overflow-hidden flex items-center justify-between bg-black rounded-xl py-4 px-5 md:px-6 mb-8 cursor-pointer hover:bg-[#111] transition-colors no-underline shadow-sm">
+        <Link href="/articles/common-p2p-scams" className="group relative overflow-hidden flex items-center justify-between bg-black rounded-xl py-4 px-5 md:px-6 mb-8 cursor-pointer transition-all no-underline shadow-sm">
           <div className="relative z-10">
             <p className="font-sans text-[0.65rem] text-lime tracking-[2px] uppercase mb-1 font-semibold">Platform Safety</p>
             <h3 className="font-condensed text-2xl md:text-3xl tracking-[1px] text-white uppercase m-0 flex items-center gap-3">
               Avoid P2P Scams
-              <span className="text-white/50 group-hover:text-lime group-hover:translate-x-1 transition-all"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>
+              <span className="text-lime group-hover:text-white group-hover:translate-x-1 transition-all"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>
             </h3>
           </div>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -510,7 +510,7 @@ export default function MarketplacePage() {
                 ) : order.isMine ? (
                   <Link href={`/marketplace/${order.id}`}
                     className="font-sans text-sm font-semibold text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff] py-1.5 px-3 rounded-lg text-center no-underline hover:bg-[#ede9fe] transition-colors">
-                    Yours →
+                    Yours <ArrowRight className="inline-block w-4 h-4 ml-1" />
                   </Link>
                 ) : (
                   <button
@@ -582,7 +582,7 @@ export default function MarketplacePage() {
                   </Link>
                 ) : order.isMine ? (
                   <span className="font-sans text-sm font-semibold py-1.5 px-4 rounded-lg text-[#7b3fe4] border border-[#ddd4fe] bg-[#f5f0ff]">
-                    Yours →
+                    Yours <ArrowRight className="inline-block w-4 h-4 ml-1" />
                   </span>
                 ) : (
                   <button
@@ -608,11 +608,11 @@ export default function MarketplacePage() {
             </p>
             {isVerified ? (
               <Link href="/marketplace/sell" className="py-2.5 px-6 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
-                Post First Order →
+                Post First Order <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             ) : (
               <Link href="/onboarding" className="py-2.5 px-6 bg-lime text-black rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
-                Get Verified →
+                Get Verified <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             )}
           </div>

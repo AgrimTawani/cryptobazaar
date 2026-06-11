@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -167,7 +168,7 @@ function StepCard({
 
       {status === "active" && (
         <div className="shrink-0 font-sans text-[0.8rem] font-semibold text-black">
-          Start →
+          Start <ArrowRight className="inline-block w-4 h-4 ml-1" />
         </div>
       )}
       {status === "done" && (

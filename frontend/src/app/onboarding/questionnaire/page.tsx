@@ -183,7 +183,7 @@ export default function QuestionnairePage() {
         onClick={() => router.back()}
         className="font-sans text-sm text-[#999] flex items-center gap-2 mb-8 bg-transparent border-0 cursor-pointer p-0"
       >
-        ← Back
+        <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back
       </button>
 
       <motion.div

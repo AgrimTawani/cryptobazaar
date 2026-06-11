@@ -192,7 +192,7 @@ export default function DashboardPage() {
           {isVerified ? (
             <Link href="/marketplace"
               className="py-2.5 px-5 bg-black text-white rounded-[10px] font-condensed text-lg tracking-[1px] no-underline shrink-0">
-              Marketplace →
+              Marketplace <ArrowRight className="inline-block w-4 h-4 ml-1" />
             </Link>
           ) : (
             <Link href="/onboarding"
@@ -363,7 +363,7 @@ export default function DashboardPage() {
             {!isVerified && (
               <Link href="/onboarding"
                 className="mt-4 block text-center font-sans text-sm font-semibold text-black bg-lime py-2 rounded-lg no-underline">
-                Continue verification →
+                Continue verification <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             )}
             </div>

@@ -68,7 +68,7 @@ export default function WalletPage() {
         onClick={() => router.back()}
         className="font-sans text-[0.8rem] text-[#999] flex items-center gap-1.5 mb-7 bg-transparent border-0 cursor-pointer p-0"
       >
-        ← Back
+        <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back
       </button>
 
       <motion.div

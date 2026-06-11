@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import Link from "next/link";
 
@@ -50,7 +51,7 @@ export default async function AdminDisputesPage() {
             </div>
             <div>
               <Link href={`/admin/disputes/${d.id}`} className="font-sans text-sm font-semibold text-[#7b3fe4] hover:underline">
-                Review →
+                Review <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import Link from "next/link";
 
@@ -52,7 +53,7 @@ export default async function AdminUsersPage() {
             <span className="font-mono text-sm">₹{Number(u.totalTradeVolumeInr).toLocaleString("en-IN")}</span>
             <div>
               <Link href={`/admin/users/${u.id}`} className="font-sans text-sm font-semibold text-[#7b3fe4] hover:underline">
-                View →
+                View <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             </div>
           </div>

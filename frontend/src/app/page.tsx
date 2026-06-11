@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { MoveToTopButton } from "@/components/MoveToTopButton";
 import Link from "next/link";
@@ -655,7 +656,7 @@ export default function Home() {
           <p className="font-sans text-[0.78rem] text-white/25 leading-relaxed">
             This is a summary, not a substitute.{" "}
             <Link href="/articles?topic=terms" className="text-white/50 underline underline-offset-2 hover:text-white transition-colors">
-              Read the full Terms of Use →
+              Read the full Terms of Use <ArrowRight className="inline-block w-4 h-4 ml-1" />
             </Link>
           </p>
 

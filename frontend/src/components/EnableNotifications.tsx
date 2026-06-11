@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface Props {
@@ -89,7 +90,7 @@ export function EnableNotifications({ variant = "banner" }: Props) {
           <span>{loading ? "Enabling…" : "Enable alerts"}</span>
         </button>
         {blockedHint && (
-          <p className="text-xs text-[#dc2626]">Click 🔒 in address bar → Notifications → Allow</p>
+          <p className="text-xs text-[#dc2626]">Click 🔒 in address bar <ArrowRight className="inline-block w-4 h-4 ml-1" /> Notifications <ArrowRight className="inline-block w-4 h-4 ml-1" /> Allow</p>
         )}
       </div>
     );
@@ -118,7 +119,7 @@ export function EnableNotifications({ variant = "banner" }: Props) {
       </div>
       {blockedHint && (
         <p className="mt-2 text-xs text-[#dc2626] font-medium">
-          🔒 Blocked by browser — click the lock icon in your address bar → Notifications → Allow, then refresh.
+          🔒 Blocked by browser — click the lock icon in your address bar <ArrowRight className="inline-block w-4 h-4 ml-1" /> Notifications <ArrowRight className="inline-block w-4 h-4 ml-1" /> Allow, then refresh.
         </p>
       )}
     </div>

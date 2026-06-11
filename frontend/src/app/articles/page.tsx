@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ARTICLES_CATEGORIES } from "@/data/articlesData";
@@ -117,7 +118,7 @@ export default function ArticlesIndexPage() {
                       {article.shortDesc}
                     </p>
                     <span className="font-sans text-sm text-black font-semibold mt-auto pt-4">
-                      Read article →
+                      Read article <ArrowRight className="inline-block w-4 h-4 ml-1" />
                     </span>
                   </Link>
                 ))}
