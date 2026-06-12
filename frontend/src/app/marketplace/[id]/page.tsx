@@ -409,7 +409,26 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     );
   }
 
-  const statusCfg = STATUS[order.status] ?? STATUS.LISTED;
+  const { viewerRole: _roleForStatus } = order;
+  const resolvedLabel = (() => {
+    if (order.status === "DISPUTE_RESOLVED_BUYER") {
+      return _roleForStatus === "buyer"
+        ? "Dispute Resolved — You Won ✓"
+        : "Dispute Resolved — Buyer Won";
+    }
+    if (order.status === "DISPUTE_RESOLVED_SELLER") {
+      return _roleForStatus === "seller"
+        ? "Dispute Resolved — You Won ✓"
+        : "Dispute Resolved — Seller Won";
+    }
+    return null;
+  })();
+
+  const statusCfg = (() => {
+    const base = STATUS[order.status] ?? STATUS.LISTED;
+    if (resolvedLabel) return { ...base, label: resolvedLabel };
+    return base;
+  })();
   const onChainId = BigInt(order.onChainId);
   const amount = parseFloat(order.amount);
   const availableAmount = parseFloat(order.amount);
