@@ -723,9 +723,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer disabled:opacity-40">
                         {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
                       </button>
-                      <button onClick={() => run("dispute", async () => {
-                        await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
-                      })} disabled={!!busy || !walletOk}
+                      <button onClick={() => run("dispute")} disabled={!!busy}
                         className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-sans text-sm font-semibold cursor-pointer disabled:opacity-40">
                         {busy === "dispute" ? "…" : "⚡ Dispute"}
                       </button>
@@ -733,9 +731,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </div>
                   )}
                   {role === "buyer" && (
-                    <button onClick={() => run("dispute", async () => {
-                      await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk}
+                    <button onClick={() => run("dispute")} disabled={!!busy}
                       className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
                       {busy === "dispute" ? "Raising dispute…" : "⚡ Raise Dispute"}
                     </button>
@@ -866,9 +862,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
               {!TERMINAL.includes(order.status) && (
                 <div className="text-center">
-                  <button onClick={() => run("dispute", async () => {
-                    await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
-                  })} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
+                  <button onClick={() => run("dispute")} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
                     Something wrong? Raise a dispute
                   </button>
                 </div>
