@@ -1,0 +1,21 @@
+# Render Blueprint — Bank Statement Analyzer
+# https://docs.render.com/infrastructure-as-code
+
+services:
+  - type: web
+    name: bank-analyzer
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./bank-analyzer/Dockerfile
+    dockerContext: ./bank-analyzer
+    healthCheckPath: /health
+    envVars:
+      - key: R2_ENDPOINT_URL
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false

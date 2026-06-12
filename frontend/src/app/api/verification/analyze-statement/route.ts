@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
     });
 
     // ── Step 3: Send to Python Microservice for Analysis ──────────────────────
-    const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze";
+    const microserviceUrl = process.env.BANK_ANALYZER_URL || "http://127.0.0.1:8000/analyze-statement";
     console.log(`[analyze-statement] Sending PDF to microservice at: ${microserviceUrl}`);
     
     // Fire and forget

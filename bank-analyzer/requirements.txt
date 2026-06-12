@@ -1,9 +1,11 @@
 fastapi==0.104.1
 uvicorn==0.24.0
+gunicorn==21.2.0
 python-multipart==0.0.6
-opendataloader-pdf
-pypdf
-python-dateutil
-boto3
-requests
-pandas
+pdfplumber==0.10.3
+boto3==1.34.0
+requests==2.31.0
+pandas==2.1.4
+numpy==1.26.2
+pydantic==2.5.3
+python-dateutil==2.8.2
