@@ -173,24 +173,150 @@ def extract_metadata(raw_text: str) -> dict:
 
 # ─── Transaction Reconstruction ──────────────────────────────────────────────
 
-def _try_table_parsing(tables: list) -> Optional[pd.DataFrame]:
+def _split_mega_rows(tables: list) -> list:
     """
-    Attempt to build a transaction DataFrame from pdfplumber-extracted tables.
-    Handles varying column counts and header labels.
-    """
-    if not tables:
-        return None
+    Some banks (HDFC) pack all transactions into a single table row
+    with newline-separated values in each cell. This function detects
+    that pattern and splits them into individual rows.
 
-    # Collect all rows from all tables
-    all_rows = []
+    For amount columns (withdrawal/deposit), HDFC uses sparse entries —
+    not every transaction row has a value. We derive W/D from consecutive
+    balance differences instead.
+    """
+    expanded = []
+    # Track the last known balance across mega-rows for cross-page continuity
+    last_balance = None
+
     for table in tables:
         if not table:
             continue
         for row in table:
-            if row:
-                # Clean None values
-                cleaned = [str(cell).strip() if cell else '' for cell in row]
-                all_rows.append(cleaned)
+            if not row:
+                continue
+            # Clean None values
+            cleaned = [str(cell).strip() if cell else '' for cell in row]
+
+            # Check if the first non-empty cell has multiple lines
+            date_cell = cleaned[0] if cleaned else ''
+            date_lines = [l.strip() for l in date_cell.split('\n') if l.strip()]
+
+            # If multiple date-like entries exist, this is a mega-row
+            date_count = sum(1 for l in date_lines if parse_date(l) is not None)
+
+            if date_count > 1:
+                col_lines = []
+                for cell in cleaned:
+                    lines = [l.strip() for l in cell.split('\n') if l.strip()]
+                    col_lines.append(lines)
+
+                date_col_lines = col_lines[0]
+                n_txns = len(date_col_lines)
+
+                # Balance column (last) — should have exactly n_txns entries
+                balance_lines = col_lines[-1] if col_lines else []
+                while len(balance_lines) < n_txns:
+                    balance_lines.append('')
+
+                # Parse all balances
+                balances = [parse_amount(b) for b in balance_lines[:n_txns]]
+
+                # Derive withdrawal/deposit from balance changes
+                withdrawal_vals = []
+                deposit_vals = []
+                for i in range(n_txns):
+                    current_bal = balances[i]
+                    if i == 0:
+                        prev_bal = last_balance if last_balance is not None else current_bal
+                    else:
+                        prev_bal = balances[i - 1]
+
+                    diff = current_bal - prev_bal
+                    if diff < 0:
+                        withdrawal_vals.append(str(abs(diff)))
+                        deposit_vals.append('')
+                    elif diff > 0:
+                        withdrawal_vals.append('')
+                        deposit_vals.append(str(diff))
+                    else:
+                        withdrawal_vals.append('')
+                        deposit_vals.append('')
+
+                # Update last_balance for next mega-row
+                if balances:
+                    last_balance = balances[-1]
+
+                # Narration and ref columns
+                narr_col = col_lines[1] if len(col_lines) > 1 else []
+                ref_col = col_lines[2] if len(col_lines) > 2 else []
+                value_dt_col = col_lines[3] if len(col_lines) > 3 else []
+
+                narr_per_txn = _distribute_lines_to_dates(narr_col, n_txns)
+                ref_per_txn = _distribute_lines_to_dates(ref_col, n_txns)
+
+                for i in range(n_txns):
+                    new_row = [
+                        date_col_lines[i] if i < len(date_col_lines) else '',
+                        narr_per_txn[i] if i < len(narr_per_txn) else '',
+                        ref_per_txn[i] if i < len(ref_per_txn) else '',
+                        value_dt_col[i] if i < len(value_dt_col) else '',
+                        withdrawal_vals[i] if i < len(withdrawal_vals) else '',
+                        deposit_vals[i] if i < len(deposit_vals) else '',
+                        balance_lines[i] if i < len(balance_lines) else '',
+                    ]
+                    expanded.append(new_row)
+            else:
+                expanded.append(cleaned)
+                # If this is a normal data row, try to track its balance
+                # for cross-table continuity (check last cell for a number)
+                if cleaned:
+                    last_cell = cleaned[-1]
+                    parsed_bal = parse_amount(last_cell)
+                    if parsed_bal > 0:
+                        last_balance = parsed_bal
+
+    return expanded
+
+
+def _distribute_lines_to_dates(lines: list, n_txns: int) -> list:
+    """
+    Distribute narration/ref lines across n_txns transactions.
+    If we have exactly n_txns lines, use 1:1. Otherwise, distribute
+    evenly or concatenate excess lines.
+    """
+    if not lines:
+        return [''] * n_txns
+    if len(lines) == n_txns:
+        return lines
+    if len(lines) < n_txns:
+        # Pad
+        result = lines + [''] * (n_txns - len(lines))
+        return result
+    # More lines than txns — group them
+    # Rough distribution: ceil(len/n_txns) lines per txn
+    result = []
+    per_txn = max(1, len(lines) // n_txns)
+    idx = 0
+    for i in range(n_txns):
+        if i == n_txns - 1:
+            # Last txn gets all remaining
+            chunk = lines[idx:]
+        else:
+            chunk = lines[idx:idx + per_txn]
+        result.append(' '.join(chunk))
+        idx += per_txn
+    return result
+
+
+def _try_table_parsing(tables: list) -> Optional[pd.DataFrame]:
+    """
+    Attempt to build a transaction DataFrame from pdfplumber-extracted tables.
+    Handles varying column counts, header labels, and HDFC-style mega-rows.
+    """
+    if not tables:
+        return None
+
+    # First, expand mega-rows (HDFC format)
+    all_rows = _split_mega_rows(tables)
 
     if not all_rows:
         return None
@@ -199,10 +325,10 @@ def _try_table_parsing(tables: list) -> Optional[pd.DataFrame]:
     header_mappings = {
         'date': ['date', 'txn date', 'transaction date', 'value date', 'val date', 'posting date'],
         'narration': ['narration', 'description', 'particulars', 'details', 'remarks', 'transaction details', 'txn description'],
-        'withdrawal': ['withdrawal', 'debit', 'withdrawals', 'debit amount', 'dr', 'dr.', 'amount(dr)'],
-        'deposit': ['deposit', 'credit', 'deposits', 'credit amount', 'cr', 'cr.', 'amount(cr)'],
-        'balance': ['balance', 'closing balance', 'running balance', 'available balance', 'bal'],
-        'ref': ['ref', 'reference', 'chq/ref', 'cheque no', 'ref no', 'chq', 'chq no', 'instrument'],
+        'withdrawal': ['withdrawal', 'debit', 'withdrawals', 'debit amount', 'dr', 'dr.', 'amount(dr)', 'withdrawalamt'],
+        'deposit': ['deposit', 'credit', 'deposits', 'credit amount', 'cr', 'cr.', 'amount(cr)', 'depositamt'],
+        'balance': ['balance', 'closing balance', 'running balance', 'available balance', 'bal', 'closingbalance'],
+        'ref': ['ref', 'reference', 'chq/ref', 'cheque no', 'ref no', 'chq', 'chq no', 'instrument', 'chq./ref'],
     }
 
     col_indices = {}
@@ -210,20 +336,21 @@ def _try_table_parsing(tables: list) -> Optional[pd.DataFrame]:
 
     # Check each row as a potential header
     for row_idx, row in enumerate(all_rows[:5]):
-        row_lower = [c.lower().strip() for c in row]
+        row_lower = [c.lower().strip().replace('.', '').replace(' ', '') for c in row]
         matches_found = 0
         temp_indices = {}
 
         for col_name, aliases in header_mappings.items():
             for alias in aliases:
+                alias_clean = alias.replace('.', '').replace(' ', '')
                 for ci, cell in enumerate(row_lower):
-                    if alias in cell:
+                    if alias_clean in cell:
                         if col_name not in temp_indices:
                             temp_indices[col_name] = ci
                             matches_found += 1
                         break
 
-        if matches_found >= 3:  # At least date, one amount, and one other
+        if matches_found >= 3:
             col_indices = temp_indices
             data_start = row_idx + 1
             break
@@ -237,19 +364,30 @@ def _try_table_parsing(tables: list) -> Optional[pd.DataFrame]:
         if len(row) <= col_indices['date']:
             continue
 
-        date_str = row[col_indices['date']]
+        date_str = row[col_indices['date']].split('\n')[0].strip()
         parsed_date = parse_date(date_str)
         if not parsed_date:
             continue
 
+        # Skip "Opening Balance" type rows
+        narration = ''
+        if 'narration' in col_indices and col_indices['narration'] < len(row):
+            narration = row[col_indices['narration']].replace('\n', ' ')
+        if 'opening balance' in narration.lower() or narration.strip() == '-':
+            continue
+
+        withdrawal_str = row[col_indices['withdrawal']] if 'withdrawal' in col_indices and col_indices['withdrawal'] < len(row) else ''
+        deposit_str = row[col_indices['deposit']] if 'deposit' in col_indices and col_indices['deposit'] < len(row) else ''
+        balance_str = row[col_indices['balance']] if 'balance' in col_indices and col_indices['balance'] < len(row) else ''
+
         record = {
             'Date': date_str,
             'DateParsed': parsed_date,
-            'Narration': row[col_indices.get('narration', -1)] if 'narration' in col_indices and col_indices['narration'] < len(row) else '',
-            'Ref': row[col_indices.get('ref', -1)] if 'ref' in col_indices and col_indices['ref'] < len(row) else '',
-            'Withdrawal': parse_amount(row[col_indices['withdrawal']]) if 'withdrawal' in col_indices and col_indices['withdrawal'] < len(row) else 0.0,
-            'Deposit': parse_amount(row[col_indices['deposit']]) if 'deposit' in col_indices and col_indices['deposit'] < len(row) else 0.0,
-            'Balance': parse_amount(row[col_indices['balance']]) if 'balance' in col_indices and col_indices['balance'] < len(row) else 0.0,
+            'Narration': narration,
+            'Ref': row[col_indices.get('ref', -1)].replace('\n', ' ') if 'ref' in col_indices and col_indices['ref'] < len(row) else '',
+            'Withdrawal': parse_amount(withdrawal_str),
+            'Deposit': parse_amount(deposit_str),
+            'Balance': parse_amount(balance_str),
         }
         records.append(record)
 
