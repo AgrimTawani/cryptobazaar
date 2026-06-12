@@ -180,6 +180,7 @@ def process_statement_background(
 
 
 @app.post("/analyze-statement")
+@app.post("/analyze")  # Backward-compatible alias
 async def analyze_statement(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
@@ -208,6 +209,7 @@ async def analyze_statement(
 
     return {"status": "PROCESSING"}
 
+@app.get("/")
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
