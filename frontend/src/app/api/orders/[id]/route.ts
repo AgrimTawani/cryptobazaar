@@ -348,9 +348,23 @@ export async function PATCH(
         if (order.status !== "BUYER_PAID")
           return NextResponse.json({ error: "Can only dispute after payment marked" }, { status: 400 });
 
+        const raisedByRole = isSeller ? "seller" : "buyer";
+
         await db.order.update({
           where: { id },
           data: { status: "DISPUTED" },
+        });
+
+        await db.dispute.upsert({
+          where: { orderId: id },
+          create: {
+            orderId: id,
+            raisedById: user.id,
+            raisedByRole,
+            status: "OPEN",
+            evidenceDeadline: new Date(Date.now() + 48 * 60 * 60 * 1000),
+          },
+          update: {},
         });
 
         // System message
@@ -367,7 +381,6 @@ export async function PATCH(
         }
 
         const disputeAmount = order.lockedAmount?.toString() ?? order.amount.toString();
-        const raisedByRole = isSeller ? "seller" : "buyer";
         const counterparty = isSeller ? order.buyer : order.seller;
         if (counterparty) {
           await notify({
