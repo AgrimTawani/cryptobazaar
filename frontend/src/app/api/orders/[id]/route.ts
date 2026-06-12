@@ -281,6 +281,10 @@ export async function PATCH(
         const locked = order.lockedAmount ? parseFloat(order.lockedAmount.toString()) : parseFloat(order.amount.toString());
         const remaining = parseFloat(order.amount.toString()) - locked;
         const fullyFilled = remaining <= 0.000001;
+        const minTrade = order.minTradeSize ? parseFloat(order.minTradeSize.toString()) : null;
+        // If remainder is below the seller's minimum, flip to non-partial so the
+        // next buyer must take the exact remainder in one go (no further fragmentation).
+        const remainderBelowMin = !fullyFilled && minTrade !== null && remaining < minTrade - 0.000001;
 
         await db.order.update({
           where: { id },
@@ -295,6 +299,7 @@ export async function PATCH(
             totalValueInr: fullyFilled
               ? order.totalValueInr
               : remaining * parseFloat(order.pricePerUnit.toString()),
+            ...(remainderBelowMin ? { partialAllowed: false, minTradeSize: null } : {}),
             ...(fullyFilled ? {} : {
               buyerMatchedAt: null,
               paymentWindowExpiresAt: null,
@@ -320,6 +325,8 @@ export async function PATCH(
               type: "SYSTEM",
               content: fullyFilled
                 ? "Seller confirmed INR received. USDC is being released to the buyer's wallet."
+                : remainderBelowMin
+                ? `Seller confirmed INR received. ${remaining.toFixed(2)} ${order.asset} remaining — partial orders disabled, next buyer must take the full remainder.`
                 : `Seller confirmed INR received. ${remaining.toFixed(2)} ${order.asset} remaining — order is live again on the marketplace.`,
             },
           });
@@ -332,7 +339,7 @@ export async function PATCH(
             ...(order.buyer.email ? { email: { to: order.buyer.email, subject: `Trade complete — ${payout} ${order.asset} sent to your wallet`, react: createElement(PaymentConfirmedEmail, { buyerName: order.buyer.name ?? "Buyer", amount: String(locked), asset: order.asset, payout, orderId: id }) } } : {}),
           }).catch(() => {});
         }
-        break;
+        return NextResponse.json({ ok: true, legCompleted: true, fullyFilled });
       }
 
       case "dispute": {

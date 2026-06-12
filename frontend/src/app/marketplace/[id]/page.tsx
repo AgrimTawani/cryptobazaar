@@ -283,6 +283,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
   const [buyAmount, setBuyAmount] = useState<string>("");
+  const prevStatusRef = useRef<string | null>(null);
 
   useEffect(() => { params.then((p) => setId(p.id)); }, [params]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
@@ -298,6 +299,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
       }
       const data = await res.json();
       if (res.ok) {
+        const wasBuyerPaid = prevStatusRef.current === "BUYER_PAID";
+        const nowListed = data.status === "LISTED";
+        if (wasBuyerPaid && nowListed && data.viewerRole === "buyer" && !data.hasRated) {
+          setTimeout(() => setShowRatingModal(true), 800);
+        }
+        prevStatusRef.current = data.status;
         setOrder(data);
         setBuyAmount((prev) => prev === "" ? (data.partialAllowed ? "" : data.amount) : prev);
       }
@@ -382,7 +389,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
         body: JSON.stringify({ action: dbAction, utr: utrInput || undefined, ...extraBody }),
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Action failed"); }
+      const data = await res.json();
       await fetchOrder();
+      if (data.legCompleted && !order?.hasRated) {
+        setTimeout(() => setShowRatingModal(true), 800);
+      }
     } catch (e: unknown) { setError(e instanceof Error ? e.message : "Something went wrong"); }
     finally { setBusy(null); }
   };
