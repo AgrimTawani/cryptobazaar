@@ -193,6 +193,7 @@ model User {
   ordersAsSeller       Order[]              @relation("SellerOrders")
   ordersAsBuyer        Order[]              @relation("BuyerOrders")
   disputesRaised       Dispute[]            @relation("DisputeRaiser")
+  disputeMessages      DisputeMessage[]     @relation("DisputeMessageSender")
   protectionFundClaims ProtectionFundClaim[]
   chatMessages         ChatMessage[]
   ratingsGiven         TradeRating[]        @relation("RatingsGiven")
@@ -428,10 +429,34 @@ model Dispute {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  order  Order @relation(fields: [orderId], references: [id])
-  raiser User  @relation("DisputeRaiser", fields: [raisedById], references: [id])
+  adminNotes String? @map("admin_notes")
+
+  order    Order            @relation(fields: [orderId], references: [id])
+  raiser   User             @relation("DisputeRaiser", fields: [raisedById], references: [id])
+  messages DisputeMessage[]
 
   @@map("disputes")
+}
+
+// Admin ↔ party messaging thread inside a dispute
+// fromAdmin=true  → admin is prompting a party for more info
+// fromAdmin=false → party is replying / submitting additional evidence
+model DisputeMessage {
+  id         String  @id @default(uuid())
+  disputeId  String  @map("dispute_id")
+  fromAdmin  Boolean @map("from_admin")
+  toRole     String? @map("to_role")   // "buyer" | "seller" | null (both)
+  senderId   Int?    @map("sender_id") // null when fromAdmin
+  content    String
+  fileKey    String? @map("file_key")  // R2 key for any attached file
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  dispute Dispute @relation(fields: [disputeId], references: [id])
+  sender  User?   @relation("DisputeMessageSender", fields: [senderId], references: [id])
+
+  @@index([disputeId])
+  @@map("dispute_messages")
 }
 
 model ProtectionFundClaim {

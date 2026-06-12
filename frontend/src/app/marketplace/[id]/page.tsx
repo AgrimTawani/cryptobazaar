@@ -14,6 +14,7 @@ import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
 import { EnableNotifications } from "@/components/EnableNotifications";
+import { DisputeEvidencePanel } from "@/components/DisputeEvidencePanel";
 
 const amoyChain = defineChain(80002);
 const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ?? "") as `0x${string}`;
@@ -751,11 +752,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 </div>
               )}
 
-              {order.status === "DISPUTED" && (
-                <div className="border-t border-[#fca5a5] px-5 py-4 shrink-0 bg-[#fef2f2]">
-                  <p className="font-condensed text-2xl text-[#991b1b] mb-1">Dispute Raised</p>
-                  <p className="font-sans text-sm text-[#dc2626]">Admin will review and resolve within 24 hours.</p>
-                </div>
+              {order.status === "DISPUTED" && id && (
+                <DisputeEvidencePanel orderId={id} />
               )}
             </div>
 
