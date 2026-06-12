@@ -1,11 +1,10 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export async function requireAdmin() {
   const user = await currentUser();
   if (!user) {
-    redirect("/login");
+    return false;
   }
 
   const email = user.emailAddresses[0]?.emailAddress;

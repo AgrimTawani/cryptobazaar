@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { requireAdmin, isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
+import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -9,9 +9,7 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { thirdwebClient } from "@/lib/thirdweb";
 
 async function checkAuth() {
-  const isAuthorized = await requireAdmin();
-  const isUnlocked = await isSecondaryPasswordUnlocked();
-  return isAuthorized && isUnlocked;
+  return isSecondaryPasswordUnlocked();
 }
 
 async function signedUrl(key: string | null): Promise<string | null> {

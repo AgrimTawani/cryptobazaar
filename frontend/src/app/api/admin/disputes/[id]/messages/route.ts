@@ -1,13 +1,9 @@
 import { db } from "@/lib/db";
-import { requireAdmin, isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
+import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { notify } from "@/lib/notify";
 
-async function checkAuth() {
-  const isAuthorized = await requireAdmin();
-  const isUnlocked = await isSecondaryPasswordUnlocked();
-  return isAuthorized && isUnlocked;
-}
+const checkAuth = () => isSecondaryPasswordUnlocked();
 
 // GET — all messages for a dispute (admin sees everything)
 export async function GET(

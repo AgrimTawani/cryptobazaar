@@ -98,11 +98,23 @@ export default function AdminDisputeDetailPage() {
   const headers = { "Content-Type": "application/json", Authorization: `Bearer ${pwd ?? ""}` };
 
   const load = async () => {
-    const res = await fetch(`/api/admin/disputes/${id}`, { headers });
-    if (res.ok) {
-      const data = await res.json();
-      setDispute(data);
-      setAdminNotes(data.adminNotes ?? "");
+    try {
+      const res = await fetch(`/api/admin/disputes/${id}`, { headers });
+      if (res.status === 401 || res.status === 403) {
+        setError("Unauthorized — check admin password in session storage.");
+        setLoading(false);
+        return;
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setDispute(data);
+        setAdminNotes(data.adminNotes ?? "");
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error ?? `HTTP ${res.status}`);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Network error");
     }
     setLoading(false);
   };
@@ -166,7 +178,12 @@ export default function AdminDisputeDetailPage() {
       <span className="w-6 h-6 border-2 border-[#7b3fe4] border-t-transparent rounded-full animate-spin" />
     </div>
   );
-  if (!dispute) return <p className="font-sans text-[#888]">Dispute not found.</p>;
+  if (!dispute) return (
+    <div className="space-y-3 p-6">
+      <p className="font-sans text-[#888]">Dispute not found.</p>
+      {error && <p className="font-sans text-sm text-[#dc2626]">Error: {error}</p>}
+    </div>
+  );
 
   const isResolved = dispute.status === "RESOLVED_BUYER" || dispute.status === "RESOLVED_SELLER";
   const statusCfg = STATUS_LABELS[dispute.status] ?? STATUS_LABELS.OPEN;

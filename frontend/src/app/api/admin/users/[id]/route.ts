@@ -1,13 +1,10 @@
 import { db } from "@/lib/db";
-import { requireAdmin, isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
+import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const isAuthorized = await requireAdmin();
-    const isUnlocked = await isSecondaryPasswordUnlocked();
-
-    if (!isAuthorized || !isUnlocked) {
+    if (!(await isSecondaryPasswordUnlocked())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
