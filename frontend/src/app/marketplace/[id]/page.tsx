@@ -410,25 +410,29 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   }
 
   const { viewerRole: _roleForStatus } = order;
-  const resolvedLabel = (() => {
-    if (order.status === "DISPUTE_RESOLVED_BUYER") {
-      return _roleForStatus === "buyer"
-        ? "Dispute Resolved — You Won ✓"
-        : "Dispute Resolved — Buyer Won";
+
+  const disputeResolutionNotice = (() => {
+    if (order.status !== "DISPUTE_RESOLVED_BUYER" && order.status !== "DISPUTE_RESOLVED_SELLER") return null;
+    const wonBySeller = order.status === "DISPUTE_RESOLVED_SELLER";
+    const viewerWon = (wonBySeller && _roleForStatus === "seller") || (!wonBySeller && _roleForStatus === "buyer");
+    const winnerRole = wonBySeller ? "Seller" : "Buyer";
+    if (viewerWon) {
+      return {
+        heading: "Dispute Resolved in Your Favour",
+        body: `Following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in your favour. ${wonBySeller ? "The escrowed funds have been returned to your wallet." : "The escrowed funds have been released to your wallet."} This determination was made in accordance with CryptoBazaar's Trading Policy and the Terms & Conditions you accepted at the time of registration. No further action is required on your part.`,
+        sub: "This decision is final and binding. If you have questions, contact support@cryptobazaar.co.in.",
+        won: true,
+      };
     }
-    if (order.status === "DISPUTE_RESOLVED_SELLER") {
-      return _roleForStatus === "seller"
-        ? "Dispute Resolved — You Won ✓"
-        : "Dispute Resolved — Seller Won";
-    }
-    return null;
+    return {
+      heading: "Dispute Resolved — Decision Against You",
+      body: `Following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in favour of the ${winnerRole}. ${wonBySeller ? "The escrowed funds have been returned to the Seller." : "The escrowed funds have been released to the Buyer."} This outcome was determined in accordance with CryptoBazaar's Trading Policy and the Terms & Conditions you accepted at the time of registration, which grant CryptoBazaar the authority to adjudicate disputes and enforce resolutions on-chain.`,
+      sub: "This decision is final and binding. If you believe this is an error, you may contact support@cryptobazaar.co.in within 7 days.",
+      won: false,
+    };
   })();
 
-  const statusCfg = (() => {
-    const base = STATUS[order.status] ?? STATUS.LISTED;
-    if (resolvedLabel) return { ...base, label: resolvedLabel };
-    return base;
-  })();
+  const statusCfg = STATUS[order.status] ?? STATUS.LISTED;
   const onChainId = BigInt(order.onChainId);
   const amount = parseFloat(order.amount);
   const availableAmount = parseFloat(order.amount);
@@ -478,9 +482,29 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 On mobile this column moves to the bottom (reference info) and the
                 status banner is pulled to the very top. */}
             <div className="flex flex-col gap-4 order-3 lg:order-none">
-              <div className="rounded-lg px-3 py-2.5 order-first lg:order-last" style={{ background: statusCfg.bg, border: `1px solid ${statusCfg.border}` }}>
-                <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
-              </div>
+              {disputeResolutionNotice ? (
+                <div className={`rounded-xl p-4 order-first lg:order-last border ${disputeResolutionNotice.won ? "bg-[#f0fdf4] border-[#86efac]" : "bg-[#fef2f2] border-[#fca5a5]"}`}>
+                  <p className={`font-sans text-sm font-bold mb-1.5 ${disputeResolutionNotice.won ? "text-[#166534]" : "text-[#991b1b]"}`}>
+                    {disputeResolutionNotice.heading}
+                  </p>
+                  <p className={`font-sans text-xs leading-relaxed mb-2 ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#b91c1c]"}`}>
+                    {disputeResolutionNotice.body}
+                  </p>
+                  <p className={`font-sans text-[0.65rem] italic ${disputeResolutionNotice.won ? "text-[#16a34a]" : "text-[#dc2626]"}`}>
+                    {disputeResolutionNotice.sub}
+                  </p>
+                  {order.escrowTxHash && (
+                    <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
+                      className={`font-sans text-xs underline mt-2 block ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#991b1b]"}`}>
+                      ✓ View on-chain transaction ↗
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg px-3 py-2.5 order-first lg:order-last" style={{ background: statusCfg.bg, border: `1px solid ${statusCfg.border}` }}>
+                  <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
+                </div>
+              )}
 
               <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Trade Steps</p>
@@ -986,14 +1010,34 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             </p>
           </div>
 
-          <div className="rounded-xl px-4 py-3 mb-5 flex items-center justify-between"
-            style={{ background: statusCfg.bg, border: `1.5px solid ${statusCfg.border}` }}>
-            <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
-            {order.escrowTxHash && (
-              <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
-                className="font-sans text-xs underline" style={{ color: statusCfg.color }}>✓ Escrow on-chain ↗</a>
-            )}
-          </div>
+          {disputeResolutionNotice ? (
+            <div className={`rounded-xl p-5 mb-5 border ${disputeResolutionNotice.won ? "bg-[#f0fdf4] border-[#86efac]" : "bg-[#fef2f2] border-[#fca5a5]"}`}>
+              <p className={`font-condensed text-xl tracking-wide mb-2 ${disputeResolutionNotice.won ? "text-[#166534]" : "text-[#991b1b]"}`}>
+                {disputeResolutionNotice.heading}
+              </p>
+              <p className={`font-sans text-sm leading-relaxed mb-3 ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#b91c1c]"}`}>
+                {disputeResolutionNotice.body}
+              </p>
+              <p className={`font-sans text-xs italic mb-3 ${disputeResolutionNotice.won ? "text-[#16a34a]" : "text-[#dc2626]"}`}>
+                {disputeResolutionNotice.sub}
+              </p>
+              {order.escrowTxHash && (
+                <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
+                  className={`font-sans text-xs font-semibold underline ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#991b1b]"}`}>
+                  ✓ View on-chain transaction ↗
+                </a>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-xl px-4 py-3 mb-5 flex items-center justify-between"
+              style={{ background: statusCfg.bg, border: `1.5px solid ${statusCfg.border}` }}>
+              <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
+              {order.escrowTxHash && (
+                <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
+                  className="font-sans text-xs underline" style={{ color: statusCfg.color }}>✓ Escrow on-chain ↗</a>
+              )}
+            </div>
+          )}
 
           {isEvm && connectionStatus === "connecting" && !TERMINAL.includes(order.status) && (
             <div className="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl px-4 py-3 mb-5 flex items-center gap-3">
