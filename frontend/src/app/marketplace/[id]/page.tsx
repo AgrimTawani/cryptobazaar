@@ -418,14 +418,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     const winnerRole = wonBySeller ? "Seller" : "Buyer";
     if (viewerWon) {
       return {
-        heading: "Dispute Resolved in Your Favour",
+        heading: "Dispute Resolved",
         body: `Following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in your favour. ${wonBySeller ? "The escrowed funds have been returned to your wallet." : "The escrowed funds have been released to your wallet."} This determination was made in accordance with CryptoBazaar's Trading Policy and the Terms & Conditions you accepted at the time of registration. No further action is required on your part.`,
         sub: "This decision is final and binding. If you have questions, contact support@cryptobazaar.co.in.",
         won: true,
       };
     }
     return {
-      heading: "Dispute Resolved — Decision Against You",
+      heading: "Dispute Resolved",
       body: `Following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in favour of the ${winnerRole}. ${wonBySeller ? "The escrowed funds have been returned to the Seller." : "The escrowed funds have been released to the Buyer."} This outcome was determined in accordance with CryptoBazaar's Trading Policy and the Terms & Conditions you accepted at the time of registration, which grant CryptoBazaar the authority to adjudicate disputes and enforce resolutions on-chain.`,
       sub: "This decision is final and binding. If you believe this is an error, you may contact support@cryptobazaar.co.in within 7 days.",
       won: false,
