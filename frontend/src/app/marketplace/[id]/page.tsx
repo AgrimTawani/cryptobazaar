@@ -284,6 +284,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
   const [buyAmount, setBuyAmount] = useState<string>("");
+  const [accessDenied, setAccessDenied] = useState(false);
   const prevStatusRef = useRef<string | null>(null);
 
   useEffect(() => { params.then((p) => setId(p.id)); }, [params]);
@@ -299,6 +300,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
         res = await fetch(`/api/orders/${id}`);
       }
       const data = await res.json();
+      if (res.status === 403) { setAccessDenied(true); return; }
       if (res.ok) {
         const wasBuyerPaid = prevStatusRef.current === "BUYER_PAID";
         const nowListed = data.status === "LISTED";
@@ -400,6 +402,21 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   };
 
   if (loading) return <LoadingSpinner />;
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center gap-3 px-5">
+        <div className="bg-white border border-[#e8e8e8] rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
+          <p className="font-condensed text-2xl tracking-wide mb-2">Access Restricted</p>
+          <p className="font-sans text-sm text-[#666] leading-relaxed mb-5">
+            This trade is private. Only the buyer and seller involved in this order can view it.
+          </p>
+          <Link href="/marketplace" className="inline-flex items-center gap-1 font-sans text-sm font-semibold text-[#7b3fe4] underline">
+            <ArrowLeft className="w-4 h-4" /> Back to marketplace
+          </Link>
+        </div>
+      </div>
+    );
+  }
   if (!order) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center gap-3">
