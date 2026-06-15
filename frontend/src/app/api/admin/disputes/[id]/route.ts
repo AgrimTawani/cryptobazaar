@@ -130,8 +130,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       include: {
         order: {
           include: {
-            seller: { select: { id: true, walletAddress: true } },
-            buyer:  { select: { id: true, walletAddress: true } },
+            seller: { select: { id: true, walletAddress: true, email: true, name: true } },
+            buyer:  { select: { id: true, walletAddress: true, email: true, name: true } },
           },
         },
       },

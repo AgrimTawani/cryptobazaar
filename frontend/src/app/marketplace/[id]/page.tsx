@@ -267,29 +267,31 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => run("lock", async () => {
-                  await sendTx(prepareContractCall({
-                    contract: escrowContract,
-                    method: "function lockOrder(uint256 id)",
-                    params: [onChainId],
-                  }));
-                })}
-                disabled={!!busy || (!account && isEvm)}
-                className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40"
-              >
-                {busy === "lock" ? "Locking…" : `Lock Order → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
-              </button>
-              <div className="flex items-center justify-center gap-1 mt-2">
-                <div className="relative group inline-flex items-center gap-1">
-                  <Info className="w-3.5 h-3.5 text-[#aaa] cursor-help" />
-                  <span className="font-sans text-xs text-[#aaa]">Funds secured by smart contract escrow</span>
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-white border border-[#e5e5e5] rounded-xl shadow-lg px-3 py-2.5 hidden group-hover:block z-50 pointer-events-auto">
-                    <p className="font-sans text-xs text-[#555] leading-relaxed">Your crypto is held by a smart contract on the blockchain — not by CryptoBazaar. We never touch your funds.</p>
-                    <a href="/articles/how-escrow-works" className="font-sans text-xs font-semibold text-[#7b3fe4] mt-1 block">Learn more →</a>
+              <>
+                <button
+                  onClick={() => run("lock", async () => {
+                    await sendTx(prepareContractCall({
+                      contract: escrowContract,
+                      method: "function lockOrder(uint256 id)",
+                      params: [onChainId],
+                    }));
+                  })}
+                  disabled={!!busy || (!account && isEvm)}
+                  className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40"
+                >
+                  {busy === "lock" ? "Locking…" : `Lock Order → Pay ₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`}
+                </button>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <div className="relative group inline-flex items-center gap-1">
+                    <Info className="w-3.5 h-3.5 text-[#aaa] cursor-help" />
+                    <span className="font-sans text-xs text-[#aaa]">Funds secured by smart contract escrow</span>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-white border border-[#e5e5e5] rounded-xl shadow-lg px-3 py-2.5 hidden group-hover:block z-50 pointer-events-auto">
+                      <p className="font-sans text-xs text-[#555] leading-relaxed">Your crypto is held by a smart contract on the blockchain — not by CryptoBazaar. We never touch your funds.</p>
+                      <a href="/articles/how-escrow-works" className="font-sans text-xs font-semibold text-[#7b3fe4] mt-1 block">Learn more →</a>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         )}
