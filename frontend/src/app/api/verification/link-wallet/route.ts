@@ -1,6 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { createElement } from "react";
 import { db } from "@/lib/db";
+import { notify } from "@/lib/notify";
+import OnboardingCompleteEmail from "@/lib/emails/onboarding-complete";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,16 +32,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "This wallet address is already linked to another account" }, { status: 409 });
     }
 
-    await db.user.update({
+    const updated = await db.user.update({
       where: { id: user.id },
       data: {
         walletAddress,
         walletChain,
         walletVerifiedAt: new Date(),
-        // We do not set status to VERIFIED here. 
+        // We do not set status to VERIFIED here.
         // The admin must manually approve the user in the dashboard.
       },
     });
+
+    if (updated.email) {
+      await notify({
+        email: {
+          to: updated.email,
+          subject: "Onboarding complete — pending admin approval",
+          react: createElement(OnboardingCompleteEmail, { name: updated.name ?? "there" }),
+        },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

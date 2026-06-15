@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { db } from "@/lib/db";
 import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,6 +8,8 @@ import { r2 } from "@/lib/r2";
 import { prepareContractCall, sendTransaction, getContract, defineChain } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { thirdwebClient } from "@/lib/thirdweb";
+import { notify } from "@/lib/notify";
+import DisputeResolvedEmail from "@/lib/emails/dispute-resolved";
 
 async function checkAuth() {
   return isSecondaryPasswordUnlocked();
@@ -182,6 +185,47 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         },
       }),
     ]);
+
+    // Email both parties
+    const winnerRole = action === "SELLER" ? "seller" : "buyer" as "buyer" | "seller";
+    const amount = dispute.order.amount.toString();
+    const asset = dispute.order.asset;
+    const orderId = dispute.orderId;
+
+    const emailTasks: Promise<void>[] = [];
+    if (dispute.order.seller.email) {
+      emailTasks.push(notify({
+        email: {
+          to: dispute.order.seller.email,
+          subject: `Dispute resolved — ${action === "SELLER" ? "decision in your favour" : "decision against you"} on ${amount} ${asset} trade`,
+          react: createElement(DisputeResolvedEmail, {
+            name: dispute.order.seller.name ?? "Seller",
+            won: action === "SELLER",
+            winnerRole,
+            amount,
+            asset,
+            orderId,
+          }),
+        },
+      }).catch(() => {}));
+    }
+    if (dispute.order.buyer?.email) {
+      emailTasks.push(notify({
+        email: {
+          to: dispute.order.buyer.email,
+          subject: `Dispute resolved — ${action === "BUYER" ? "decision in your favour" : "decision against you"} on ${amount} ${asset} trade`,
+          react: createElement(DisputeResolvedEmail, {
+            name: dispute.order.buyer.name ?? "Buyer",
+            won: action === "BUYER",
+            winnerRole,
+            amount,
+            asset,
+            orderId,
+          }),
+        },
+      }).catch(() => {}));
+    }
+    await Promise.allSettled(emailTasks);
 
     return NextResponse.json({ success: true, contractTxHash });
   } catch (error) {

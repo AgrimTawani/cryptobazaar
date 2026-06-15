@@ -1,7 +1,9 @@
+import { createElement } from "react";
 import { db } from "@/lib/db";
 import { isSecondaryPasswordUnlocked } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { notify } from "@/lib/notify";
+import AdminEvidenceRequestEmail from "@/lib/emails/admin-evidence-request";
 
 const checkAuth = () => isSecondaryPasswordUnlocked();
 
@@ -64,7 +66,7 @@ export async function POST(
       },
     });
 
-    // Notify the relevant party/parties
+    // Notify the relevant party/parties (push + email)
     const notifyUser = async (user: { id: number; name: string | null; email: string | null } | null | undefined) => {
       if (!user) return;
       await notify({
@@ -74,6 +76,17 @@ export async function POST(
           body: content.trim().slice(0, 80),
           url: `/marketplace/${dispute.order.id}`,
         },
+        ...(user.email ? {
+          email: {
+            to: user.email,
+            subject: "Additional information requested for your dispute",
+            react: createElement(AdminEvidenceRequestEmail, {
+              name: user.name ?? "there",
+              message: content.trim(),
+              orderId: dispute.order.id,
+            }),
+          },
+        } : {}),
       }).catch(() => {});
     };
 
