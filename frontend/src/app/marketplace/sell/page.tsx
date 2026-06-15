@@ -1,87 +1,69 @@
 "use client";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 import {
   useActiveAccount,
   useSendTransaction,
-  useActiveWalletConnectionStatus,
-  useConnect,
-  useActiveWalletChain,
+  ConnectButton,
 } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
 import {
   getContract,
   prepareContractCall,
   readContract,
-  waitForReceipt,
   defineChain,
 } from "thirdweb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { EnableNotifications } from "@/components/EnableNotifications";
 import { txUrl } from "@/lib/explorer";
 
 const amoyChain = defineChain(80002);
-const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ?? "") as `0x${string}`;
-const USDC_ADDR = (process.env.NEXT_PUBLIC_AMOY_USDC_ADDRESS ?? "") as `0x${string}`;
+const ESCROW_ADDR = (process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS ??
+  "") as `0x${string}`;
+const USDC_ADDR = (process.env.NEXT_PUBLIC_AMOY_USDC_ADDRESS ??
+  "") as `0x${string}`;
 
-const escrowContract = getContract({ client: thirdwebClient, chain: amoyChain, address: ESCROW_ADDR });
-const usdcContract = getContract({ client: thirdwebClient, chain: amoyChain, address: USDC_ADDR });
+const escrowContract = getContract({
+  client: thirdwebClient,
+  chain: amoyChain,
+  address: ESCROW_ADDR,
+});
+const usdcContract = getContract({
+  client: thirdwebClient,
+  chain: amoyChain,
+  address: USDC_ADDR,
+});
 
-type Step = "form" | "review" | "approving" | "creating" | "saving" | "done" | "error";
+type Step = "form" | "approving" | "creating" | "saving" | "done" | "error";
 type PaymentMethod = "UPI" | "IMPS" | "NEFT";
 
 const STEPS: { key: Step; label: string }[] = [
   { key: "approving", label: "Approving USDC" },
-  { key: "creating",  label: "Creating order" },
-  { key: "saving",    label: "Saving" },
-  { key: "done",      label: "Done!" },
+  { key: "creating", label: "Creating order" },
+  { key: "saving", label: "Saving" },
+  { key: "done", label: "Done!" },
 ];
 const STEP_ORDER = STEPS.map((s) => s.key);
 
 export default function SellPage() {
   const router = useRouter();
   const account = useActiveAccount();
-  const connectionStatus = useActiveWalletConnectionStatus();
-  const walletOk = connectionStatus === "connected" && !!account;
-  const activeChain = useActiveWalletChain();
-  const sellChainId = parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002");
-  // Require exact chain match — !activeChain (Solana/unknown) is NOT ok
-  const chainOk = !account || activeChain?.id === sellChainId;
-  const sellChainLabel = sellChainId === 80002 ? "Polygon Amoy" : "Polygon";
-  const CHAIN_LABELS: Record<number, string> = {
-    1: "Ethereum", 137: "Polygon", 80002: "Polygon Amoy",
-    56: "BNB Chain", 97: "BNB Testnet",
-    728126428: "Tron", 3448148188: "Tron Nile", 2494104990: "Tron Shasta",
-    1399811149: "Solana", 103: "Solana Devnet",
-  };
-  const activeChainName = activeChain
-    ? (CHAIN_LABELS[activeChain.id] ?? `Chain ${activeChain.id}`)
-    : account ? "Unknown Network" : null;
-  const { connect } = useConnect();
   const { mutateAsync: sendTx } = useSendTransaction();
 
-  const reconnectWallet = () => connect(async () => {
-    const wallet = createWallet("io.metamask");
-    await wallet.connect({ client: thirdwebClient });
-    return wallet;
-  });
-
-  const [walletInfo, setWalletInfo] = useState<{ address: string } | null>(null);
-  const [profilePayment, setProfilePayment] = useState<{
-    upiId: string | null;
-    bankAccount: string | null;
-    ifscCode: string | null;
+  const [walletInfo, setWalletInfo] = useState<{
+    address: string;
+    chain: string;
   } | null>(null);
   const [amount, setAmount] = useState("");
   const [pricePerUnit, setPricePerUnit] = useState("");
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(["UPI"]);
-  const [partialAllowed, setPartialAllowed] = useState(false);
-  const [minOrderAmount, setMinOrderAmount] = useState("");
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+    "UPI",
+  ]);
+  const [upiId, setUpiId] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [ifsc, setIfsc] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -90,18 +72,19 @@ export default function SellPage() {
   useEffect(() => {
     Promise.all([
       fetch("/api/onboarding/status").then((r) => r.json()).catch(() => ({})),
-      new Promise((resolve) => setTimeout(resolve, 1500)),
+      new Promise((resolve) => setTimeout(resolve, 1500))
     ]).then(([d]) => {
-      if (d.walletAddress) setWalletInfo({ address: d.walletAddress });
-      setProfilePayment({ upiId: d.upiId ?? null, bankAccount: d.bankAccount ?? null, ifscCode: d.ifscCode ?? null });
-      if (!d.upiId) setPaymentMethods((prev) => prev.filter((m) => m !== "UPI"));
+      if (d.walletAddress && d.walletChain) {
+        setWalletInfo({ address: d.walletAddress, chain: d.walletChain });
+      }
       setIsLoadingDb(false);
     });
   }, []);
 
-  const totalInr = amount && pricePerUnit
-    ? (parseFloat(amount) * parseFloat(pricePerUnit)).toFixed(2)
-    : null;
+  const totalInr =
+    amount && pricePerUnit
+      ? (parseFloat(amount) * parseFloat(pricePerUnit)).toFixed(2)
+      : null;
 
   const togglePayment = (method: PaymentMethod) => {
     setPaymentMethods((prev) =>
@@ -110,150 +93,181 @@ export default function SellPage() {
   };
 
   const validate = () => {
-    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return "Enter a valid amount.";
-    if (!pricePerUnit || isNaN(parseFloat(pricePerUnit)) || parseFloat(pricePerUnit) <= 0) return "Enter a valid price.";
-    if (paymentMethods.length === 0) return "Select at least one payment method.";
-    if (!profilePayment?.bankAccount || !profilePayment?.ifscCode)
-      return "Payment details missing. Complete the bank statement step in onboarding.";
-    if (partialAllowed) {
-      const min = parseFloat(minOrderAmount);
-      const total = parseFloat(amount);
-      if (!minOrderAmount || isNaN(min) || min <= 0)
-        return "Enter a valid minimum order amount.";
-      if (min >= total)
-        return "Minimum order must be less than total amount.";
-      if (min < 1)
-        return "Minimum order must be at least 1 USDC.";
-    }
+    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0)
+      return "Enter a valid amount.";
+    if (
+      !pricePerUnit ||
+      isNaN(parseFloat(pricePerUnit)) ||
+      parseFloat(pricePerUnit) <= 0
+    )
+      return "Enter a valid price.";
+    if (paymentMethods.length === 0)
+      return "Select at least one payment method.";
+    if (paymentMethods.includes("UPI") && !upiId.trim())
+      return "Enter your UPI ID.";
+    if (
+      (paymentMethods.includes("IMPS") || paymentMethods.includes("NEFT")) &&
+      (!bankAccount.trim() || !ifsc.trim())
+    )
+      return "Enter your bank account number and IFSC code.";
     return null;
   };
 
   const handleSubmit = async () => {
     const err = validate();
-    if (err) { setErrorMsg(err); return; }
+    if (err) {
+      setErrorMsg(err);
+      return;
+    }
     setErrorMsg("");
+
     try {
       const amountRaw = BigInt(Math.round(parseFloat(amount) * 1e6));
       const priceRaw = BigInt(Math.round(parseFloat(pricePerUnit) * 100));
 
+      // Step 1: Approve USDC spend
       setStep("approving");
-      await sendTx(prepareContractCall({
-        contract: usdcContract,
-        method: "function approve(address spender, uint256 amount)",
-        params: [ESCROW_ADDR, amountRaw],
-        gas: BigInt(100000),
-      }));
+      await sendTx(
+        prepareContractCall({
+          contract: usdcContract,
+          method: "function approve(address spender, uint256 amount)",
+          params: [ESCROW_ADDR, amountRaw],
+          gas: BigInt(100000),
+        })
+      );
 
+      // Read nextOrderId right after approve confirms — minimises race window
       const nextId = await readContract({
         contract: escrowContract,
         method: "function nextOrderId() view returns (uint256)",
         params: [],
       });
 
+      // Step 2: Create order on-chain
       setStep("creating");
-      const { transactionHash } = await sendTx(prepareContractCall({
-        contract: escrowContract,
-        method: "function createOrder(address token, uint128 amount, uint96 priceInr)",
-        params: [USDC_ADDR, amountRaw, priceRaw],
-        gas: BigInt(200000),
-      }));
-
-      const receipt = await waitForReceipt({ client: thirdwebClient, chain: amoyChain, transactionHash });
-      if (receipt.status === "reverted") {
-        throw new Error("createOrder transaction reverted on-chain. Your USDC was not moved. Please try again.");
-      }
-
+      const { transactionHash } = await sendTx(
+        prepareContractCall({
+          contract: escrowContract,
+          method:
+            "function createOrder(address token, uint128 amount, uint96 priceInr)",
+          params: [USDC_ADDR, amountRaw, priceRaw],
+          gas: BigInt(200000),
+        })
+      );
       setTxHash(transactionHash);
+
+      // Step 3: Save to DB
       setStep("saving");
       const orderId = `${ESCROW_ADDR.toLowerCase()}_${nextId.toString()}`;
-      const saveRes = await fetch("/api/orders", {
+      await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId, chain: "POLYGON", asset: "USDC",
-          amount: parseFloat(amount), pricePerUnit: parseFloat(pricePerUnit),
-          escrowTxHash: transactionHash, escrowContractAddress: ESCROW_ADDR,
+          orderId,
+          chain: "POLYGON",
+          asset: "USDC",
+          amount: parseFloat(amount),
+          pricePerUnit: parseFloat(pricePerUnit),
+          escrowTxHash: transactionHash,
+          escrowContractAddress: ESCROW_ADDR,
           paymentMethods,
-          partialAllowed,
-          minOrderAmount: partialAllowed ? parseFloat(minOrderAmount) : null,
+          sellerUpiId: upiId || null,
+          sellerBankAccount: bankAccount || null,
+          sellerIfsc: ifsc || null,
         }),
       });
-      if (!saveRes.ok) {
-        const body = await saveRes.json().catch(() => ({})) as { error?: string };
-        throw new Error(`Order saved on-chain (tx: ${transactionHash}) but failed to save to database: ${body.error ?? saveRes.status}. Contact support with this transaction hash.`);
-      }
 
       setStep("done");
       setTimeout(() => router.push("/marketplace"), 1500);
     } catch (e: unknown) {
       console.error(e);
-      setErrorMsg(e instanceof Error ? e.message : "Transaction failed. Please try again.");
+      setErrorMsg(
+        e instanceof Error ? e.message : "Transaction failed. Please try again."
+      );
       setStep("error");
     }
   };
 
-  const isBusy = step === "approving" || step === "creating" || step === "saving";
+  const isBusy =
+    step === "approving" || step === "creating" || step === "saving";
+  const needsBank =
+    paymentMethods.includes("IMPS") || paymentMethods.includes("NEFT");
 
-  if (isLoadingDb) return <LoadingSpinner />;
+  if (isLoadingDb) {
+    return <LoadingSpinner />;
+  }
 
-  const isNonEvmWallet = walletInfo && !walletInfo.address.startsWith("0x");
-  if (isNonEvmWallet) {
-    const chainLabel = walletInfo.address.startsWith("T") && walletInfo.address.length === 34
-      ? "TRON" : "Solana";
+  if (walletInfo && walletInfo.chain !== "POLYGON") {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center px-6 text-center">
-        <h2 className="font-condensed text-2xl mb-2">Only available on Polygon</h2>
-        <p className="font-sans text-sm text-[#666] max-w-xs leading-relaxed">
-          Your wallet is on {chainLabel}. Sell orders are currently only supported on Polygon.
+      <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center px-6 text-center">
+        <h2 className="font-condensed text-2xl mb-2">
+          Only available on Polygon
+        </h2>
+        <p className="font-sans text-sm text-[#666] max-w-xs leading-[1.6]">
+          Your registered wallet is on {walletInfo.chain}. Escrow sell orders
+          are currently only supported on Polygon. Support for {walletInfo.chain}{" "}
+          is coming soon.
         </p>
-        <Link href="/marketplace" className="mt-6 font-sans text-sm text-[#7b3fe4] underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
+        <Link
+          href="/marketplace"
+          className="mt-6 font-sans text-sm text-[#7b3fe4] underline"
+        >
+          ← Back to marketplace
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
-        <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
-        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
+    <div className="min-h-screen bg-[#fafafa]">
+      <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between sticky top-0 z-50">
+        <Link
+          href="/"
+          className="font-condensed text-base tracking-[3px] text-black no-underline"
+        >
+          CRYPTOBAZAAR
+        </Link>
+        <Link
+          href="/marketplace"
+          className="font-sans text-[0.82rem] text-[#888] no-underline"
+        >
+          ← Back to marketplace
+        </Link>
       </header>
 
-      <div className="max-w-[560px] mx-auto py-8 px-5">
-        <div className="mb-5">
-          <EnableNotifications variant="banner" />
-        </div>
-        <h1 className="font-condensed text-[2.4rem] tracking-[1px] mb-1">SELL USDC</h1>
-        <p className="font-sans text-sm text-[#888] mb-8">
-          Tokens are held in escrow until you confirm the buyer&apos;s INR payment.
+      <div className="max-w-[560px] mx-auto py-12 px-6">
+        <h1 className="font-condensed text-[2.4rem] tracking-[1px] mb-1">
+          SELL USDC
+        </h1>
+        <p className="font-sans text-[0.85rem] text-[#888] mb-8">
+          Tokens are held in escrow until you confirm the buyer&apos;s INR
+          payment.
         </p>
 
-        {/* Wallet banners */}
-        {connectionStatus === "connecting" && (
-          <div className="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-4 mb-5 flex items-center gap-3">
-            <span className="w-4 h-4 border-2 border-[#0369a1] border-t-transparent rounded-full animate-spin shrink-0" />
-            <p className="font-sans text-sm text-[#0369a1]">Reconnecting wallet…</p>
-          </div>
-        )}
-        {!walletOk && connectionStatus !== "connecting" && (
-          <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-4 mb-5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="text-base shrink-0">🦊</span>
-              <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
-            </div>
-            <button onClick={reconnectWallet}
-              className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
-              Reconnect <ArrowRight className="inline-block w-4 h-4 ml-1" />
-            </button>
-          </div>
-        )}
-        {account && walletInfo && account.address.toLowerCase() !== walletInfo.address.toLowerCase() && (
-          <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-xl p-4 mb-5">
-            <p className="font-sans text-sm text-[#9a3412]">
-              ⚠️ Connected wallet <strong>{account.address.slice(0, 8)}…</strong> doesn&apos;t match your registered wallet{" "}
-              <strong>{walletInfo?.address.slice(0, 8)}…</strong>. Switch accounts in MetaMask.
+        {/* Wallet connection */}
+        {!account && (
+          <div className="bg-[#f5f0ff] border border-[#c4b5fd] rounded-[14px] p-5 mb-6">
+            <p className="font-sans text-sm text-[#5b21b6] mb-3">
+              Connect your wallet to sign the transaction.
             </p>
+            <ConnectButton client={thirdwebClient} />
           </div>
         )}
+
+        {account &&
+          walletInfo &&
+          account.address.toLowerCase() !==
+            walletInfo.address.toLowerCase() && (
+            <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-[14px] p-5 mb-6">
+              <p className="font-sans text-sm text-[#9a3412]">
+                ⚠️ Connected wallet{" "}
+                <strong>{account.address.slice(0, 8)}…</strong> doesn&apos;t
+                match your registered wallet{" "}
+                <strong>{walletInfo?.address.slice(0, 8)}…</strong>. Please
+                switch accounts in MetaMask.
+              </p>
+            </div>
+          )}
 
         {/* Progress indicator */}
         {step !== "form" && step !== "error" && (
@@ -265,271 +279,217 @@ export default function SellPage() {
               const active = step === key;
               return (
                 <div key={key} className="flex items-center gap-2">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    done ? "bg-[#22c55e] text-white" : active ? "bg-[#7b3fe4] text-white animate-pulse" : "bg-[#e5e5e5] text-[#999]"
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[0.65rem] font-bold ${
+                      done
+                        ? "bg-[#22c55e] text-white"
+                        : active
+                        ? "bg-[#7b3fe4] text-white animate-pulse"
+                        : "bg-[#e5e5e5] text-[#999]"
+                    }`}
+                  >
                     {done ? "✓" : "·"}
                   </div>
-                  <span className={`font-sans text-sm ${active ? "text-[#7b3fe4] font-semibold" : "text-[#999]"}`}>
+                  <span
+                    className={`font-sans text-[0.72rem] ${
+                      active
+                        ? "text-[#7b3fe4] font-semibold"
+                        : "text-[#999]"
+                    }`}
+                  >
                     {label}
                   </span>
-                  {i < STEPS.length - 1 && <span className="text-[#ddd]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>}
+                  {i < STEPS.length - 1 && (
+                    <span className="text-[#ddd] text-sm">→</span>
+                  )}
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Done state */}
         {step === "done" && (
-          <div className="bg-[#f0fdf4] border border-[#86efac] rounded-xl p-5 mb-6">
-            <p className="font-condensed text-2xl text-[#166534] mb-1 text-center">Order Created!</p>
+          <div className="bg-[#f0fdf4] border border-[#86efac] rounded-[14px] p-5 mb-6">
+            <p className="font-condensed text-2xl text-[#166534] mb-1 text-center">
+              Order Created!
+            </p>
             {txHash && (
               <div className="mt-3 pt-3 border-t border-[#86efac]">
-                <p className="font-sans text-xs text-[#166534] uppercase tracking-widest mb-1">Transaction</p>
-                <a href={txUrl(txHash)} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-xs text-[#15803d] underline break-all">
+                <p className="font-sans text-[0.7rem] text-[#166534] uppercase tracking-[1px] mb-1">
+                  Transaction
+                </p>
+                <a
+                  href={txUrl(txHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[0.72rem] text-[#15803d] underline break-all"
+                >
                   {txHash.slice(0, 18)}…{txHash.slice(-10)} ↗
                 </a>
               </div>
             )}
-            <p className="font-sans text-sm text-[#15803d] mt-3 text-center">Redirecting to marketplace…</p>
-          </div>
-        )}
-
-        {/* Review panel */}
-        {(step === "review" || isBusy) && (
-          <div className="bg-white border-2 border-black rounded-xl p-5 sm:p-6 mb-6 space-y-5">
-            <h2 className="font-condensed text-2xl tracking-[0.5px]">Confirm your listing</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5">
-              {[
-                ["Amount", `${amount} USDC`],
-                ["Price per USDC", `₹${pricePerUnit}`],
-                ["Total value", `₹${totalInr ? parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}`],
-                ["Payment methods", paymentMethods.join(", ")],
-                ["Partial orders", partialAllowed ? `Yes — min ${minOrderAmount} USDC` : "No (full order only)"],
-                ...(profilePayment?.upiId ? [["UPI ID", profilePayment.upiId]] : []),
-                ...(profilePayment?.bankAccount ? [["Bank account", profilePayment.bankAccount], ["IFSC", profilePayment.ifscCode ?? ""]] : []),
-              ].map(([k, v]) => (
-                <div key={k} className="min-w-0">
-                  <p className="font-sans text-xs text-[#999] uppercase tracking-widest">{k}</p>
-                  <p className="font-sans text-sm font-semibold text-[#111] break-words">{v}</p>
-                </div>
-              ))}
-            </div>
-            <div className="bg-[#fffbeb] border border-[#fde68a] rounded-lg px-4 py-3">
-              <p className="font-sans text-sm text-[#92400e] leading-relaxed">
-                MetaMask will ask you to approve exactly <strong>{amount} USDC</strong> for the escrow — not unlimited.
-              </p>
-            </div>
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-1">
-              <button onClick={() => setStep("form")} disabled={isBusy}
-                className="sm:flex-1 py-3 px-4 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity whitespace-nowrap">
-                <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to Edit
-              </button>
-              <button onClick={handleSubmit} disabled={isBusy}
-                className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
-                {isBusy
-                  ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
-                  : (<span className="flex items-center justify-center gap-1">Confirm & Approve USDC <ArrowRight className="w-4 h-4" /></span>)}
-              </button>
-            </div>
+            <p className="font-sans text-sm text-[#15803d] mt-3 text-center">
+              Redirecting to marketplace…
+            </p>
           </div>
         )}
 
         {/* Form */}
-        {(step === "form" || step === "error") && (
-          <div className="space-y-6">
-
+        <div
+          className={`space-y-5 ${
+            isBusy || step === "done" ? "opacity-50 pointer-events-none" : ""
+          }`}
+        >
+          {/* Amount */}
           <div>
-            <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
+            <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
               Amount (USDC)
             </label>
-            <input type="number" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)}
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g. 10"
-              className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-3 font-mono text-base text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors" />
+              className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[1rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+            />
           </div>
 
-          {/* Partial orders toggle */}
+          {/* Price per unit */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block">
-                  Allow Partial Orders
-                </label>
-                <p className="font-sans text-xs text-[#999] mt-0.5">
-                  Let buyers purchase less than the full amount
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => { setPartialAllowed((p) => !p); setMinOrderAmount(""); }}
-                className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer border-0 shrink-0 p-0 ${
-                  partialAllowed ? "bg-[#7b3fe4]" : "bg-[#e5e5e5]"
-                }`}
-              >
-                <span className={`absolute top-[2px] left-[2px] w-5 h-5 rounded-full bg-white shadow transition-all ${
-                  partialAllowed ? "translate-x-6" : "translate-x-0"
-                }`} />
-              </button>
-            </div>
-
-            {partialAllowed && (
-              <div>
-                <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
-                  Minimum Order (USDC)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="0.01"
-                  value={minOrderAmount}
-                  onChange={(e) => setMinOrderAmount(e.target.value)}
-                  placeholder={`e.g. ${amount ? Math.floor(parseFloat(amount) * 0.1) || 10 : 10}`}
-                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-3 font-mono text-base text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
-                />
-                {minOrderAmount && amount && (
-                  <p className="font-sans text-xs text-[#7b3fe4] mt-1.5">
-                    Buyers can purchase between {minOrderAmount} and {amount} USDC
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
+            <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
               Price per USDC (₹)
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-sans text-base text-[#999]">₹</span>
-              <input type="number" min="1" step="0.01" value={pricePerUnit} onChange={(e) => setPricePerUnit(e.target.value)}
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-sans text-[1rem] text-[#999]">
+                ₹
+              </span>
+              <input
+                type="number"
+                min="1"
+                step="0.01"
+                value={pricePerUnit}
+                onChange={(e) => setPricePerUnit(e.target.value)}
                 placeholder="e.g. 95.00"
-                className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl pl-8 pr-4 py-3 font-mono text-base text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors" />
+                className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] pl-8 pr-4 py-3 font-mono text-[1rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+              />
             </div>
             {totalInr && (
-              <p className="font-sans text-sm text-[#7b3fe4] mt-2">
-                Total value: ₹{parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+              <p className="font-sans text-[0.78rem] text-[#7b3fe4] mt-[6px]">
+                Total value: ₹
+                {parseFloat(totalInr).toLocaleString("en-IN", {
+                  maximumFractionDigits: 2,
+                })}
               </p>
             )}
           </div>
 
-          {/* Network — detected from MetaMask */}
+          {/* Payment methods */}
           <div>
-            <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
-              Network
-            </label>
-            <div className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
-              chainOk ? "bg-[#f0fdf4] border-[#bbf7d0]" : "bg-[#fff7ed] border-[#fed7aa]"
-            }`}>
-              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${chainOk ? "bg-[#22c55e]" : "bg-[#f97316]"}`} />
-              <div>
-                <p className="font-sans text-sm font-semibold text-[#111]">
-                  {activeChainName ?? (account ? "Detecting…" : "Not connected")}
-                </p>
-                <p className={`font-sans text-xs mt-0.5 ${chainOk ? "text-[#16a34a]" : "text-[#9a3412]"}`}>
-                  {chainOk
-                    ? `✓ Correct network — orders post to ${sellChainLabel}`
-                    : `Switch to ${sellChainLabel} in MetaMask to continue`}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
+            <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
               Accepted Payment Methods
             </label>
             <div className="flex gap-2">
-              {(["UPI", "IMPS", "NEFT"] as PaymentMethod[])
-                .filter((m) => m !== "UPI" || !!profilePayment?.upiId)
-                .map((method) => (
-                  <button key={method} type="button" onClick={() => togglePayment(method)}
-                    className={`py-2 px-5 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${
-                      paymentMethods.includes(method)
-                        ? "border-[#7b3fe4] bg-[#7b3fe4] text-white"
-                        : "border-[#e5e5e5] bg-white text-[#555]"
-                    }`}>
-                    {method}
-                  </button>
-                ))}
+              {(["UPI", "IMPS", "NEFT"] as PaymentMethod[]).map((method) => (
+                <button
+                  key={method}
+                  type="button"
+                  onClick={() => togglePayment(method)}
+                  className={`py-[7px] px-[18px] rounded-full border-[1.5px] border-solid font-sans text-[0.8rem] font-medium cursor-pointer ${
+                    paymentMethods.includes(method)
+                      ? "border-[#7b3fe4] bg-[#7b3fe4] text-white"
+                      : "border-[#e5e5e5] bg-white text-[#555]"
+                  }`}
+                >
+                  {method}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Payment details — read-only from profile */}
-          <div className="bg-[#f8f8f8] border border-[#e8e8e8] rounded-xl px-5 py-4 space-y-3">
-            <p className="font-sans text-xs font-semibold text-[#999] uppercase tracking-widest">Your Payment Details</p>
-            {profilePayment?.bankAccount ? (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-1">Bank Account</p>
-                  <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.bankAccount}</p>
-                </div>
-                <div>
-                  <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-1">IFSC</p>
-                  <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.ifscCode}</p>
-                </div>
-                {profilePayment.upiId && (
-                  <div className="col-span-2 mt-2 pt-3 border-t border-[#e8e8e8] flex items-center justify-between">
-                    <div>
-                      <p className="font-sans text-xs text-[#aaa] uppercase tracking-widest mb-1">UPI ID</p>
-                      <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.upiId}</p>
-                    </div>
-                    <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] shrink-0 shadow-sm ml-4">
-                      <QRCodeSVG 
-                        value={`upi://pay?pa=${profilePayment.upiId}&cu=INR`} 
-                        size={96} 
-                        level="M"
-                        includeMargin={false}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="font-sans text-sm text-[#dc2626]">
-                No payment details on file. Complete the bank statement step in{" "}
-                <Link href="/onboarding/bank-statement" className="underline">onboarding</Link>.
-              </p>
-            )}
-          </div>
+          {/* UPI ID */}
+          {paymentMethods.includes("UPI") && (
+            <div>
+              <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
+                Your UPI ID
+              </label>
+              <input
+                type="text"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                placeholder="e.g. yourname@upi"
+                className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+              />
+            </div>
+          )}
 
+          {/* Bank details */}
+          {needsBank && (
+            <div className="space-y-3">
+              <div>
+                <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
+                  Bank Account Number
+                </label>
+                <input
+                  type="text"
+                  value={bankAccount}
+                  onChange={(e) => setBankAccount(e.target.value)}
+                  placeholder="e.g. 123456789012"
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="font-sans text-[0.78rem] font-semibold text-[#333] uppercase tracking-[0.8px] block mb-[6px]">
+                  IFSC Code
+                </label>
+                <input
+                  type="text"
+                  value={ifsc}
+                  onChange={(e) => setIfsc(e.target.value.toUpperCase())}
+                  placeholder="e.g. HDFC0001234"
+                  className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-[10px] px-4 py-3 font-mono text-[0.9rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Error */}
           {errorMsg && (
-            <div className="bg-[#fef2f2] border border-[#fca5a5] rounded-xl px-4 py-3">
+            <div className="bg-[#fef2f2] border border-[#fca5a5] rounded-[10px] px-4 py-3">
               <p className="font-sans text-sm text-[#dc2626]">{errorMsg}</p>
             </div>
           )}
 
-          {!chainOk && activeChainName && (
-            <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-xl px-4 py-3 flex items-start gap-2">
-              <span className="text-[#ea580c] shrink-0 mt-0.5">⚠</span>
-              <p className="font-sans text-sm text-[#9a3412] leading-relaxed">
-                Your wallet is on <strong>{activeChainName}</strong>. Switch to <strong>{sellChainLabel}</strong> in MetaMask to post this order.
-              </p>
-            </div>
-          )}
-          <button type="button"
-            onClick={() => {
-              if (!walletOk) {
-                reconnectWallet();
-                return;
-              }
-              const err = validate();
-              if (err) { setErrorMsg(err); return; }
-              setErrorMsg("");
-              setStep("review");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            disabled={walletOk && !chainOk}
-            className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
-            {!walletOk ? "Connect Wallet" : (<span className="flex items-center justify-center gap-1">Review Order <ArrowRight className="w-4 h-4" /></span>)}
+          {/* Submit */}
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!account || isBusy || step === "done"}
+            className="w-full py-4 bg-black text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+          >
+            {isBusy
+              ? step === "approving"
+                ? "Approving USDC…"
+                : step === "creating"
+                ? "Creating Order…"
+                : "Saving…"
+              : "Create Order →"}
           </button>
 
-          <p className="font-sans text-sm text-[#999] text-center leading-relaxed">
-            Your USDC moves to the escrow contract on submission. You release it after confirming INR payment.
-          </p>
+          <div className="flex items-center justify-center gap-1.5">
+            <div className="relative group inline-flex items-center gap-1">
+              <Info className="w-3.5 h-3.5 text-[#aaa] cursor-help shrink-0" />
+              <p className="font-sans text-[0.78rem] text-[#999] leading-[1.6]">
+                Your USDC moves to the escrow contract on submission. You release it after confirming INR payment.
+              </p>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-white border border-[#e5e5e5] rounded-xl shadow-lg px-3 py-2.5 hidden group-hover:block z-50 pointer-events-auto">
+                <p className="font-sans text-xs text-[#555] leading-relaxed">Your crypto is held by a smart contract on the blockchain — not by CryptoBazaar. We never touch your funds.</p>
+                <a href="/articles/how-escrow-works" className="font-sans text-xs font-semibold text-[#7b3fe4] mt-1 block">Learn more →</a>
+              </div>
+            </div>
+          </div>
         </div>
-        )}
       </div>
     </div>
   );
