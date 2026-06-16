@@ -1,5 +1,24 @@
 # CryptoBazaar — Dev Notes for Claude
 
+## ⚠️ CRITICAL: UI Preservation Rules
+
+**NEVER rewrite, simplify, or replace existing UI components.** This has caused major regressions.
+Specific rules — treat these as hard constraints, not suggestions:
+
+1. **Mobile responsiveness = additive only.** Add `sm:`, `md:`, `lg:` breakpoint variants and `flex-wrap`/`grid-cols-1` fallbacks. Never remove existing classes, restructure JSX, replace component logic, or change desktop layout.
+
+2. **Never strip imports or state.** If a file imports `Slider`, `AnimatePresence`, `motion`, `useRouter`, `useRef` etc. — leave them. Removing imports deletes features (sort/filter panel, chain popup, animations, polling).
+
+3. **Never simplify data-fetching.** The marketplace uses a polling interval (`setInterval`) and separate guest/authenticated paths. Do not replace with a single `Promise.all`.
+
+4. **Never change component interfaces or remove props** from `OrderRow`, `ChainConfirmPopup`, or any other type/component while making layout changes.
+
+5. **Before touching any page that has an existing desktop UI:** read the file first, identify the minimum-diff change needed, and only touch those lines. If unsure, do nothing and ask.
+
+6. **Reference commit for marketplace page:** `81ac30f` — this is the last known-good state of `frontend/src/app/marketplace/page.tsx`. If the marketplace page is ever wrong, restore from this commit.
+
+---
+
 ## Pending: block Tron and Solana chain warnings
 
 In `frontend/src/app/marketplace/[id]/page.tsx`, the network mismatch warning
