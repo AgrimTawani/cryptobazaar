@@ -17,6 +17,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
     include: {
       bankStatementAnalysis: true,
       onboardingRecords: true,
+      walletScreenings: { orderBy: { screenedAt: "desc" }, take: 1 },
     },
   });
 
@@ -79,6 +80,72 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <span className="font-sans text-sm">{user.panMasked || "N/A"}</span>
             </div>
           </div>
+        </div>
+
+        {/* Wallet Screening */}
+        <div className="bg-white p-6 rounded-xl border border-[#e8e8e8] shadow-sm">
+          <h2 className="font-condensed text-xl mb-4 border-b border-[#eee] pb-2">Wallet Screening</h2>
+          {user.walletScreenings.length > 0 ? (() => {
+            const s = user.walletScreenings[0];
+            const riskColors: Record<string, string> = {
+              LOW: "bg-green-100 text-green-800",
+              MEDIUM: "bg-yellow-100 text-yellow-800",
+              HIGH: "bg-orange-100 text-orange-800",
+              BLOCKED: "bg-red-100 text-red-800",
+            };
+            const flags = Array.isArray(s.flags) ? s.flags as string[] : [];
+            const rawResponse = s.rawResponse as Record<string, unknown> | null;
+            return (
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Risk Level</span>
+                  <span className={`font-sans text-xs font-bold px-2.5 py-1 rounded-full ${riskColors[s.riskLevel] ?? "bg-gray-100 text-gray-700"}`}>
+                    {s.riskLevel}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Risk Score</span>
+                  <span className="font-sans text-sm">{s.riskScore ?? "N/A"} / 100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Provider</span>
+                  <span className="font-sans text-sm uppercase">{s.provider}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Screened At</span>
+                  <span className="font-sans text-sm">{s.screenedAt.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Wallet</span>
+                  <span className="font-mono text-xs text-[#555] break-all text-right max-w-[60%]">{s.walletAddress}</span>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-sans text-xs font-semibold text-[#888] uppercase">Flags</span>
+                  {flags.length === 0 ? (
+                    <span className="font-sans text-sm text-green-700">No flags detected</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 mt-0.5">
+                      {flags.map((f) => (
+                        <span key={f} className="font-sans text-[0.7rem] font-semibold bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">
+                          {f.replace(/_/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {rawResponse && (
+                  <details className="mt-2">
+                    <summary className="font-sans text-xs text-[#888] cursor-pointer select-none">Raw GoPlus response</summary>
+                    <pre className="mt-2 text-[0.7rem] bg-[#f7f7f7] rounded-lg p-3 overflow-x-auto text-[#444] leading-relaxed">
+                      {JSON.stringify(rawResponse, null, 2)}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            );
+          })() : (
+            <p className="font-sans text-sm text-[#888]">No wallet screening on record.</p>
+          )}
         </div>
 
         {/* Bank Analysis */}

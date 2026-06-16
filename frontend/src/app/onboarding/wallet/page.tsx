@@ -27,6 +27,8 @@ export default function WalletPage() {
   const [acknowledged, setAcknowledged] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [screeningStatus, setScreeningStatus] = useState<"idle" | "screening" | "done">("idle");
+  const [screenResult, setScreenResult] = useState<{ riskLevel: string; flags: string[] } | null>(null);
 
   const { disconnect } = useDisconnect();
   const activeWallet = useActiveWallet();
@@ -42,6 +44,18 @@ export default function WalletPage() {
     setSaving(true);
     setError(null);
     try {
+      // Step 1: screen the wallet
+      setScreeningStatus("screening");
+      const screenRes = await fetch("/api/verification/screen-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: address, walletChain: "POLYGON" }),
+      });
+      const screenData = await screenRes.json();
+      setScreenResult({ riskLevel: screenData.riskLevel ?? "LOW", flags: screenData.flags ?? [] });
+      setScreeningStatus("done");
+
+      // Step 2: link wallet regardless of screening result
       const res = await fetch("/api/verification/link-wallet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -141,10 +155,10 @@ export default function WalletPage() {
               {saving ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-fast" />
-                  Saving wallet…
+                  {screeningStatus === "screening" ? "Screening wallet…" : "Saving wallet…"}
                 </span>
               ) : (
-                (<span className="flex items-center justify-center gap-1">Confirm & Enter CryptoBazaar <ArrowRight className="w-4 h-4" /></span>)
+                <span className="flex items-center justify-center gap-1">Confirm & Enter CryptoBazaar <ArrowRight className="w-4 h-4" /></span>
               )}
             </button>
           </motion.div>
