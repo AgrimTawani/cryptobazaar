@@ -197,21 +197,17 @@ export default function QuestionnairePage() {
         </div>
 
         <h1 className="font-condensed text-[2.8rem] tracking-[1px] mb-3 leading-none">
-          AI Questionnaire
+          Questionnaire
         </h1>
         <p className="font-sans text-base text-[#666] mb-10 leading-relaxed">
-          11 questions about your trading background. Scored by AI to assess intent and risk. Takes under 3 minutes.
+          11 questions about your trading background. Reviewed by our compliance team to assess intent and eligibility. Takes under 3 minutes.
         </p>
 
         {result ? (
           <div className="rounded-2xl p-7 mb-4 border-2 bg-[#f0fff4] border-[#68d391]">
             <div className="flex items-center gap-4 mb-3">
-              <span className="text-3xl">✓</span>
               <span className="font-condensed text-[1.8rem] tracking-[1px]">
                 Questionnaire Received
-              </span>
-              <span className="ml-auto font-sans text-sm font-bold px-3 py-1 rounded-full bg-[#e2e8f0] text-[#4a5568]">
-                AI Score {result.score}/100
               </span>
             </div>
             <p className="font-sans text-[0.95rem] text-[#555] leading-relaxed">
@@ -267,14 +263,21 @@ export default function QuestionnairePage() {
                       )}
 
                       {q.detailFor && answers[q.id] === q.detailFor && (
-                        <input
-                          type="text"
-                          autoFocus
-                          placeholder={q.detailPrompt ?? ""}
-                          value={answers[`${q.id}_detail`] ?? ""}
-                          onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
-                          className="mt-1 w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-[0.95rem] text-[#111] outline-none focus:border-black placeholder:text-[#bbb]"
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder={q.detailPrompt ?? ""}
+                            value={answers[`${q.id}_detail`] ?? ""}
+                            onChange={(e) => setAnswers((a) => ({ ...a, [`${q.id}_detail`]: e.target.value }))}
+                            className="mt-1 w-full py-4 px-5 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-[0.95rem] text-[#111] outline-none focus:border-black placeholder:text-[#bbb]"
+                          />
+                          {q.id === "binance" && (
+                            <p className="font-sans text-[0.78rem] text-[#888] mt-2 leading-relaxed">
+                              Providing your Binance UID allows our compliance team to verify your trading history independently, significantly strengthening your application and improving your likelihood of approval.
+                            </p>
+                          )}
+                        </div>
                       )}
 
                       {q.id === "itr" && answers["itr"] === "Yes" && (
@@ -297,7 +300,6 @@ export default function QuestionnairePage() {
                             ) : answers["itr_r2Key"] ? (
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-base">📄</span>
                                   <span className="font-sans text-[0.82rem] font-semibold text-[#111]">{itrFileName}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -317,7 +319,6 @@ export default function QuestionnairePage() {
                               </div>
                             ) : (
                               <>
-                                <div className="text-xl mb-1">📁</div>
                                 <p className="font-sans text-[0.82rem] font-semibold text-[#333] mb-0.5">Upload ITR acknowledgement PDF</p>
                                 <p className="font-sans text-[0.72rem] text-[#aaa]">Click to browse · max 10MB · optional</p>
                               </>
@@ -363,7 +364,7 @@ export default function QuestionnairePage() {
               {submitting ? (
                 <span className="flex items-center justify-center gap-3">
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin-fast" />
-                  Scoring with AI…
+                  Submitting…
                 </span>
               ) : allAnswered ? (
                 (<span className="flex items-center justify-center gap-1">Submit Answers <ArrowRight className="w-4 h-4" /></span>)
@@ -375,9 +376,8 @@ export default function QuestionnairePage() {
         )}
 
         <div className="flex items-center gap-2 mt-8 pt-6 border-t border-[#f0f0f0]">
-          <span>🔒</span>
           <span className="font-sans text-[0.78rem] text-[#bbb]">
-            Answers are used solely for risk assessment and stored securely.
+            Answers are used solely for compliance assessment and stored securely.
           </span>
         </div>
       </motion.div>

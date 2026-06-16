@@ -177,7 +177,6 @@ export default function WalletPage() {
         )}
 
         <div className="flex items-center gap-2 mt-6 pt-5 border-t border-[#f0f0f0]">
-          <span>🔒</span>
           <span className="font-sans text-[0.72rem] text-[#bbb]">
             Wallet screened for on-chain history. Clean wallet required.
           </span>
