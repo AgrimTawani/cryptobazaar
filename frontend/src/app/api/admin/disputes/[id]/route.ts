@@ -142,27 +142,41 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       ? dispute.order.seller.walletAddress
       : dispute.order.buyer?.walletAddress;
 
-    // Call smart contract if admin key + winner wallet address are available
-    let contractTxHash: string | null = null;
+    // Resolve on-chain BEFORE touching the DB. If the contract call fails (or is
+    // misconfigured), we must NOT mark the dispute resolved — otherwise the UI
+    // lies that funds were returned while the tokens are still locked in escrow.
     const adminKey = process.env.ADMIN_WALLET_PRIVATE_KEY;
     const onChainId = dispute.order.orderId.split("_").pop();
     const escrowAddr = process.env.NEXT_PUBLIC_ESCROW_POLYGON_ADDRESS;
-    if (adminKey && winnerAddress && onChainId && escrowAddr) {
-      try {
-        const chain = defineChain(parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002"));
-        const account = privateKeyToAccount({ client: thirdwebClient, privateKey: `0x${adminKey.replace(/^0x/, "")}` as `0x${string}` });
-        const contract = getContract({ client: thirdwebClient, chain, address: escrowAddr as `0x${string}` });
-        const tx = prepareContractCall({
-          contract,
-          method: "function resolveDispute(uint256 id, address winner) external",
-          params: [BigInt(onChainId), winnerAddress as `0x${string}`],
-        });
-        const result = await sendTransaction({ account, transaction: tx });
-        contractTxHash = result.transactionHash;
-      } catch (contractErr) {
-        console.error("[admin/disputes resolveDispute contract]", contractErr);
-        // Don't block DB update if contract call fails — log and continue
-      }
+
+    if (!adminKey) {
+      return NextResponse.json({ error: "ADMIN_WALLET_PRIVATE_KEY not configured — cannot release escrow on-chain." }, { status: 500 });
+    }
+    if (!winnerAddress) {
+      return NextResponse.json({ error: `${action === "SELLER" ? "Seller" : "Buyer"} has no wallet address on file — cannot release escrow.` }, { status: 400 });
+    }
+    if (!onChainId || !escrowAddr) {
+      return NextResponse.json({ error: "Order is missing an on-chain id or escrow address." }, { status: 400 });
+    }
+
+    let contractTxHash: string;
+    try {
+      const chain = defineChain(parseInt(process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID ?? "80002"));
+      const account = privateKeyToAccount({ client: thirdwebClient, privateKey: `0x${adminKey.replace(/^0x/, "")}` as `0x${string}` });
+      const contract = getContract({ client: thirdwebClient, chain, address: escrowAddr as `0x${string}` });
+      const tx = prepareContractCall({
+        contract,
+        method: "function resolveDispute(uint256 id, address winner) external",
+        params: [BigInt(onChainId), winnerAddress as `0x${string}`],
+      });
+      const result = await sendTransaction({ account, transaction: tx });
+      contractTxHash = result.transactionHash;
+    } catch (contractErr) {
+      console.error("[admin/disputes resolveDispute contract]", contractErr);
+      return NextResponse.json({
+        error: "On-chain resolveDispute failed — no funds were moved. The order must be in DISPUTED state on-chain and the admin wallet must be the contract admin. Dispute was NOT marked resolved.",
+        detail: String(contractErr),
+      }, { status: 502 });
     }
 
     await db.$transaction([

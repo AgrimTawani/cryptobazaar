@@ -590,8 +590,10 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   <a href="mailto:support@cryptobazaar.co.in" className="inline-block w-full text-center bg-black text-white font-condensed text-lg tracking-[0.05em] py-2.5 rounded-lg border border-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer no-underline">
                     CONTACT SUPPORT
                   </a>
-                  <button onClick={() => run("dispute")} className="font-sans text-xs text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
-                    Something wrong? Raise a dispute
+                  <button onClick={() => run("dispute", async () => {
+                    await sendTx(prepareContractCall({ contract: escrowContract, method: "function raiseDispute(uint256 id)", params: [onChainId] }));
+                  })} disabled={!!busy || !walletOk || !chainOk} className="font-sans text-xs text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline disabled:opacity-40">
+                    {busy === "dispute" ? "Raising dispute…" : "Something wrong? Raise a dispute"}
                   </button>
                 </div>
               )}
