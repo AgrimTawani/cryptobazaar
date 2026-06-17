@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, Copy } from "lucide-react";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -821,8 +821,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       <button onClick={() => run("confirm", async () => {
                         await sendTx(prepareContractCall({ contract: escrowContract, method: "function confirmPayment(uint256 id)", params: [onChainId] }));
                       })} disabled={!!busy || !walletOk || !chainOk}
-                        className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer disabled:opacity-40">
-                        {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
+                        className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
+                        {busy === "confirm" ? "Confirming…" : "Payment Received"}
                       </button>
                     </div>
                     </div>
@@ -932,11 +932,21 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         <>
                           <div>
                             <p className="font-sans text-xs text-[#bbb] mb-0.5">Account Number</p>
-                            <p className="font-mono text-sm font-semibold text-[#111]">{order.sellerBankAccount}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-mono text-sm font-semibold text-[#111]">{order.sellerBankAccount}</p>
+                              <button onClick={() => navigator.clipboard.writeText(order.sellerBankAccount || "")} className="text-[#888] hover:text-[#111] transition-colors cursor-pointer bg-transparent border-0 p-0" title="Copy Account Number">
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
                           <div>
                             <p className="font-sans text-xs text-[#bbb] mb-0.5">IFSC</p>
-                            <p className="font-mono text-sm font-semibold text-[#111]">{order.sellerIfsc}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-mono text-sm font-semibold text-[#111]">{order.sellerIfsc}</p>
+                              <button onClick={() => navigator.clipboard.writeText(order.sellerIfsc || "")} className="text-[#888] hover:text-[#111] transition-colors cursor-pointer bg-transparent border-0 p-0" title="Copy IFSC">
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
                         </>
                       )}
