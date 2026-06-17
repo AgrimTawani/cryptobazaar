@@ -587,12 +587,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
               {!TERMINAL.includes(order.status) && (
                 <div className="text-center flex flex-col gap-3">
-                  <button onClick={() => run("dispute")} className="font-sans text-xs text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
-                    Something wrong? Raise a dispute
-                  </button>
                   <a href="mailto:support@cryptobazaar.co.in" className="inline-block w-full text-center bg-black text-white font-condensed text-lg tracking-[0.05em] py-2.5 rounded-lg border border-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer no-underline">
                     CONTACT SUPPORT
                   </a>
+                  <button onClick={() => run("dispute")} className="font-sans text-xs text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
+                    Something wrong? Raise a dispute
+                  </button>
                 </div>
               )}
             </div>
@@ -755,18 +755,19 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     placeholder="UTR / Reference number (e.g. NEFT2025…)"
                     className="w-full border border-[#e5e5e5] bg-white rounded-lg px-4 py-2.5 font-mono text-sm focus:outline-none focus:border-[#7b3fe4] transition-colors mb-3" />
 
+                  {wrongChainMsg && <p className="font-sans text-xs text-[#9a3412] bg-[#fff7ed] border border-[#fed7aa] rounded-lg px-3 py-2 mb-3">{wrongChainMsg}</p>}
                   {error && <p className="font-sans text-sm text-[#dc2626] mb-3">{error}</p>}
 
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => run("markPaid", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function markPaid(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk || !utrInput.trim() || !screenshotUploaded}
+                    })} disabled={!!busy || !walletOk || !chainOk || !utrInput.trim() || !screenshotUploaded}
                       className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
                     <button onClick={() => run("buyerCancel", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk}
+                    })} disabled={!!busy || !walletOk || !chainOk}
                       className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "buyerCancel" ? "…" : "✕  Cancel Order"}
                     </button>
