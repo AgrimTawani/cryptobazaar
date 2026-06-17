@@ -167,7 +167,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
         <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
-        <Link href="/marketplace" className="font-sans text-[0.82rem] text-[#888] no-underline">
+        <Link href="/marketplace" className="font-sans text-[0.82rem] text-[#888] no-underline border border-[#e5e5e5] rounded-full px-4 py-1.5 hover:bg-[#f5f5f5] transition-colors">
           ← Marketplace
         </Link>
       </header>
@@ -209,7 +209,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               className="font-sans text-[0.7rem] underline"
               style={{ color: statusCfg.color }}
             >
-              ✓ Escrow on-chain ↗
+              view on chain
             </a>
           )}
         </div>

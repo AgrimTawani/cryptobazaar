@@ -215,7 +215,7 @@ export default function SellPage() {
     <div className="min-h-screen bg-[#f5f5f5]">
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
-        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
+        <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline border border-[#e5e5e5] rounded-full px-4 py-1.5 hover:bg-[#f5f5f5] transition-colors flex items-center"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to marketplace</Link>
       </header>
 
       <div className="max-w-[560px] mx-auto py-8 px-5">

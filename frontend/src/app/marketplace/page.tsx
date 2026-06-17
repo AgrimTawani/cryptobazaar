@@ -214,7 +214,7 @@ export default function MarketplacePage() {
       <header className="bg-white border-b border-[#ebebeb] px-4 md:px-10 h-[64px] flex items-center justify-between gap-2 sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black shrink-0">CRYPTOBAZAAR</Link>
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
-          <Link href="/" className="hidden md:inline font-sans text-sm text-[#888] no-underline">Home</Link>
+          <Link href="/" className="hidden md:inline font-sans text-sm text-[#888] no-underline border border-[#e5e5e5] rounded-full px-4 py-1.5 hover:bg-[#f5f5f5] transition-colors">Home</Link>
           <span className="text-[#ddd] hidden md:inline">·</span>
           <WalletNavWidget />
           {!isGuest && (
