@@ -127,26 +127,42 @@ function SellerReviewsCard({ order }: { order: OrderDetail }) {
   const reviews = order.sellerReviews.filter((r) => r.comment);
   const hasStats = order.sellerAvgRating != null;
   const releaseTime = fmtReleaseSecs(order.sellerAvgConfirmTimeSecs);
-  if (!hasStats && reviews.length === 0) return null;
+
   return (
     <div className="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
       <div className="px-5 py-3 border-b border-[#f0f0f0]">
-        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Seller Reviews</p>
+        <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Seller Details</p>
       </div>
-      {hasStats && (
-        <div className="px-5 py-3 flex items-center gap-4 border-b border-[#f5f5f5]">
-          <div className="flex items-center gap-1.5">
-            <Stars value={order.sellerAvgRating!} size="sm" />
-            <span className="font-sans text-xs font-semibold text-[#333]">
-              {order.sellerAvgRating!.toFixed(1)}
-            </span>
-            <span className="font-sans text-xs text-[#aaa]">({order.sellerRatingCount})</span>
-          </div>
-          {releaseTime && (
-            <span className="font-sans text-xs text-[#666]">⚡ {releaseTime} avg release</span>
+      <div className="px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#f5f5f5]">
+        <div className="flex items-center gap-3">
+          {order.sellerAvatar ? (
+            <Image src={order.sellerAvatar} alt="Seller avatar" width={40} height={40} className="rounded-full w-10 h-10 shrink-0" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-[#e5e5e5] shrink-0" />
           )}
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-sans text-sm font-semibold text-[#111]">{order.sellerName ?? "Anonymous"}</p>
+              <span className="font-sans text-[0.6rem] font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px]">✓</span>
+            </div>
+            <p className="font-sans text-xs text-[#999] mt-0.5">{order.sellerTotalTrades} Total Trades</p>
+          </div>
         </div>
-      )}
+        {hasStats && (
+          <div className="text-left sm:text-right">
+            <div className="flex items-center sm:justify-end gap-1.5 mb-0.5">
+              <Stars value={order.sellerAvgRating!} size="sm" />
+              <span className="font-sans text-sm font-semibold text-[#111]">
+                {order.sellerAvgRating!.toFixed(1)}
+              </span>
+              <span className="font-sans text-xs text-[#aaa]">({order.sellerRatingCount})</span>
+            </div>
+            {releaseTime && (
+              <span className="font-sans text-xs text-[#666]">⚡ {releaseTime} avg release</span>
+            )}
+          </div>
+        )}
+      </div>
       {reviews.length > 0 && <div className="divide-y divide-[#f5f5f5]">
         {reviews.map((review, i) => (
           <div key={i} className="px-5 py-3.5">
@@ -485,9 +501,13 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     <div className="min-h-screen bg-[#f5f5f5]">
       <header className="bg-white border-b border-[#ebebeb] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace" className="font-sans text-sm text-[#888] no-underline"><ArrowLeft className="inline-block w-4 h-4 mr-1" /> Marketplace</Link>
-          <Link href="/dashboard" className="font-sans text-sm font-semibold text-black border border-[#e0e0e0] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors">Dashboard</Link>
+        <div className="flex items-center gap-3">
+          <Link href="/marketplace" className="font-sans text-sm text-[#555] border border-[#555] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors flex items-center gap-1.5">
+            <ArrowLeft className="w-4 h-4" /> Marketplace
+          </Link>
+          <Link href="/dashboard" className="font-sans text-sm text-[#555] border border-[#555] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors">
+            Dashboard
+          </Link>
         </div>
       </header>
 
@@ -1053,7 +1073,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
               {order.escrowTxHash && (
                 <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
-                  className="font-sans text-xs underline" style={{ color: statusCfg.color }}>✓ Escrow on-chain ↗</a>
+                  className="font-sans text-xs underline" style={{ color: statusCfg.color }}>✓ View on-chain ↗</a>
               )}
             </div>
           )}
@@ -1208,7 +1228,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             <div className="bg-[#f5f5f5] border border-[#e5e5e5] rounded-2xl p-6 mb-5 text-center space-y-2">
               <p className="font-condensed text-[1.8rem] text-[#555]">{order.status === "CANCELLED" ? "Order Cancelled" : "Order Expired"}</p>
               <p className="font-sans text-sm text-[#888]">Tokens have been returned to the seller.</p>
-              <Link href="/marketplace" className="font-sans text-sm text-[#7b3fe4] underline block">Back to marketplace <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
+              <Link href="/marketplace" className="font-sans text-sm text-black underline block">Back to marketplace <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
             </div>
           )}
 
