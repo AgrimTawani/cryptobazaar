@@ -77,7 +77,7 @@ export function WalletNavWidget() {
   return (
     <Link
       href="/dashboard"
-      className="flex items-center gap-1.5 border border-[#e5e5e5] bg-[#fafafa] rounded-full px-2.5 py-1 no-underline hover:border-[#ccc] transition-colors"
+      className="flex items-center gap-1.5 border border-[#555] text-[#555] bg-white rounded-full px-3 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors"
     >
       <span className="text-[8px] leading-none" style={{ color: meta.color }}>●</span>
       <span className="font-sans text-[0.7rem] font-semibold" style={{ color: meta.color }}>
