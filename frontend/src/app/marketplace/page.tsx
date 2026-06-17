@@ -247,7 +247,7 @@ export default function MarketplacePage() {
           <p className="font-sans text-sm text-white/70">
             <strong className="text-white">Guest view.</strong> Seller names are hidden. Sign in to buy, sell, and see full details.
           </p>
-          <Link href="/login" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
+          <Link href="/login" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
             Sign In to Trade <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -259,7 +259,7 @@ export default function MarketplacePage() {
           <p className="font-sans text-sm text-white/70">
             <strong className="text-white">View only.</strong> Complete verification to buy or sell.
           </p>
-          <Link href="/onboarding" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline">
+          <Link href="/onboarding" className="font-sans text-sm font-semibold text-black bg-lime py-1.5 px-4 rounded-full no-underline hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
             Complete Verification <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -329,7 +329,7 @@ export default function MarketplacePage() {
           <div className="flex gap-2 flex-wrap">
             {ASSET_FILTERS.map((f) => (
               <button key={f} onClick={() => setAssetFilter(f)}
-                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:border-[#ccc] ${assetFilter === f ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
                   }`}>
                 {f}
               </button>
@@ -337,7 +337,7 @@ export default function MarketplacePage() {
             <div className="w-px bg-[#e5e5e5] mx-1" />
             {CHAIN_FILTERS.map((c) => (
               <button key={c} onClick={() => setChainFilter(c)}
-                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:border-[#ccc] ${chainFilter === c ? "border-black bg-black text-white" : "border-[#e5e5e5] bg-white text-[#555]"
                   }`}>
                 {c}
               </button>
@@ -348,7 +348,7 @@ export default function MarketplacePage() {
           <div className="relative" ref={sortRef}>
             <button 
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="py-1.5 px-3 rounded-full border-[1.5px] border-[#e5e5e5] bg-white hover:bg-[#fafafa] font-sans text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
+              className="py-1.5 px-3 rounded-full border-[1.5px] border-[#e5e5e5] bg-white font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:border-[#ccc] flex items-center gap-2"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               <span>Sort & Filter</span>
@@ -611,7 +611,7 @@ export default function MarketplacePage() {
                 Post First Order <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             ) : (
-              <Link href="/onboarding" className="py-2.5 px-6 bg-lime text-black rounded-[10px] font-condensed text-lg tracking-[1px] no-underline">
+              <Link href="/onboarding" className="py-2.5 px-6 bg-lime text-black rounded-[10px] font-condensed text-lg tracking-[1px] no-underline hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-shadow duration-300">
                 Get Verified <ArrowRight className="inline-block w-4 h-4 ml-1" />
               </Link>
             )}
