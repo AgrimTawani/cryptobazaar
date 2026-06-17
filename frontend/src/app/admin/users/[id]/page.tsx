@@ -25,6 +25,21 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
   let statementUrl = null;
   let jsonUrl = null;
+  let aadhaarDocUrl = null;
+  let panDocUrl = null;
+
+  if (user.aadhaarR2Key) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      aadhaarDocUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: user.aadhaarR2Key }), { expiresIn: 3600 });
+    } catch { console.error("Failed to sign aadhaar R2 key"); }
+  }
+  if (user.panR2Key) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      panDocUrl = await getSignedUrl(r2 as any, new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: user.panR2Key }), { expiresIn: 3600 });
+    } catch { console.error("Failed to sign pan R2 key"); }
+  }
 
   const eddRecord = user.onboardingRecords.find((r) => r.layer === "EDD");
   if (eddRecord?.result && typeof eddRecord.result === "object") {
@@ -72,12 +87,34 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <span className="font-sans text-sm">{user.createdAt.toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Aadhaar (Last 4)</span>
-              <span className="font-sans text-sm">{user.aadhaarLast4 || "N/A"}</span>
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Phone</span>
+              <span className="font-sans text-sm">{user.phone || "N/A"}</span>
             </div>
             <div className="flex justify-between">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Date of Birth</span>
+              <span className="font-sans text-sm">{user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("en-IN") : "N/A"}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-sans text-xs font-semibold text-[#888] uppercase">Aadhaar (Last 4)</span>
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-sm">{user.aadhaarLast4 ? `XXXX XXXX ${user.aadhaarLast4}` : "N/A"}</span>
+                {aadhaarDocUrl && (
+                  <a href={aadhaarDocUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-2.5 py-1 rounded-md transition-colors font-sans text-[#333] no-underline">
+                    View
+                  </a>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
               <span className="font-sans text-xs font-semibold text-[#888] uppercase">PAN</span>
-              <span className="font-sans text-sm">{user.panMasked || "N/A"}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-sm">{user.panMasked || "N/A"}</span>
+                {panDocUrl && (
+                  <a href={panDocUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold bg-[#f5f5f5] hover:bg-[#ebebeb] px-2.5 py-1 rounded-md transition-colors font-sans text-[#333] no-underline">
+                    View
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

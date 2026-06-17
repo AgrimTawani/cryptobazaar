@@ -131,8 +131,10 @@ model User {
   phone        String?
   dateOfBirth  DateTime? @map("date_of_birth")
   gender       String?
-  aadhaarLast4 String?   @map("aadhaar_last4")
-  panMasked    String?   @map("pan_masked")
+  aadhaarLast4  String?   @map("aadhaar_last4")
+  aadhaarR2Key  String?   @map("aadhaar_r2_key")
+  panMasked     String?   @map("pan_masked")
+  panR2Key      String?   @map("pan_r2_key")
   address      String?
   city         String?
   state        String?
