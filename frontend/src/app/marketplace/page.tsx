@@ -617,26 +617,90 @@ export default function MarketplacePage() {
             )}
           </div>
         )}
-        {/* How to Buy / Sell Cards */}
+        {/* How It Works Cards */}
         <div className="mt-12 mb-8">
-          <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-4 uppercase">Guides</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link href="/articles/how-to-buy-usdt" className="block bg-white border border-[#e8e8e8] rounded-xl p-5 cursor-pointer hover:shadow-sm hover:border-[#bbb] transition-all no-underline">
-              <div className="flex flex-col h-full">
-                <span className="font-sans text-xs font-bold text-[#7b3fe4] bg-[#f5f0ff] w-fit px-2 py-0.5 rounded-full mb-2">For Buyers</span>
-                <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Buy USDT on CryptoBazaar</h4>
-                <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">Learn how to securely purchase USDT using UPI or bank transfer. Follow our step-by-step guide to complete your first trade safely.</p>
-                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span></span>
+          <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-4 uppercase text-[#111]">How It Works</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
+              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
+                01
+              </span>
+              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                01
+              </span>
+              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                Create Order
+              </h4>
+              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
+                Seller posts an order and locks their crypto securely in our on-chain smart contract escrow.
+              </p>
+              <div className="mt-1">
+                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                  SMART CONTRACT
+                </span>
               </div>
-            </Link>
-            <Link href="/articles/how-to-sell-usdt" className="block bg-white border border-[#e8e8e8] rounded-xl p-5 cursor-pointer hover:shadow-sm hover:border-[#bbb] transition-all no-underline">
-              <div className="flex flex-col h-full">
-                <span className="font-sans text-xs font-bold text-[#b45309] bg-[#fef9ee] w-fit px-2 py-0.5 rounded-full mb-2">For Sellers</span>
-                <h4 className="font-condensed text-xl mb-2 text-[#111]">How to Sell USDT on CryptoBazaar</h4>
-                <p className="font-sans text-sm text-[#888] leading-relaxed mb-4 flex-1">A comprehensive guide to posting sell orders, managing disputes, and verifying buyer payments before releasing your crypto.</p>
-                <span className="font-sans text-sm font-semibold text-[#111] flex items-center gap-1">Read Guide <span className="text-[#16a34a]"> <ArrowRight className="inline-block w-4 h-4 ml-1" /></span></span>
+            </div>
+
+            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
+              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
+                02
+              </span>
+              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                02
+              </span>
+              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                Lock Trade
+              </h4>
+              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
+                A verified buyer finds the order, agrees to the price, and locks the trade to secure the crypto.
+              </p>
+              <div className="mt-1">
+                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                  TRADE LOCK
+                </span>
               </div>
-            </Link>
+            </div>
+
+            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
+              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
+                03
+              </span>
+              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                03
+              </span>
+              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                Make Payment
+              </h4>
+              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
+                Buyer transfers INR directly to the seller's verified bank account using UPI or IMPS.
+              </p>
+              <div className="mt-1">
+                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                  P2P TRANSFER
+                </span>
+              </div>
+            </div>
+
+            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
+              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
+                04
+              </span>
+              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
+                04
+              </span>
+              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
+                Crypto Released
+              </h4>
+              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
+                Seller confirms the payment receipt. The smart contract automatically releases the crypto to the buyer.
+              </p>
+              <div className="mt-1">
+                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
+                  AUTO RELEASE
+                </span>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
