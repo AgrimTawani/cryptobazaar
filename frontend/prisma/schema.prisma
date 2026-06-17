@@ -512,17 +512,12 @@ model BankStatementAnalysis {
   transactionModes       String[] @map("transaction_modes")
   hasMerchantSpend       Boolean? @map("has_merchant_spend")
 
-  exchangeTxCount        Int?     @map("exchange_tx_count")
-  monthsWithCryptoTrades Int?     @map("months_with_crypto_trades")
-  hasBidirectionalCrypto Boolean? @map("has_bidirectional_crypto")
-  maxVolumeSpikeRatio    Float?   @map("max_volume_spike_ratio")
+  exchangeTxCount          Int?     @map("exchange_tx_count")
+  statementMonths          Float?   @map("statement_months")
+  totalTransactionCount    Int?     @map("total_transaction_count")
+  maxVolumeSpikeRatio      Float?   @map("max_volume_spike_ratio")
 
   avgUniqueSendersPerMonth Float?  @map("avg_unique_senders_per_month")
-  senderRecurrenceRate     Float?  @map("sender_recurrence_rate")
-  avgCreditToDebitHours    Float?  @map("avg_credit_to_debit_hours")
-  roundNumberRatio         Float?  @map("round_number_ratio")
-  structuringClustersCount Int?    @map("structuring_clusters_count")
-  inflowSpikeRatio         Float?  @map("inflow_spike_ratio")
 
   avgMonthlyBalance     Decimal? @map("avg_monthly_balance") @db.Decimal(15, 2)
   balanceDropsToZero    Int?     @map("balance_drops_to_zero")

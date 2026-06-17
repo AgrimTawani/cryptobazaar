@@ -265,33 +265,27 @@ def check_b1_exchange_match(df: pd.DataFrame) -> dict:
                          f"Found {count} crypto/exchange-related transactions")
 
 
-def check_b2_trading_frequency(df: pd.DataFrame) -> dict:
-    crypto = _get_crypto_txns(df)
-    if crypto.empty:
-        return _check_result("B2", "Trading Frequency", "B", 0,
-                             "Exchange transactions in 3+ months",
-                             False, "No crypto transactions found")
-    months = crypto['DateParsed'].dt.to_period('M').nunique()
-    return _check_result("B2", "Trading Frequency", "B", months,
-                         "Exchange transactions in 3+ months",
+def check_b2_statement_months(df: pd.DataFrame) -> dict:
+    if df.empty:
+        return _check_result("B2", "Statement Period (Months)", "B", 0,
+                             "Statement covers at least 3 months",
+                             False, "No transactions found")
+    oldest = df['DateParsed'].min()
+    newest = df['DateParsed'].max()
+    span_days = (newest - oldest).days
+    months = round(span_days / 30.44, 1)
+    return _check_result("B2", "Statement Period (Months)", "B", months,
+                         "Statement covers at least 3 months",
                          months >= 3,
-                         f"Crypto transactions present in {months} unique months")
+                         f"Statement spans {months} months ({oldest.strftime('%d-%b-%Y')} to {newest.strftime('%d-%b-%Y')})")
 
 
-def check_b3_bidirectional_flow(df: pd.DataFrame) -> dict:
-    crypto = _get_crypto_txns(df)
-    if crypto.empty:
-        return _check_result("B3", "Bidirectional Flow", "B", False,
-                             "Both crypto inflows and outflows present",
-                             False, "No crypto transactions found")
-    has_outflow = (crypto['Withdrawal'] > 0).any()
-    has_inflow = (crypto['Deposit'] > 0).any()
-    bidirectional = bool(has_outflow and has_inflow)
-    return _check_result("B3", "Bidirectional Flow", "B", bidirectional,
-                         "Both crypto inflows and outflows present",
-                         bidirectional,
-                         f"Crypto outflows: {'Yes' if has_outflow else 'No'}, "
-                         f"Crypto inflows: {'Yes' if has_inflow else 'No'}")
+def check_b3_total_transaction_count(df: pd.DataFrame) -> dict:
+    count = len(df)
+    return _check_result("B3", "Total Transaction Count", "B", count,
+                         "At least 10 transactions in the statement",
+                         count >= 10,
+                         f"Statement contains {count} total transactions")
 
 
 def check_b4_trade_volume_consistency(df: pd.DataFrame) -> dict:
@@ -354,110 +348,6 @@ def check_c1_unique_sender_count(df: pd.DataFrame) -> dict:
                          f"Average {avg:.1f} unique senders per month")
 
 
-def check_c2_sender_recurrence(df: pd.DataFrame) -> dict:
-    credits = df[df['Deposit'] > 0].copy()
-    if credits.empty:
-        return _check_result("C2", "Sender Recurrence Rate", "C", 0.0,
-                             "Over 50% of unique inflow senders are recurring",
-                             False, "No credit transactions found")
-    credits['Sender'] = credits['Narration'].apply(_extract_sender)
-    credits = credits.dropna(subset=['Sender'])
-    credits['MonthYear'] = credits['DateParsed'].dt.to_period('M')
-    if credits.empty:
-        return _check_result("C2", "Sender Recurrence Rate", "C", 0.0,
-                             "Over 50% of unique inflow senders are recurring",
-                             False, "Could not extract sender information")
-    sender_month_counts = credits.groupby('Sender')['MonthYear'].nunique()
-    total_senders = len(sender_month_counts)
-    recurring_senders = len(sender_month_counts[sender_month_counts > 1])
-    rate = float(recurring_senders / total_senders * 100) if total_senders > 0 else 0.0
-    return _check_result("C2", "Sender Recurrence Rate", "C",
-                         round(rate, 1),
-                         "Over 50% of unique inflow senders are recurring",
-                         rate > 50,
-                         f"{recurring_senders}/{total_senders} senders ({rate:.1f}%) appear in multiple months")
-
-
-def check_c3_credit_debit_velocity(df: pd.DataFrame) -> dict:
-    df_sorted = df.sort_values('DateParsed')
-    last_credit_date = None
-    diffs_hours = []
-    for _, row in df_sorted.iterrows():
-        if row['Deposit'] > 0:
-            last_credit_date = row['DateParsed']
-        elif row['Withdrawal'] > 0 and last_credit_date is not None:
-            delta = row['DateParsed'] - last_credit_date
-            hours = delta.total_seconds() / 3600
-            diffs_hours.append(hours)
-            last_credit_date = None
-    avg_hours = float(np.mean(diffs_hours)) if diffs_hours else 0.0
-    return _check_result("C3", "Credit-to-Debit Velocity", "C",
-                         round(avg_hours, 1),
-                         "Average time between credit and next debit exceeds 24 hours",
-                         avg_hours > 24,
-                         f"Average gap: {avg_hours:.1f} hours ({avg_hours/24:.1f} days)")
-
-
-def check_c4_round_number_concentration(df: pd.DataFrame) -> dict:
-    credits = df[df['Deposit'] > 0].copy()
-    if credits.empty:
-        return _check_result("C4", "Round Number Concentration", "C", 0.0,
-                             "Round number inflows below 40% of total",
-                             True, "No credit transactions found")
-    total = len(credits)
-    round_count = len(credits[credits['Deposit'].apply(
-        lambda x: x >= 1000 and x % 1000 == 0
-    )])
-    ratio = float(round_count / total) if total > 0 else 0.0
-    return _check_result("C4", "Round Number Concentration", "C",
-                         round(ratio, 3),
-                         "Round number inflows below 40% of total",
-                         ratio < 0.40,
-                         f"{round_count}/{total} inflows ({ratio*100:.1f}%) are round numbers (multiples of 1000)")
-
-
-def check_c5_structuring_pattern(df: pd.DataFrame) -> dict:
-    credits = df[df['Deposit'] > 0].copy()
-    if credits.empty:
-        return _check_result("C5", "Structuring Pattern", "C", 0,
-                             "No more than 2 same-day multi-sender clusters",
-                             True, "No credit transactions found")
-    credits['Sender'] = credits['Narration'].apply(_extract_sender)
-    credits['TxnDate'] = credits['DateParsed'].dt.date
-    cluster_count = 0
-    for date, group in credits.groupby('TxnDate'):
-        small_credits = group[group['Deposit'] < 50000]
-        if len(small_credits) < 2:
-            continue
-        unique_senders = small_credits['Sender'].nunique()
-        total_sum = small_credits['Deposit'].sum()
-        if unique_senders >= 2 and total_sum >= 50000:
-            cluster_count += 1
-    return _check_result("C5", "Structuring Pattern", "C", cluster_count,
-                         "No more than 2 same-day multi-sender clusters",
-                         cluster_count <= 2,
-                         f"Found {cluster_count} potential structuring clusters")
-
-
-def check_c6_inflow_spike(df: pd.DataFrame) -> dict:
-    credits = df[df['Deposit'] > 0].copy()
-    if credits.empty:
-        return _check_result("C6", "Inflow Spike Detection", "C", 0.0,
-                             "No inflow spikes above 3x the 6-month average",
-                             True, "No credit transactions found")
-    monthly_inflows = credits.groupby(credits['DateParsed'].dt.to_period('M'))['Deposit'].sum()
-    if len(monthly_inflows) <= 1:
-        return _check_result("C6", "Inflow Spike Detection", "C", 0.0,
-                             "No inflow spikes above 3x the 6-month average",
-                             True, "Only 1 month of data")
-    avg_inflow = monthly_inflows.mean()
-    max_inflow = monthly_inflows.max()
-    spike_ratio = float(max_inflow / avg_inflow) if avg_inflow > 0 else 0.0
-    return _check_result("C6", "Inflow Spike Detection", "C",
-                         round(spike_ratio, 2),
-                         "No inflow spikes above 3x the 6-month average",
-                         spike_ratio <= 3.0,
-                         f"Max monthly inflow / avg = {spike_ratio:.2f}x")
 
 
 # ─── Group D: Financial Stability Checks ─────────────────────────────────────
@@ -522,7 +412,7 @@ def check_d4_net_flow_sign(df: pd.DataFrame) -> dict:
 # ─── Master Analysis Runner ──────────────────────────────────────────────────
 
 def run_all_checks(df: pd.DataFrame) -> list:
-    """Execute all 19 checks and return a list of structured results."""
+    """Execute all checks and return a list of structured results."""
     return [
         check_a1_account_age(df),
         check_a2_regular_income(df),
@@ -530,15 +420,10 @@ def run_all_checks(df: pd.DataFrame) -> list:
         check_a4_transaction_diversity(df),
         check_a5_merchant_spend(df),
         check_b1_exchange_match(df),
-        check_b2_trading_frequency(df),
-        check_b3_bidirectional_flow(df),
+        check_b2_statement_months(df),
+        check_b3_total_transaction_count(df),
         check_b4_trade_volume_consistency(df),
         check_c1_unique_sender_count(df),
-        check_c2_sender_recurrence(df),
-        check_c3_credit_debit_velocity(df),
-        check_c4_round_number_concentration(df),
-        check_c5_structuring_pattern(df),
-        check_c6_inflow_spike(df),
         check_d1_avg_monthly_balance(df),
         check_d2_balance_consistency(df),
         check_d3_returned_payments(df),
@@ -566,15 +451,10 @@ def checks_to_flat_metrics(checks: list) -> dict:
         "transactionModes": _get("A4", default=[]),
         "hasMerchantSpend": _get("A5", default=False),
         "exchangeTxCount": _get("B1", default=0),
-        "monthsWithCryptoTrades": _get("B2", default=0),
-        "hasBidirectionalCrypto": _get("B3", default=False),
+        "statementMonths": _get("B2", default=0.0),
+        "totalTransactionCount": _get("B3", default=0),
         "maxVolumeSpikeRatio": _get("B4", default=0.0),
         "avgUniqueSendersPerMonth": _get("C1", default=0.0),
-        "senderRecurrenceRate": _get("C2", default=0.0),
-        "avgCreditToDebitHours": _get("C3", default=0.0),
-        "roundNumberRatio": _get("C4", default=0.0),
-        "structuringClustersCount": _get("C5", default=0),
-        "inflowSpikeRatio": _get("C6", default=0.0),
         "avgMonthlyBalance": _get("D1", default=0.0),
         "balanceDropsToZero": _get("D2", default=0),
         "returnedPaymentsCount": _get("D3", default=0),
