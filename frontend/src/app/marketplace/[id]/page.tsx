@@ -250,10 +250,10 @@ function TradeSteps({ status }: { status: string }) {
                 {isDone ? "✓" : i + 1}
               </div>
               {i < steps.length - 1 && (
-                <div className={`w-px flex-1 min-h-[22px] my-0.5 ${isDone ? "bg-lime" : "bg-[#e5e5e5]"}`} />
+                <div className={`w-px flex-1 min-h-[14px] my-0.5 ${isDone ? "bg-lime" : "bg-[#e5e5e5]"}`} />
               )}
             </div>
-            <div className={`pb-4 ${i === steps.length - 1 ? "pb-0" : ""}`}>
+            <div className={`pb-3 ${i === steps.length - 1 ? "pb-0" : ""}`}>
               <p className={`font-sans text-sm font-semibold leading-6 ${isDone || isActive ? "text-[#111]" : "text-[#bbb]"}`}>
                 {step.label}
               </p>
@@ -547,12 +547,12 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 </div>
               )}
 
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
-                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Trade Steps</p>
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-4">
+                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Trade Steps</p>
                 <TradeSteps status={order.status} />
               </div>
 
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-4">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Order Details</p>
                 <div className="flex flex-col gap-2.5">
                   {[
@@ -761,14 +761,14 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     <button onClick={() => run("markPaid", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function markPaid(uint256 id)", params: [onChainId] }));
                     })} disabled={!!busy || !walletOk || !utrInput.trim() || !screenshotUploaded}
-                      className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer disabled:opacity-40">
+                      className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
                     <button onClick={() => run("cancel", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
                       await fetch(`/api/orders/${order.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "buyerCancel" }) });
                     })} disabled={!!busy || !walletOk}
-                      className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer disabled:opacity-40">
+                      className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "cancel" ? "…" : "✕  Cancel Order"}
                     </button>
                   </div>
