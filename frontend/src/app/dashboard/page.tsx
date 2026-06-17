@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
@@ -157,7 +157,9 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-[#f2f2f2] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
         <div className="flex items-center gap-3">
-          <Link href="/marketplace" className="font-sans text-sm text-[#555] no-underline">Marketplace</Link>
+          <Link href="/marketplace" className="font-sans text-sm text-[#555] no-underline border border-[#555] rounded-full px-4 py-1.5 flex items-center gap-1.5 hover:bg-[#f5f5f5] transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Marketplace
+          </Link>
           <button onClick={handleSignOut}
             className="font-sans text-sm text-[#888] bg-transparent border border-[#e5e5e5] rounded-full py-1.5 px-4 cursor-pointer">
             Sign out
@@ -251,7 +253,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col divide-y divide-[#f5f5f5]">
-                  {stats.activity.slice(0, 4).map((row) => (
+                  {stats.activity.slice(0, 3).map((row) => (
                     <Link key={row.id} href={`/marketplace/${row.id}`}
                       className="flex items-center justify-between py-3 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
                       <div>
