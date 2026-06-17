@@ -9,7 +9,7 @@ import { createWallet } from "thirdweb/wallets";
 import { getContract, prepareContractCall, defineChain } from "thirdweb";
 import Link from "next/link";
 import Image from "next/image";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCode } from "react-qrcode-logo";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { txUrl } from "@/lib/explorer";
@@ -99,7 +99,10 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           onClick={() => onChange(n)}
           className="text-[1.6rem] leading-none transition-transform hover:scale-110 cursor-pointer bg-transparent border-0 p-0"
         >
-          <span className={`${(hovered || value) >= n ? "text-lime" : "text-[#e0e0e0]"}`}>★</span>
+          <span 
+            className={`${(hovered || value) >= n ? "text-lime" : "text-white"}`}
+            style={{ WebkitTextStroke: "1px #111" }}
+          >★</span>
         </button>
       ))}
     </div>
@@ -801,18 +804,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         className="flex-1 py-3 bg-black text-white rounded-lg font-sans font-bold text-sm cursor-pointer disabled:opacity-40">
                         {busy === "confirm" ? "Confirming…" : "Payment Received ✓"}
                       </button>
-                      <button onClick={() => run("dispute")} disabled={!!busy}
-                        className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-sans text-sm font-semibold cursor-pointer disabled:opacity-40">
-                        {busy === "dispute" ? "…" : "Dispute"}
-                      </button>
                     </div>
                     </div>
-                  )}
-                  {role === "buyer" && (
-                    <button onClick={() => run("dispute")} disabled={!!busy}
-                      className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
-                      {busy === "dispute" ? "Raising dispute…" : "Raise Dispute"}
-                    </button>
                   )}
                 </div>
               )}
@@ -894,12 +887,18 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         <div>
                           <p className="font-sans text-xs text-[#bbb] mb-0.5">UPI ID</p>
                           <p className="font-mono text-sm font-semibold text-[#111] mb-3">{order.sellerUpiId}</p>
-                          <div className="bg-white p-2 rounded-lg border border-[#e5e5e5] w-fit">
-                            <QRCodeSVG 
+                          <div className="bg-white p-1.5 rounded-xl border border-[#e5e5e5] w-fit">
+                            <QRCode 
                               value={`upi://pay?pa=${order.sellerUpiId}&am=${parseFloat(order.totalValueInr).toFixed(2)}&cu=INR`} 
                               size={120} 
-                              level="M"
-                              includeMargin={false}
+                              ecLevel="H"
+                              quietZone={0}
+                              logoImage="/icon.png"
+                              logoWidth={28}
+                              logoHeight={28}
+                              removeQrCodeBehindLogo={true}
+                              qrStyle="dots"
+                              eyeRadius={10}
                             />
                           </div>
                           <p className="font-sans text-[0.65rem] text-[#aaa] mt-1.5">Scan to pay via any UPI app</p>
@@ -932,10 +931,13 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               </div>
 
               {!TERMINAL.includes(order.status) && (
-                <div className="text-center">
+                <div className="text-center flex flex-col gap-4 mt-2">
                   <button onClick={() => run("dispute")} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
                     Something wrong? Raise a dispute
                   </button>
+                  <a href="mailto:support@cryptobazaar.co.in" className="inline-block w-full text-center bg-black text-white font-condensed text-[1.2rem] tracking-[0.05em] py-3 rounded-lg border border-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer no-underline">
+                    CONTACT SUPPORT
+                  </a>
                 </div>
               )}
             </div>
