@@ -56,6 +56,13 @@ export async function GET(
       },
     });
 
+    const sellerTotalTrades = await db.order.count({
+      where: {
+        status: "COMPLETED",
+        OR: [{ sellerId: order.sellerId }, { buyerId: order.sellerId }],
+      },
+    });
+
     const isSeller = user.id === order.sellerId;
     const isBuyer  = user.id === order.buyerId;
     const viewerRole = isSeller ? "seller" : isBuyer ? "buyer" : "observer";
@@ -78,7 +85,7 @@ export async function GET(
       sellerName:  order.seller.name  ?? "Anonymous",
       sellerAvatar: order.seller.avatarUrl ?? null,
       sellerRatingCount: order.seller.sellerRatingCount,
-      sellerTotalTrades: order.seller.totalTradeCount,
+      sellerTotalTrades: sellerTotalTrades,
       sellerAvgRating: order.seller.avgSellerRating?.toNumber() ?? null,
       sellerAvgSpeed: order.seller.avgSellerSpeedRating?.toNumber() ?? null,
       sellerAvgPoliteness: order.seller.avgSellerPoliteness?.toNumber() ?? null,

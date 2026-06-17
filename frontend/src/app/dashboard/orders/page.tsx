@@ -44,8 +44,9 @@ export default function OrdersHistoryPage() {
       <header className="bg-white border-b border-[#f2f2f2] px-5 md:px-10 h-[64px] flex items-center justify-between sticky top-0 z-50">
         <Link href="/" className="nav-logo no-underline text-black">CRYPTOBAZAAR</Link>
         <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="font-sans text-sm text-[#555] no-underline">Dashboard</Link>
-          <Link href="/marketplace" className="font-sans text-sm text-[#555] no-underline">Marketplace</Link>
+          <Link href="/marketplace" className="font-sans text-sm text-[#555] border border-[#555] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors flex items-center gap-1.5">
+            <ArrowLeft className="w-4 h-4" /> Marketplace
+          </Link>
         </div>
       </header>
       

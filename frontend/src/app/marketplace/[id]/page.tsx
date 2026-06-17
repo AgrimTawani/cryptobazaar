@@ -534,7 +534,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   {order.escrowTxHash && (
                     <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
                       className={`font-sans text-xs underline mt-2 block ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#991b1b]"}`}>
-                      ✓ View on-chain transaction ↗
+                      View on-chain transaction ↗
                     </a>
                   )}
                 </div>
@@ -568,7 +568,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 {order.escrowTxHash && (
                   <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
                     className="font-sans text-xs text-[#7b3fe4] no-underline hover:underline mt-3 block">
-                    ✓ View escrow on-chain ↗
+                    View escrow on-chain ↗
                   </a>
                 )}
               </div>
@@ -1063,7 +1063,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               {order.escrowTxHash && (
                 <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
                   className={`font-sans text-xs font-semibold underline ${disputeResolutionNotice.won ? "text-[#15803d]" : "text-[#991b1b]"}`}>
-                  ✓ View on-chain transaction ↗
+                  View on-chain transaction ↗
                 </a>
               )}
             </div>
@@ -1073,7 +1073,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
               {order.escrowTxHash && (
                 <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
-                  className="font-sans text-xs underline" style={{ color: statusCfg.color }}>✓ View on-chain ↗</a>
+                  className="font-sans text-xs underline" style={{ color: statusCfg.color }}>View on-chain ↗</a>
               )}
             </div>
           )}
