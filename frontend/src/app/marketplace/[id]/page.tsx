@@ -164,7 +164,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen bg-[#fafafa]">
       <header className="bg-white border-b border-[#f0f0f0] px-10 h-16 flex items-center justify-between sticky top-0 z-50">
-        <Link href="/" className="font-condensed text-base tracking-[3px] text-black no-underline">
+        <Link href="/" className="nav-logo no-underline text-black">
           CRYPTOBAZAAR
         </Link>
         <Link href="/marketplace" className="font-sans text-[0.82rem] text-[#888] no-underline">
@@ -222,36 +222,58 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           </div>
         )}
 
+        
+        {/* ── UNIFIED ORDER DETAILS ── */}
+        <div className="bg-white border border-[#e5e5e5] rounded-[16px] p-6 mb-6 space-y-6">
+          {/* Seller info */}
+          <div className="flex items-center gap-3 pb-4 border-b border-[#f0f0f0]">
+            {order.sellerAvatar
+              ? <img src={order.sellerAvatar} className="w-9 h-9 rounded-full" alt="" />
+              : <div className="w-9 h-9 rounded-full bg-[#e5e5e5]" />}
+            <div>
+              <p className="font-sans text-[0.85rem] font-semibold text-[#111]">{order.sellerName}</p>
+              <p className="font-sans text-[0.72rem] text-[#999]">Verified Seller</p>
+            </div>
+          </div>
+
+          {/* Payment methods */}
+          <div>
+            <p className="font-sans text-[0.72rem] text-[#999] uppercase tracking-[1px] mb-2">Accepts</p>
+            <div className="flex gap-2">
+              {order.acceptedPaymentMethods.map((m) => (
+                <span key={m} className="font-sans text-[0.78rem] font-semibold bg-[#f0f0f0] text-[#333] px-3 py-1 rounded-full">
+                  {m}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Order details grid */}
+          <div className="pt-2 border-t border-[#f0f0f0]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-3 mt-4">
+              {[
+                ["Chain",    order.chain],
+                ["Asset",    order.asset],
+                ["Amount",   `${order.amount} ${order.asset}`],
+                ["Price",    `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
+                ["Total",    `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`],
+                ["Fee",      `1 USDT`],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <p className="font-sans text-[0.65rem] text-[#999] uppercase tracking-[1px]">{k}</p>
+                  <p className="font-sans text-[0.82rem] font-semibold text-[#111]">{v}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* ── LISTED ───────────────────────────────────────── */}
         {order.status === "LISTED" && (
-          <div className="bg-white border border-[#e5e5e5] rounded-[16px] p-6 mb-6 space-y-4">
-            {/* Seller info */}
-            <div className="flex items-center gap-3 pb-4 border-b border-[#f0f0f0]">
-              {order.sellerAvatar
-                ? <img src={order.sellerAvatar} className="w-9 h-9 rounded-full" alt="" />
-                : <div className="w-9 h-9 rounded-full bg-[#e5e5e5]" />}
-              <div>
-                <p className="font-sans text-[0.85rem] font-semibold text-[#111]">{order.sellerName}</p>
-                <p className="font-sans text-[0.72rem] text-[#999]">Verified Seller</p>
-              </div>
-            </div>
-
-            {/* Payment methods */}
-            <div>
-              <p className="font-sans text-[0.72rem] text-[#999] uppercase tracking-[1px] mb-2">Accepts</p>
-              <div className="flex gap-2">
-                {order.acceptedPaymentMethods.map((m) => (
-                  <span key={m} className="font-sans text-[0.78rem] font-semibold bg-[#f0f0f0] text-[#333] px-3 py-1 rounded-full">
-                    {m}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Action */}
+          <div className="bg-white border border-[#e5e5e5] rounded-[16px] p-6 mb-6">
             {role === "seller" ? (
-              <div className="pt-2 space-y-3">
-                <p className="font-sans text-[0.85rem] text-[#666]">Waiting for a buyer to lock this order.</p>
+              <div className="flex flex-col gap-3 items-center text-center">
+                <p className="font-sans text-[0.85rem] text-[#666] text-left w-full">Waiting for a buyer to lock this order.</p>
                 <button
                   onClick={() => run("cancel", async () => {
                     await sendTx(prepareContractCall({
@@ -261,7 +283,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     }));
                   })}
                   disabled={!!busy}
-                  className="font-sans text-[0.82rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-[8px] cursor-pointer disabled:opacity-40"
+                  className="w-full font-sans text-[0.85rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-3 rounded-[8px] cursor-pointer disabled:opacity-40"
                 >
                   {busy === "cancel" ? "Cancelling…" : "Cancel Order"}
                 </button>

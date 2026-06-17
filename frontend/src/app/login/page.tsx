@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div className="grid grid-cols-2 gap-[28px_40px] relative z-[1]">
           {[
             { value: "3-Layer", label: "Verification" },
-            { value: "0.75%", label: "Service Fund" },
+            { value: "1 USDT", label: "Service Fund" },
             { value: "₹5L", label: "Max Payout" },
             { value: "0", label: "Custody Risk" },
           ].map((stat) => (
