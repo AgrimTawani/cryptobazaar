@@ -902,7 +902,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </div>
                   </div>
                 </div>
-              </div>
 
                 {role === "buyer" && order.status === "BUYER_MATCHED" && (order.sellerUpiId || order.sellerBankAccount) && (
                   <div className="border-t border-[#f2f2f2] pt-3 mt-3">
