@@ -621,83 +621,83 @@ export default function MarketplacePage() {
         <div className="mt-12 mb-8">
           <h3 className="font-condensed text-[1.6rem] tracking-[0.5px] mb-4 uppercase text-[#111]">How It Works</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
-              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
-                01
-              </span>
-              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
-                01
-              </span>
-              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
-                Create Order
-              </h4>
-              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
-                Seller posts an order and locks their crypto securely in our on-chain smart contract escrow.
-              </p>
-              <div className="mt-1">
-                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
-                  SMART CONTRACT
+            <div className="relative overflow-hidden bg-white border border-[#e5e5e5] rounded-xl p-5 flex flex-col gap-2 min-h-[160px]">
+              <img src="/mono_create_order_new_1781721893435.png" alt="" className="absolute -right-6 top-1/2 -translate-y-1/2 w-32 h-32 object-contain mix-blend-multiply pointer-events-none opacity-90" />
+              <div className="relative z-10 flex flex-col gap-2 h-full">
+                <span className="font-sans text-[11px] text-[#888] tracking-widest uppercase font-semibold">
+                  01
                 </span>
+                <h4 className="font-condensed text-[1.15rem] text-[#111] uppercase tracking-[0.5px] leading-tight mt-[-2px]">
+                  Create Order
+                </h4>
+                <p className="font-sans text-[13px] text-[#555] leading-relaxed flex-1 pr-16">
+                  Seller posts an order and locks their crypto securely in our on-chain smart contract escrow.
+                </p>
+                <div className="mt-1">
+                  <span className="font-sans text-[0.6rem] tracking-widest uppercase bg-[#f5f5f5] text-[#555] border border-[#e5e5e5] px-2.5 py-1 rounded-full">
+                    SMART CONTRACT
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
-              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
-                02
-              </span>
-              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
-                02
-              </span>
-              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
-                Lock Trade
-              </h4>
-              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
-                A verified buyer finds the order, agrees to the price, and locks the trade to secure the crypto.
-              </p>
-              <div className="mt-1">
-                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
-                  TRADE LOCK
+            <div className="relative overflow-hidden bg-white border border-[#e5e5e5] rounded-xl p-5 flex flex-col gap-2 min-h-[160px]">
+              <img src="/mono_lock_trade_1781721550898.png" alt="" className="absolute -right-6 top-1/2 -translate-y-1/2 w-32 h-32 object-contain mix-blend-multiply pointer-events-none opacity-90" />
+              <div className="relative z-10 flex flex-col gap-2 h-full">
+                <span className="font-sans text-[11px] text-[#888] tracking-widest uppercase font-semibold">
+                  02
                 </span>
+                <h4 className="font-condensed text-[1.15rem] text-[#111] uppercase tracking-[0.5px] leading-tight mt-[-2px]">
+                  Lock Trade
+                </h4>
+                <p className="font-sans text-[13px] text-[#555] leading-relaxed flex-1 pr-16">
+                  A verified buyer finds the order, agrees to the price, and locks the trade to secure the crypto.
+                </p>
+                <div className="mt-1">
+                  <span className="font-sans text-[0.6rem] tracking-widest uppercase bg-[#f5f5f5] text-[#555] border border-[#e5e5e5] px-2.5 py-1 rounded-full">
+                    TRADE LOCK
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
-              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
-                03
-              </span>
-              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
-                03
-              </span>
-              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
-                Make Payment
-              </h4>
-              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
-                Buyer transfers INR directly to the seller's verified bank account using UPI or IMPS.
-              </p>
-              <div className="mt-1">
-                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
-                  P2P TRANSFER
+            <div className="relative overflow-hidden bg-white border border-[#e5e5e5] rounded-xl p-5 flex flex-col gap-2 min-h-[160px]">
+              <img src="/mono_make_payment_1781721562490.png" alt="" className="absolute -right-6 top-1/2 -translate-y-1/2 w-32 h-32 object-contain mix-blend-multiply pointer-events-none opacity-90" />
+              <div className="relative z-10 flex flex-col gap-2 h-full">
+                <span className="font-sans text-[11px] text-[#888] tracking-widest uppercase font-semibold">
+                  03
                 </span>
+                <h4 className="font-condensed text-[1.15rem] text-[#111] uppercase tracking-[0.5px] leading-tight mt-[-2px]">
+                  Make Payment
+                </h4>
+                <p className="font-sans text-[13px] text-[#555] leading-relaxed flex-1 pr-16">
+                  Buyer transfers INR directly to the seller's verified bank account using UPI or IMPS.
+                </p>
+                <div className="mt-1">
+                  <span className="font-sans text-[0.6rem] tracking-widest uppercase bg-[#f5f5f5] text-[#555] border border-[#e5e5e5] px-2.5 py-1 rounded-full">
+                    P2P TRANSFER
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="group relative overflow-hidden bg-[#0a0a0a] border border-[#222] rounded-xl p-6 flex flex-col gap-3 min-h-[220px] transition-all duration-200 ease-out hover:-translate-y-1.5 hover:bg-[#111] hover:shadow-[0_12px_30px_-10px_rgba(212,255,0,0.25),0_0_20px_-5px_rgba(212,255,0,0.15)]">
-              <span className="absolute bottom-1 right-3 font-condensed text-[5.5rem] leading-none text-white/[0.03] select-none pointer-events-none transition-colors duration-200 group-hover:text-lime/10">
-                04
-              </span>
-              <span className="font-sans text-xs text-lime tracking-widest uppercase font-semibold">
-                04
-              </span>
-              <h4 className="font-condensed text-[1.25rem] text-white uppercase tracking-[0.5px] leading-tight">
-                Crypto Released
-              </h4>
-              <p className="font-sans text-sm text-white/60 leading-[1.65] flex-1 pr-12">
-                Seller confirms the payment receipt. The smart contract automatically releases the crypto to the buyer.
-              </p>
-              <div className="mt-1">
-                <span className="font-sans text-[0.65rem] tracking-widest uppercase bg-lime/[0.08] text-lime/80 border border-lime/[0.18] px-3 py-1.5 rounded-full">
-                  AUTO RELEASE
+            <div className="relative overflow-hidden bg-white border border-[#e5e5e5] rounded-xl p-5 flex flex-col gap-2 min-h-[160px]">
+              <img src="/mono_crypto_released_new_1781722203973.png" alt="" className="absolute -right-6 top-1/2 -translate-y-1/2 w-32 h-32 object-contain mix-blend-multiply pointer-events-none opacity-90" />
+              <div className="relative z-10 flex flex-col gap-2 h-full">
+                <span className="font-sans text-[11px] text-[#888] tracking-widest uppercase font-semibold">
+                  04
                 </span>
+                <h4 className="font-condensed text-[1.15rem] text-[#111] uppercase tracking-[0.5px] leading-tight mt-[-2px]">
+                  Crypto Released
+                </h4>
+                <p className="font-sans text-[13px] text-[#555] leading-relaxed flex-1 pr-16">
+                  Seller confirms the payment receipt. The smart contract automatically releases the crypto to the buyer.
+                </p>
+                <div className="mt-1">
+                  <span className="font-sans text-[0.6rem] tracking-widest uppercase bg-[#f5f5f5] text-[#555] border border-[#e5e5e5] px-2.5 py-1 rounded-full">
+                    AUTO RELEASE
+                  </span>
+                </div>
               </div>
             </div>
 
