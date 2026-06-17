@@ -575,6 +575,26 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   </a>
                 )}
               </div>
+
+              <div className="bg-[#fffef0] border border-[#fde68a] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <p className="font-sans text-sm font-bold text-[#92400e]">Escrow Protection</p>
+                </div>
+                <p className="font-sans text-xs text-[#a16207] leading-relaxed">
+                  Funds held in smart-contract escrow. Never mark paid until you have completed the transfer.
+                </p>
+              </div>
+
+              {!TERMINAL.includes(order.status) && (
+                <div className="text-center flex flex-col gap-3">
+                  <button onClick={() => run("dispute")} className="font-sans text-xs text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
+                    Something wrong? Raise a dispute
+                  </button>
+                  <a href="mailto:support@cryptobazaar.co.in" className="inline-block w-full text-center bg-black text-white font-condensed text-lg tracking-[0.05em] py-2.5 rounded-lg border border-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer no-underline">
+                    CONTACT SUPPORT
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* MIDDLE: Chat (dominant). On mobile it sits between the actionable
@@ -857,28 +877,33 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
-                <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Counterparty</p>
-                <div className="flex items-center gap-3 mb-4">
-                  {counterpartyAvatar
-                    ? <Image src={counterpartyAvatar} className="w-10 h-10 rounded-full shrink-0" alt="Avatar" width={40} height={40} />
-                    : <div className="w-10 h-10 rounded-full bg-[#e5e5e5] shrink-0" />}
+              <div className="bg-white border border-[#e8e8e8] rounded-xl p-4">
+                <div className="flex justify-between items-start">
                   <div>
+                    <p className="font-sans text-[0.65rem] text-[#999] uppercase tracking-widest font-semibold mb-2">Counterparty</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-sans text-sm font-semibold text-[#111]">{counterpartyName ?? "Anonymous"}</p>
-                      <span className="font-sans text-xs font-bold bg-lime text-black px-1.5 py-0.5 rounded-[3px]">✓</span>
+                      {counterpartyAvatar
+                        ? <Image src={counterpartyAvatar} className="w-8 h-8 rounded-full shrink-0" alt="Avatar" width={32} height={32} />
+                        : <div className="w-8 h-8 rounded-full bg-[#e5e5e5] shrink-0" />}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-sans text-sm font-semibold text-[#111]">{counterpartyName ?? "Anonymous"}</p>
+                          <span className="font-sans text-[0.6rem] font-bold bg-lime text-black px-1 py-0.5 rounded-[3px] leading-none">✓</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="font-sans text-xs text-[#999]">Verified member</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-sans text-[0.65rem] text-[#999] uppercase tracking-widest font-semibold mb-2">Accepts</p>
+                    <div className="flex gap-1 justify-end flex-wrap">
+                      {order.acceptedPaymentMethods.map((m) => (
+                        <span key={m} className="font-sans text-[0.65rem] bg-[#f2f2f2] text-[#555] px-2 py-0.5 rounded-full">{m}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="border-t border-[#f2f2f2] pt-3">
-                  <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-2">Payment Methods</p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {order.acceptedPaymentMethods.map((m) => (
-                      <span key={m} className="font-sans text-xs bg-[#f2f2f2] text-[#555] px-2.5 py-1 rounded-full">{m}</span>
-                    ))}
-                  </div>
-                </div>
+              </div>
+
                 {role === "buyer" && order.status === "BUYER_MATCHED" && (order.sellerUpiId || order.sellerBankAccount) && (
                   <div className="border-t border-[#f2f2f2] pt-3 mt-3">
                     <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-3">Send Payment To</p>
@@ -921,25 +946,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 )}
               </div>
 
-              <div className="bg-[#fffef0] border border-[#fde68a] rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <p className="font-sans text-sm font-bold text-[#92400e]">Escrow Protection</p>
-                </div>
-                <p className="font-sans text-sm text-[#a16207] leading-relaxed">
-                  Funds held in smart-contract escrow. Never mark paid until you have completed the transfer.
-                </p>
-              </div>
-
-              {!TERMINAL.includes(order.status) && (
-                <div className="text-center flex flex-col gap-4 mt-2">
-                  <button onClick={() => run("dispute")} className="font-sans text-sm text-[#ef4444] bg-transparent border-0 cursor-pointer hover:underline">
-                    Something wrong? Raise a dispute
-                  </button>
-                  <a href="mailto:support@cryptobazaar.co.in" className="inline-block w-full text-center bg-black text-white font-condensed text-[1.2rem] tracking-[0.05em] py-3 rounded-lg border border-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer no-underline">
-                    CONTACT SUPPORT
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1183,7 +1189,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   )}
                   <div className="flex gap-3">
                     <button onClick={() => { setShowBuyConfirm(false); setTcAgreed(false); }}
-                      className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white">
+                      className="flex-1 py-3 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
                       Cancel
                     </button>
                     <button onClick={() => run("lock", async () => {
@@ -1193,7 +1199,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       parseFloat(buyAmount) < minTrade ||
                       parseFloat(buyAmount) > availableAmount
                     ))}
-                      className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer disabled:opacity-40">
+                      className="flex-1 py-3 bg-black text-white rounded-xl font-condensed text-xl tracking-[0.5px] cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "lock" ? "Locking…" : (<span className="flex items-center justify-center gap-1">Lock Order & Start Timer <ArrowRight className="w-4 h-4" /></span>)}
                     </button>
                   </div>
@@ -1207,7 +1213,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </div>
                   )}
                   <button onClick={() => setShowBuyConfirm(true)} disabled={!!busy || !walletOk || !chainOk}
-                    className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40">
+                    className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                     <>Buy <ArrowRight className="inline-block w-4 h-4 mx-1" /> Pay ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")}</>
                   </button>
                 </div>

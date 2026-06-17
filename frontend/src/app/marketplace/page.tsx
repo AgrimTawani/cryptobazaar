@@ -90,12 +90,12 @@ function ChainConfirmPopup({ order, onConfirm, onCancel }: {
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl border border-[#e5e5e5] text-[#666] cursor-pointer bg-white hover:bg-[#f5f5f5] transition-colors">
+            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl border border-[#e5e5e5] text-[#666] cursor-pointer bg-white hover:bg-[#f5f5f5] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-colors">
+            className="flex-1 font-sans text-sm font-semibold py-2.5 rounded-xl bg-black text-white cursor-pointer hover:bg-[#222] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
             Continue <ArrowRight className="inline-block w-4 h-4 ml-1" />
           </button>
         </div>
@@ -515,14 +515,14 @@ export default function MarketplacePage() {
                 ) : (
                   <button
                     onClick={() => setPendingOrder(order)}
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] border-0">
                     Buy
                   </button>
                 )}
                 {order.escrowTxHash && (
                   <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
                     className="font-sans text-xs text-[#999] underline hover:text-[#7b3fe4] transition-colors">
-                    view on chain
+                    View-on-chain
                   </a>
                 )}
               </div>
@@ -587,7 +587,7 @@ export default function MarketplacePage() {
                 ) : (
                   <button
                     onClick={(e) => { e.preventDefault(); setPendingOrder(order); }}
-                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-colors border-0">
+                    className="font-sans text-sm font-semibold text-white bg-black py-1.5 px-4 rounded-lg cursor-pointer hover:bg-[#333] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] border-0">
                     Buy
                   </button>
                 )}
