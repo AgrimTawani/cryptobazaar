@@ -764,12 +764,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
-                    <button onClick={() => run("cancel", async () => {
+                    <button onClick={() => run("buyerCancel", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function buyerCancel(uint256 id)", params: [onChainId] }));
-                      await fetch(`/api/orders/${order.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "buyerCancel" }) });
                     })} disabled={!!busy || !walletOk}
                       className="py-3 bg-white text-[#666] border border-[#e0e0e0] font-sans text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
-                      {busy === "cancel" ? "…" : "✕  Cancel Order"}
+                      {busy === "buyerCancel" ? "…" : "✕  Cancel Order"}
                     </button>
                   </div>
                 </div>
