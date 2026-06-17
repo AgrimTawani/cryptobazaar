@@ -283,9 +283,9 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     }));
                   })}
                   disabled={!!busy}
-                  className="w-full font-sans text-[0.85rem] text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-3 rounded-[8px] cursor-pointer disabled:opacity-40"
+                  className="w-full py-4 bg-[#dc2626] text-white rounded-[12px] font-condensed text-[1.2rem] tracking-[1px] cursor-pointer disabled:opacity-40 border-0 hover:bg-[#b91c1c] transition-colors"
                 >
-                  {busy === "cancel" ? "Cancelling…" : "Cancel Order"}
+                  {busy === "cancel" ? "CANCELLING…" : "CANCEL ORDER"}
                 </button>
               </div>
             ) : (
@@ -528,22 +528,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           </div>
         )}
 
-        {/* Order detail strip */}
-        <div className="bg-white border border-[#e5e5e5] rounded-[14px] px-5 py-4 grid grid-cols-2 gap-3">
-          {[
-            ["Chain",    order.chain],
-            ["Asset",    order.asset],
-            ["Amount",   `${order.amount} ${order.asset}`],
-            ["Price",    `₹${parseFloat(order.pricePerUnit).toFixed(2)}`],
-            ["Total",    `₹${parseFloat(order.totalValueInr).toLocaleString("en-IN")}`],
-            ["Fee",      `${fee.toFixed(4)} ${order.asset} (0.75%)`],
-          ].map(([k, v]) => (
-            <div key={k}>
-              <p className="font-sans text-[0.65rem] text-[#999] uppercase tracking-[1px]">{k}</p>
-              <p className="font-sans text-[0.82rem] font-semibold text-[#111]">{v}</p>
-            </div>
-          ))}
-        </div>
+
       </div>
     </div>
   );
