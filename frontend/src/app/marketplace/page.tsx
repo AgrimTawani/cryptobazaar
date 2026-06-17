@@ -522,7 +522,7 @@ export default function MarketplacePage() {
                 {order.escrowTxHash && (
                   <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
                     className="font-sans text-xs text-[#999] underline hover:text-[#7b3fe4] transition-colors">
-                    ✓ on-chain ↗
+                    view on chain
                   </a>
                 )}
               </div>
