@@ -296,8 +296,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   onClick={() => run("lock", async () => {
                     await sendTx(prepareContractCall({
                       contract: escrowContract,
-                      method: "function lockOrder(uint256 id)",
-                      params: [onChainId],
+                      method: "function lockOrder(uint256 id, uint128 buyAmount)",
+                      params: [onChainId, BigInt(Math.round(parseFloat(order.amount) * 1_000_000))],
                     }));
                   })}
                   disabled={!!busy || (!account && isEvm)}
