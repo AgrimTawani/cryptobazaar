@@ -523,6 +523,8 @@ model BankStatementAnalysis {
   balanceDropsToZero    Int?     @map("balance_drops_to_zero")
   returnedPaymentsCount Int?     @map("returned_payments_count")
   positiveNetFlowMonths Int?     @map("positive_net_flow_months")
+  openingBalance        Decimal? @map("opening_balance") @db.Decimal(15, 2)
+  closingBalance        Decimal? @map("closing_balance") @db.Decimal(15, 2)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

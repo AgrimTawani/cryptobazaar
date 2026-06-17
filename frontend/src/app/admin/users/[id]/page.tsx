@@ -216,6 +216,14 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                     </span>
                  </div>
                  <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Opening Balance</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.openingBalance != null ? `₹${Number(user.bankStatementAnalysis.openingBalance).toLocaleString()}` : "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="font-sans text-xs font-semibold text-[#888] uppercase">Closing Balance</span>
+                    <span className="font-sans text-sm">{user.bankStatementAnalysis.closingBalance != null ? `₹${Number(user.bankStatementAnalysis.closingBalance).toLocaleString()}` : "N/A"}</span>
+                 </div>
+                 <div className="flex justify-between">
                     <span className="font-sans text-xs font-semibold text-[#888] uppercase">Avg Monthly Balance</span>
                     <span className="font-sans text-sm">₹{Number(user.bankStatementAnalysis.avgMonthlyBalance || 0).toLocaleString()}</span>
                  </div>

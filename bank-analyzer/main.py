@@ -128,7 +128,7 @@ def process_statement_background(
         checks = analyzer.run_all_checks(df)
 
         # 8. Convert to flat metrics for backward compatibility with webhook/DB
-        flat_metrics = analyzer.checks_to_flat_metrics(checks)
+        flat_metrics = analyzer.checks_to_flat_metrics(checks, df)
 
         # 9. Build complete analysis result
         analysis_json = {

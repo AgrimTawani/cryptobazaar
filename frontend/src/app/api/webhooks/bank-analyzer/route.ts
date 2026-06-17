@@ -59,6 +59,8 @@ export async function POST(req: NextRequest) {
           balanceDropsToZero: data.balanceDropsToZero,
           returnedPaymentsCount: data.returnedPaymentsCount,
           positiveNetFlowMonths: data.positiveNetFlowMonths,
+          openingBalance: data.openingBalance,
+          closingBalance: data.closingBalance,
         },
         update: {
           status: data.status,
@@ -79,6 +81,8 @@ export async function POST(req: NextRequest) {
           balanceDropsToZero: data.balanceDropsToZero,
           returnedPaymentsCount: data.returnedPaymentsCount,
           positiveNetFlowMonths: data.positiveNetFlowMonths,
+          openingBalance: data.openingBalance,
+          closingBalance: data.closingBalance,
         }
       });
 

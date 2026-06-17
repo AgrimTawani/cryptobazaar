@@ -431,7 +431,7 @@ def run_all_checks(df: pd.DataFrame) -> list:
     ]
 
 
-def checks_to_flat_metrics(checks: list) -> dict:
+def checks_to_flat_metrics(checks: list, df: pd.DataFrame = None) -> dict:
     """
     Convert structured check results to the flat metric format
     expected by the existing webhook handler / bankStatementAnalysis DB model.
@@ -443,6 +443,15 @@ def checks_to_flat_metrics(checks: list) -> dict:
         if c is None:
             return default
         return c.get(field, default)
+
+    opening_balance = None
+    closing_balance = None
+    if df is not None and not df.empty and 'Balance' in df.columns:
+        df_sorted = df.sort_values('DateParsed')
+        first_bal = df_sorted['Balance'].iloc[0]
+        last_bal = df_sorted['Balance'].iloc[-1]
+        opening_balance = float(first_bal) if pd.notna(first_bal) else None
+        closing_balance = float(last_bal) if pd.notna(last_bal) else None
 
     return {
         "accountAgeDays": _get("A1", default=0),
@@ -459,4 +468,6 @@ def checks_to_flat_metrics(checks: list) -> dict:
         "balanceDropsToZero": _get("D2", default=0),
         "returnedPaymentsCount": _get("D3", default=0),
         "positiveNetFlowMonths": _get("D4", default=0),
+        "openingBalance": opening_balance,
+        "closingBalance": closing_balance,
     }
