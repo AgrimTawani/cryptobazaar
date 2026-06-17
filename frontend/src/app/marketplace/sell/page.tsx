@@ -19,7 +19,7 @@ import {
 } from "thirdweb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCode } from "react-qrcode-logo";
 import { thirdwebClient } from "@/lib/thirdweb";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EnableNotifications } from "@/components/EnableNotifications";
@@ -440,7 +440,7 @@ export default function SellPage() {
                 </p>
                 <p className={`font-sans text-xs mt-0.5 ${chainOk ? "text-[#16a34a]" : "text-[#9a3412]"}`}>
                   {chainOk
-                    ? `✓ Correct network — orders post to ${sellChainLabel}`
+                    ? `Correct network — orders post to ${sellChainLabel}`
                     : `Switch to ${sellChainLabel} in MetaMask to continue`}
                 </p>
               </div>
@@ -487,11 +487,17 @@ export default function SellPage() {
                       <p className="font-mono text-sm font-semibold text-[#111]">{profilePayment.upiId}</p>
                     </div>
                     <div className="bg-white p-2 rounded-xl border border-[#e5e5e5] shrink-0 shadow-sm ml-4">
-                      <QRCodeSVG 
+                      <QRCode 
                         value={`upi://pay?pa=${profilePayment.upiId}&cu=INR`} 
                         size={96} 
-                        level="M"
-                        includeMargin={false}
+                        ecLevel="H"
+                        quietZone={0}
+                        logoImage="/icon.png"
+                        logoWidth={22}
+                        logoHeight={22}
+                        removeQrCodeBehindLogo={true}
+                        qrStyle="dots"
+                        eyeRadius={10}
                       />
                     </div>
                   </div>
