@@ -600,20 +600,20 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
             {/* MIDDLE: Chat (dominant). On mobile it sits between the actionable
                 payment panel (above) and the reference info (below), and is
                 height-capped so it doesn't swallow the whole viewport. */}
-            <div className="bg-white border border-[#e8e8e8] rounded-xl flex flex-col order-2 lg:order-none h-[70vh] max-h-[560px] lg:h-[calc(100vh-88px)] lg:max-h-[740px] lg:sticky lg:top-[68px]">
+            <div className="bg-white border border-[#e8e8e8] rounded-xl flex flex-col order-2 lg:order-none h-[80vh] min-h-[550px] lg:h-[calc(100vh-88px)] lg:max-h-[740px] lg:sticky lg:top-[68px]">
 
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#ebebeb] shrink-0">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#22c55e]" />
                   <span className="font-sans text-sm font-semibold text-[#111]">Trade Chat</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   {timeLeft !== null && !TERMINAL.includes(order.status) && (
-                    <span className={`font-mono text-sm font-bold ${timedOut ? "text-[#dc2626]" : "text-[#1e40af]"}`}>
+                    <span className={`font-mono text-sm font-bold shrink-0 ${timedOut ? "text-[#dc2626]" : "text-[#1e40af]"}`}>
                       {timedOut ? "00:00" : formatTime(timeLeft)}
                     </span>
                   )}
-                  <span className="font-sans text-xs text-[#bbb]">#{order.orderId}</span>
+                  <span className="font-sans text-xs text-[#bbb] truncate max-w-[120px] sm:max-w-none" title={`#${order.orderId}`}>#{order.orderId}</span>
                 </div>
               </div>
 
