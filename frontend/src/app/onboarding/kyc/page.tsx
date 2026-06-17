@@ -1,12 +1,190 @@
 "use client";
 
-import { ArrowLeft, Upload, CheckCircle2, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { ArrowLeft, Upload, CheckCircle2, X, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 type PollStatus = "IDLE" | "IN_PROGRESS" | "PASSED" | "FAILED";
 type DocUploadState = { file: File; uploading: boolean; done: boolean; error: string | null };
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const TODAY = new Date();
+
+function DatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const selected = value ? new Date(value + "T00:00:00") : null;
+  const initial = selected ?? new Date(1995, 0, 1);
+  const [view, setView] = useState({ month: initial.getMonth(), year: initial.getFullYear() });
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("keydown", esc); };
+  }, [open]);
+
+  const prevMonth = useCallback(() => setView(v => {
+    const d = new Date(v.year, v.month - 1, 1);
+    return { month: d.getMonth(), year: d.getFullYear() };
+  }), []);
+
+  const nextMonth = useCallback(() => setView(v => {
+    const d = new Date(v.year, v.month + 1, 1);
+    // Don't go past current month
+    if (d > TODAY) return v;
+    return { month: d.getMonth(), year: d.getFullYear() };
+  }), []);
+
+  const canGoNext = new Date(view.year, view.month + 1, 1) <= TODAY;
+
+  // Build calendar grid
+  const firstDay = new Date(view.year, view.month, 1).getDay();
+  const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstDay).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  // Pad to full weeks
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const selectDay = (day: number) => {
+    const d = new Date(view.year, view.month, day);
+    if (d > TODAY) return;
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    onChange(`${yyyy}-${mm}-${dd}`);
+    setOpen(false);
+  };
+
+  const isSelected = (day: number) =>
+    selected &&
+    selected.getDate() === day &&
+    selected.getMonth() === view.month &&
+    selected.getFullYear() === view.year;
+
+  const isToday = (day: number) =>
+    TODAY.getDate() === day &&
+    TODAY.getMonth() === view.month &&
+    TODAY.getFullYear() === view.year;
+
+  const isFuture = (day: number) => new Date(view.year, view.month, day) > TODAY;
+
+  const displayValue = selected
+    ? selected.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between border-[1.5px] rounded-xl px-4 py-3 font-sans text-[0.95rem] transition-colors duration-150 bg-white ${
+          open ? "border-[#7b3fe4]" : "border-[#e5e5e5] hover:border-[#bbb]"
+        }`}
+      >
+        <span className={displayValue ? "text-[#111]" : "text-[#bbb]"}>
+          {displayValue ?? "Select date of birth"}
+        </span>
+        <CalendarDays className="w-4 h-4 text-[#bbb] shrink-0" />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-[calc(100%+6px)] left-0 right-0 bg-white border-[1.5px] border-[#e5e5e5] rounded-2xl shadow-xl p-4"
+          >
+            {/* Month/year header */}
+            <div className="flex items-center justify-between mb-3">
+              <button
+                type="button"
+                onClick={prevMonth}
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors border-0 bg-transparent cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4 text-[#555]" />
+              </button>
+              <span className="font-sans text-sm font-semibold text-[#111]">
+                {MONTHS[view.month]} {view.year}
+              </span>
+              <button
+                type="button"
+                onClick={nextMonth}
+                disabled={!canGoNext}
+                className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors border-0 bg-transparent ${
+                  canGoNext ? "hover:bg-[#f5f5f5] cursor-pointer" : "opacity-30 cursor-not-allowed"
+                }`}
+              >
+                <ChevronRight className="w-4 h-4 text-[#555]" />
+              </button>
+            </div>
+
+            {/* Day headers */}
+            <div className="grid grid-cols-7 mb-1">
+              {DAYS.map(d => (
+                <div key={d} className="text-center font-sans text-[0.68rem] font-semibold text-[#bbb] uppercase py-1">
+                  {d}
+                </div>
+              ))}
+            </div>
+
+            {/* Day cells */}
+            <div className="grid grid-cols-7 gap-y-0.5">
+              {cells.map((day, i) => (
+                <div key={i} className="flex items-center justify-center">
+                  {day ? (
+                    <button
+                      type="button"
+                      disabled={isFuture(day)}
+                      onClick={() => selectDay(day)}
+                      className={`w-8 h-8 rounded-lg font-sans text-sm transition-colors border-0 cursor-pointer ${
+                        isSelected(day)
+                          ? "bg-black text-white font-semibold"
+                          : isFuture(day)
+                          ? "text-[#ddd] cursor-not-allowed bg-transparent"
+                          : isToday(day)
+                          ? "bg-[#f5f0ff] text-[#7b3fe4] font-semibold hover:bg-[#ede8ff]"
+                          : "text-[#333] bg-transparent hover:bg-[#f5f5f5]"
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  ) : (
+                    <div className="w-8 h-8" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Quick year jump */}
+            <div className="mt-3 pt-3 border-t border-[#f0f0f0] flex items-center gap-2">
+              <span className="font-sans text-xs text-[#aaa]">Year</span>
+              <select
+                value={view.year}
+                onChange={(e) => setView(v => ({ ...v, year: parseInt(e.target.value) }))}
+                className="flex-1 border-[1.5px] border-[#e5e5e5] rounded-lg px-2 py-1 font-sans text-xs text-[#111] focus:outline-none focus:border-[#7b3fe4] bg-white"
+              >
+                {Array.from({ length: TODAY.getFullYear() - 1924 }, (_, i) => TODAY.getFullYear() - i).map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 const ACCEPTED = "image/jpeg,image/png,image/webp,application/pdf";
 
@@ -303,12 +481,7 @@ export default function KYCPage() {
                       <label className="font-sans text-xs font-semibold text-[#333] uppercase tracking-widest block mb-2">
                         Date of Birth
                       </label>
-                      <input
-                        type="date"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        className="w-full border-[1.5px] border-[#e5e5e5] bg-white rounded-xl px-4 py-3 font-sans text-[0.95rem] text-[#111] focus:outline-none focus:border-[#7b3fe4] transition-colors"
-                      />
+                      <DatePicker value={dob} onChange={setDob} />
                     </div>
                   </div>
                 </div>
