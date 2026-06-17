@@ -158,7 +158,7 @@ function SellerReviewsCard({ order }: { order: OrderDetail }) {
               <span className="font-sans text-xs text-[#aaa]">({order.sellerRatingCount})</span>
             </div>
             {releaseTime && (
-              <span className="font-sans text-xs text-[#666]">⚡ {releaseTime} avg release</span>
+              <span className="font-sans text-xs text-[#666]">{releaseTime} avg release</span>
             )}
           </div>
         )}
@@ -192,7 +192,7 @@ const STATUS: Record<string, { label: string; color: string; bg: string; border:
   LISTED:                  { label: "Open",                  color: "#555",    bg: "#f5f5f5", border: "#e5e5e5" },
   BUYER_MATCHED:           { label: "Payment Pending",       color: "#1e40af", bg: "#eff6ff", border: "#bfdbfe" },
   BUYER_PAID:              { label: "Awaiting Confirmation", color: "#92400e", bg: "#fffbeb", border: "#fde68a" },
-  COMPLETED:               { label: "Completed ✓",           color: "#166534", bg: "#f0fdf4", border: "#86efac" },
+  COMPLETED:               { label: "Completed",           color: "#166534", bg: "#f0fdf4", border: "#86efac" },
   DISPUTED:                { label: "Disputed",              color: "#991b1b", bg: "#fef2f2", border: "#fca5a5" },
   DISPUTE_RESOLVED_BUYER:  { label: "Resolved - Buyer Won",  color: "#166534", bg: "#f0fdf4", border: "#86efac" },
   DISPUTE_RESOLVED_SELLER: { label: "Resolved - Seller Won", color: "#166534", bg: "#f0fdf4", border: "#86efac" },
@@ -538,7 +538,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     </a>
                   )}
                 </div>
-              ) : (
+              ) : order.status !== "COMPLETED" && (
                 <div className="rounded-lg px-3 py-2.5 order-first lg:order-last" style={{ background: statusCfg.bg, border: `1px solid ${statusCfg.border}` }}>
                   <span className="font-sans text-sm font-semibold" style={{ color: statusCfg.color }}>{statusCfg.label}</span>
                 </div>
@@ -567,8 +567,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                 </div>
                 {order.escrowTxHash && (
                   <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
-                    className="font-sans text-xs text-[#7b3fe4] no-underline hover:underline mt-3 block">
-                    View escrow on-chain ↗
+                    className="font-sans text-xs text-black no-underline hover:underline mt-3 block">
+                    View on-chain ↗
                   </a>
                 )}
               </div>
@@ -585,10 +585,9 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   <span className="font-sans text-sm font-semibold text-[#111]">Trade Chat</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <EnableNotifications variant="inline" />
                   {timeLeft !== null && !TERMINAL.includes(order.status) && (
                     <span className={`font-mono text-sm font-bold ${timedOut ? "text-[#dc2626]" : "text-[#1e40af]"}`}>
-                      ⏱ {timedOut ? "00:00" : formatTime(timeLeft)}
+                      {timedOut ? "00:00" : formatTime(timeLeft)}
                     </span>
                   )}
                   <span className="font-sans text-xs text-[#bbb]">#{order.orderId}</span>
@@ -605,7 +604,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
               {isEvm && !walletOk && connectionStatus !== "connecting" && ["BUYER_MATCHED","BUYER_PAID"].includes(order.status) && (
                 <div className="mx-4 mt-3 bg-[#fffbeb] border border-[#fde68a] rounded-lg px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-base shrink-0">🦊</span>
                     <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
                   </div>
                   <button onClick={reconnectWallet}
@@ -711,7 +709,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       ) : screenshotUploaded ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span>🖼️</span>
                             <span className="font-sans text-sm font-semibold text-[#111]">{screenshotFileName}</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -806,7 +803,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                       </button>
                       <button onClick={() => run("dispute")} disabled={!!busy}
                         className="px-4 py-3 border border-[#fca5a5] text-[#dc2626] bg-[#fff1f2] rounded-lg font-sans text-sm font-semibold cursor-pointer disabled:opacity-40">
-                        {busy === "dispute" ? "…" : "⚡ Dispute"}
+                        {busy === "dispute" ? "…" : "Dispute"}
                       </button>
                     </div>
                     </div>
@@ -814,15 +811,15 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   {role === "buyer" && (
                     <button onClick={() => run("dispute")} disabled={!!busy}
                       className="font-sans text-sm text-[#dc2626] border border-[#fca5a5] bg-[#fff1f2] px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40">
-                      {busy === "dispute" ? "Raising dispute…" : "⚡ Raise Dispute"}
+                      {busy === "dispute" ? "Raising dispute…" : "Raise Dispute"}
                     </button>
                   )}
                 </div>
               )}
 
               {order.status === "COMPLETED" && (
-                <div className="border-t border-[#86efac] px-5 py-4 shrink-0 bg-[#f0fdf4]">
-                  <p className="font-condensed text-2xl text-[#166534] mb-1">Trade Complete ✓</p>
+                <div className="border-t border-[#86efac] px-5 py-4 shrink-0 bg-[#f0fdf4] text-center">
+                  <p className="font-condensed text-2xl text-[#166534] mb-1">Trade Complete</p>
                   <p className="font-sans text-sm text-[#15803d]">
                     {role === "buyer" ? `You received ${payout.toFixed(4)} ${order.asset}.` : `Buyer received ${payout.toFixed(4)} ${order.asset}. Platform fee: 1 ${order.asset}.`}
                   </p>
@@ -927,18 +924,11 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
 
               <div className="bg-[#fffef0] border border-[#fde68a] rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span>🔒</span>
                   <p className="font-sans text-sm font-bold text-[#92400e]">Escrow Protection</p>
                 </div>
                 <p className="font-sans text-sm text-[#a16207] leading-relaxed">
                   Funds held in smart-contract escrow. Never mark paid until you have completed the transfer.
                 </p>
-                {order.escrowTxHash && (
-                  <a href={txUrl(order.escrowTxHash)} target="_blank" rel="noopener noreferrer"
-                    className="font-sans text-xs text-[#7b3fe4] no-underline hover:underline mt-2 block">
-                    View on Polygonscan ↗
-                  </a>
-                )}
               </div>
 
               {!TERMINAL.includes(order.status) && (
@@ -1087,7 +1077,6 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           {isEvm && !walletOk && connectionStatus !== "connecting" && order.status === "LISTED" && (
             <div className="bg-[#fffbeb] border border-[#fde68a] rounded-xl px-4 py-3 mb-5 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="text-base shrink-0">🦊</span>
                 <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
               </div>
               <button onClick={reconnectWallet}
