@@ -241,7 +241,7 @@ export default function SellPage() {
               <p className="font-sans text-sm text-[#92400e]">Wallet disconnected.</p>
             </div>
             <button onClick={reconnectWallet}
-              className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0">
+              className="font-sans text-sm font-semibold text-white bg-[#92400e] px-3 py-1.5 rounded-lg cursor-pointer shrink-0 transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
               Reconnect <ArrowRight className="inline-block w-4 h-4 ml-1" />
             </button>
           </div>
@@ -324,11 +324,11 @@ export default function SellPage() {
             </div>
             <div className="flex flex-col-reverse sm:flex-row gap-3 pt-1">
               <button onClick={() => setStep("form")} disabled={isBusy}
-                className="sm:flex-1 py-3 px-4 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity whitespace-nowrap">
+                className="sm:flex-1 py-3 px-4 border-[1.5px] border-[#e5e5e5] rounded-xl font-sans text-sm text-[#555] cursor-pointer bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:border-[#ccc] whitespace-nowrap">
                 <ArrowLeft className="inline-block w-4 h-4 mr-1" /> Back to Edit
               </button>
               <button onClick={handleSubmit} disabled={isBusy}
-                className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="sm:flex-1 py-3 px-4 bg-black text-white rounded-xl font-sans text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
                 {isBusy
                   ? step === "approving" ? "Approving USDC…" : step === "creating" ? "Creating Order…" : "Saving…"
                   : (<span className="flex items-center justify-center gap-1">Confirm & Approve USDC <ArrowRight className="w-4 h-4" /></span>)}
@@ -456,7 +456,7 @@ export default function SellPage() {
                 .filter((m) => m !== "UPI" || !!profilePayment?.upiId)
                 .map((method) => (
                   <button key={method} type="button" onClick={() => togglePayment(method)}
-                    className={`py-2 px-5 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${
+                    className={`py-2 px-5 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:border-[#ccc] ${
                       paymentMethods.includes(method)
                         ? "border-[#7b3fe4] bg-[#7b3fe4] text-white"
                         : "border-[#e5e5e5] bg-white text-[#555]"
@@ -538,7 +538,7 @@ export default function SellPage() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             disabled={walletOk && !chainOk}
-            className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+            className="w-full py-4 bg-black text-white rounded-xl font-condensed text-2xl tracking-[1px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
             {!walletOk ? "Connect Wallet" : (<span className="flex items-center justify-center gap-1">Review Order <ArrowRight className="w-4 h-4" /></span>)}
           </button>
 
