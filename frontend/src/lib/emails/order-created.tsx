@@ -7,9 +7,10 @@ interface Props {
   asset: string;
   pricePerUnit: string;
   orderId: string;
+  displayId: number;
 }
 
-export default function OrderCreatedEmail({ sellerName, amount, asset, pricePerUnit, orderId }: Props) {
+export default function OrderCreatedEmail({ sellerName, amount, asset, pricePerUnit, orderId, displayId }: Props) {
   const url = `https://cryptobazaar.co.in/marketplace/${orderId}`;
   return (
     <BaseEmail
@@ -22,6 +23,9 @@ export default function OrderCreatedEmail({ sellerName, amount, asset, pricePerU
       </Text>
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
         Hi {sellerName}, your order to sell <strong>{amount} {asset}</strong> at ₹{pricePerUnit}/unit is now live on the marketplace. You will be notified as soon as a buyer locks your order.
+      </Text>
+      <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>
+        Order reference: #{displayId}
       </Text>
     </BaseEmail>
   );

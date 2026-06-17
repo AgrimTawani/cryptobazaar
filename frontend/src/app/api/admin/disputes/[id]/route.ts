@@ -191,6 +191,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const amount = dispute.order.amount.toString();
     const asset = dispute.order.asset;
     const orderId = dispute.orderId;
+    const displayId = dispute.order.displayId;
 
     const emailTasks: Promise<void>[] = [];
     if (dispute.order.seller.email) {
@@ -205,6 +206,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             amount,
             asset,
             orderId,
+            displayId,
           }),
         },
       }).catch(() => {}));
@@ -221,6 +223,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             amount,
             asset,
             orderId,
+            displayId,
           }),
         },
       }).catch(() => {}));

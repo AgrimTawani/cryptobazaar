@@ -42,6 +42,7 @@ export async function GET() {
       const isSeller = o.sellerId === user.id;
       return {
         id: o.id,
+        displayId: o.displayId,
         role: isSeller ? "seller" : "buyer",
         action: isSeller ? "Sold" : "Bought",
         amount: o.amount.toString(),

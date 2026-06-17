@@ -5,9 +5,10 @@ interface Props {
   name: string;
   message: string;
   orderId: string;
+  displayId: number;
 }
 
-export default function AdminEvidenceRequestEmail({ name, message, orderId }: Props) {
+export default function AdminEvidenceRequestEmail({ name, message, orderId, displayId }: Props) {
   const url = `https://cryptobazaar.co.in/marketplace/${orderId}`;
   return (
     <BaseEmail
@@ -27,6 +28,7 @@ export default function AdminEvidenceRequestEmail({ name, message, orderId }: Pr
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
         Please respond with the requested information as soon as possible. Delays in responding may affect the outcome of the dispute resolution.
       </Text>
+      <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>Order reference: #{displayId}</Text>
       <Text style={{ color: "#888", fontSize: 13, lineHeight: 1.6 }}>
         If you have any questions, contact support@cryptobazaar.co.in.
       </Text>

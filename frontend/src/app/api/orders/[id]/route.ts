@@ -72,6 +72,7 @@ export async function GET(
 
     return NextResponse.json({
       id: order.id,
+      displayId: order.displayId,
       orderId: order.orderId,
       onChainId,
       sellerName:  order.seller.name  ?? "Anonymous",
@@ -385,12 +386,12 @@ export async function PATCH(
         if (counterparty) {
           await notify({
             push: { userId: counterparty.id, title: "Dispute raised", body: "Admin will review within 24 hours", url: `/marketplace/${id}` },
-            ...(counterparty.email ? { email: { to: counterparty.email, subject: "Dispute raised on your trade", react: createElement(DisputeRaisedEmail, { role: isSeller ? "buyer" : "seller", name: counterparty.name ?? "User", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) } } : {}),
+            ...(counterparty.email ? { email: { to: counterparty.email, subject: "Dispute raised on your trade", react: createElement(DisputeRaisedEmail, { role: isSeller ? "buyer" : "seller", name: counterparty.name ?? "User", amount: disputeAmount, asset: order.asset, orderId: id, displayId: order.displayId, raisedByRole }) } } : {}),
           }).catch(() => {});
         }
         // Notify admin
         await notify({
-          email: { to: "alerts@cryptobazaar.co.in", subject: `[Admin] Dispute on ${disputeAmount} ${order.asset} order`, react: createElement(DisputeRaisedEmail, { role: "admin", name: "Admin", amount: disputeAmount, asset: order.asset, orderId: id, raisedByRole }) },
+          email: { to: "alerts@cryptobazaar.co.in", subject: `[Admin] Dispute on ${disputeAmount} ${order.asset} order`, react: createElement(DisputeRaisedEmail, { role: "admin", name: "Admin", amount: disputeAmount, asset: order.asset, orderId: id, displayId: order.displayId, raisedByRole }) },
         }).catch(() => {});
         break;
       }

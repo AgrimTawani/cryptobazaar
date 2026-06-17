@@ -8,9 +8,10 @@ interface Props {
   amount: string;
   asset: string;
   orderId: string;
+  displayId: number;
 }
 
-export default function DisputeResolvedEmail({ name, won, winnerRole, amount, asset, orderId }: Props) {
+export default function DisputeResolvedEmail({ name, won, winnerRole, amount, asset, orderId, displayId }: Props) {
   const url = `https://cryptobazaar.co.in/marketplace/${orderId}`;
   const fundsAction = winnerRole === "seller"
     ? "returned to the seller's wallet"
@@ -32,6 +33,7 @@ export default function DisputeResolvedEmail({ name, won, winnerRole, amount, as
         <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
           The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This determination was made in accordance with CryptoBazaar's Trading Policy and the Terms &amp; Conditions you accepted at registration.
         </Text>
+        <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>Order reference: #{displayId}</Text>
         <Text style={{ color: "#888", fontSize: 13, lineHeight: 1.6 }}>
           This decision is final and binding. For any questions, contact support@cryptobazaar.co.in.
         </Text>
@@ -54,6 +56,7 @@ export default function DisputeResolvedEmail({ name, won, winnerRole, amount, as
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
         The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This outcome was determined in accordance with CryptoBazaar's Trading Policy and the Terms &amp; Conditions you accepted at registration, which grant CryptoBazaar the authority to adjudicate disputes and enforce resolutions on-chain.
       </Text>
+      <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>Order reference: #{displayId}</Text>
       <Text style={{ color: "#888", fontSize: 13, lineHeight: 1.6 }}>
         This decision is final and binding. If you believe this is an error, you may contact support@cryptobazaar.co.in within 7 days.
       </Text>

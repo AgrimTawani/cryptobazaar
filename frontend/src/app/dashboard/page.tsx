@@ -14,6 +14,7 @@ import { EnableNotifications } from "@/components/EnableNotifications";
 
 interface ActivityRow {
   id: string;
+  displayId: number;
   role: "seller" | "buyer";
   action: string;
   amount: string;
@@ -261,6 +262,7 @@ export default function DashboardPage() {
                           {row.counterpartyName ? `${row.role === "seller" ? "Buyer" : "Seller"}: ${row.counterpartyName} · ` : ""}
                           ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                         </p>
+                        <p className="font-sans text-xs text-[#bbb] mt-0.5">Order #{row.displayId}</p>
                       </div>
                       <span className={`font-sans text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${activityBadge(row.status)}`}>
                         {row.statusLabel}

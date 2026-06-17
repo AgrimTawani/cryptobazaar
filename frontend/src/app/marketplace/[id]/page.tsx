@@ -15,6 +15,7 @@ const escrowContract = getContract({ client: thirdwebClient, chain: amoyChain, a
 
 interface OrderDetail {
   id: string;
+  displayId: number;
   orderId: string;
   onChainId: string;
   sellerName: string;
@@ -182,6 +183,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
           <p className="font-sans text-[0.85rem] text-[#888]">
             ₹{parseFloat(order.pricePerUnit).toFixed(2)} per {order.asset} · Total ₹{parseFloat(order.totalValueInr).toLocaleString("en-IN")}
           </p>
+          <p className="font-sans text-xs text-[#bbb] mt-0.5">Order #{order.displayId}</p>
         </div>
 
         {/* Status banner */}

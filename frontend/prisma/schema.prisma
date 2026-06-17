@@ -278,8 +278,9 @@ model Subscription {
 }
 
 model Order {
-  id      String @id @default(uuid())
-  orderId String @unique @map("order_id")
+  id        String @id @default(uuid())
+  displayId Int    @unique @default(autoincrement()) @map("display_id")
+  orderId   String @unique @map("order_id")
 
   // Parties
   sellerId Int  @map("seller_id")

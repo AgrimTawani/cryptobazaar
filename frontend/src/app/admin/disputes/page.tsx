@@ -19,6 +19,7 @@ export default async function AdminDisputesPage() {
       order: {
         select: {
           orderId: true,
+          displayId: true,
           amount: true,
           asset: true,
           totalValueInr: true,
@@ -59,7 +60,7 @@ export default async function AdminDisputesPage() {
               >
                 {/* Order ID */}
                 <div className="min-w-0">
-                  <p className="font-mono text-xs text-[#555] truncate">{d.order.orderId}</p>
+                  <p className="font-sans text-sm font-semibold text-[#111]">#{d.order.displayId}</p>
                   <p className="font-sans text-[0.6rem] text-[#bbb] mt-0.5">
                     {new Date(d.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                   </p>

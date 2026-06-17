@@ -13,6 +13,7 @@ function activityBadge(status: string) {
 
 interface OrderRow {
   id: string;
+  displayId: number;
   role: string;
   action: string;
   amount: string;
@@ -83,7 +84,7 @@ export default function OrdersHistoryPage() {
                       ₹{parseFloat(row.totalValueInr).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </p>
                     <p className="font-sans text-xs text-[#aaa] mt-1">
-                      {new Date(row.updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      Order #{row.displayId} · {new Date(row.updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                   <span className={`font-sans text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${activityBadge(row.status)}`}>

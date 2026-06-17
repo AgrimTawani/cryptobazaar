@@ -84,6 +84,7 @@ export async function POST(
               name: user.name ?? "there",
               message: content.trim(),
               orderId: dispute.order.id,
+              displayId: dispute.order.displayId,
             }),
           },
         } : {}),

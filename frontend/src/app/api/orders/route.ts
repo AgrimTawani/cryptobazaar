@@ -194,6 +194,7 @@ export async function POST(request: Request) {
             asset,
             pricePerUnit: String(priceNum),
             orderId: order.id,
+            displayId: order.displayId,
           }),
         },
       } : {}),
