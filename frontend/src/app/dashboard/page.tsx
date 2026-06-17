@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <ArrowLeft className="w-4 h-4" /> Marketplace
           </Link>
           <button onClick={handleSignOut}
-            className="font-sans text-sm text-[#888] bg-transparent border border-[#e5e5e5] rounded-full py-1.5 px-4 cursor-pointer">
+            className="font-sans text-sm text-[#555] bg-transparent border border-[#555] rounded-full py-1.5 px-4 cursor-pointer hover:bg-[#f5f5f5] transition-colors">
             Sign out
           </button>
         </div>
@@ -206,10 +206,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
           
           {/* Left Column: Stats, Wallet, Activity */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 h-full">
             {/* Card 1: Stats (Horizontal) */}
             <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
               {[
@@ -242,7 +242,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Card 3: Recent Activity */}
-            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col flex-1">
               <div className="flex justify-between items-center mb-4">
                 <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold">Recent Activity</p>
                 <Link href="/dashboard/orders" className="font-sans text-sm text-[#888] no-underline">View full order history <ArrowRight className="inline-block w-4 h-4 ml-1" /></Link>
@@ -253,9 +253,9 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col divide-y divide-[#f5f5f5]">
-                  {stats.activity.slice(0, 3).map((row) => (
+                  {stats.activity.slice(0, 4).map((row) => (
                     <Link key={row.id} href={`/marketplace/${row.id}`}
-                      className="flex items-center justify-between py-3 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
+                      className="flex items-center justify-between py-2 no-underline hover:bg-[#fafafa] -mx-2 px-2 rounded-lg transition-colors">
                       <div>
                         <p className="font-sans text-sm font-semibold text-[#111]">
                           {row.action} {parseFloat(row.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} {row.asset}
@@ -277,7 +277,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column: Payment & Verification */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 h-full">
             {/* Card 4: Payment Details */}
             <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Payment Details</p>
@@ -379,7 +379,7 @@ export default function DashboardPage() {
             </div>
             
             {/* Card 5: Verification */}
-            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5">
+            <div className="bg-white border border-[#e8e8e8] rounded-xl p-5 flex flex-col flex-1">
               <p className="font-sans text-xs text-[#999] uppercase tracking-widest font-semibold mb-4">Verification</p>
             {[
               { label: "Google Login",       done: true },
