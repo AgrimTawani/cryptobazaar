@@ -20,18 +20,18 @@ export default function DisputeResolvedEmail({ name, won, winnerRole, amount, as
   if (won) {
     return (
       <BaseEmail
-        previewText={`Dispute resolved — decision in your favour on ${amount} ${asset} trade`}
+        previewText={`Dispute ruling: Favourable decision on ${amount} ${asset} trade`}
         ctaLabel="View Order"
         ctaUrl={url}
       >
         <Text style={{ fontSize: 22, fontWeight: "bold", color: "#166534", margin: "0 0 8px" }}>
-          Dispute Resolved
+          Dispute Resolved in Your Favour
         </Text>
         <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-          Hi {name}, following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in your favour.
+          Hi {name}, following a comprehensive review of the evidence, our compliance team has ruled in your favour.
         </Text>
         <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-          The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This determination was made in accordance with CryptoBazaar's Trading Policy and the Terms &amp; Conditions you accepted at registration.
+          The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This determination was made securely in accordance with CryptoBazaar's Trading Policy.
         </Text>
         <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>Order reference: #{displayId}</Text>
         <Text style={{ color: "#888", fontSize: 13, lineHeight: 1.6 }}>
@@ -43,18 +43,18 @@ export default function DisputeResolvedEmail({ name, won, winnerRole, amount, as
 
   return (
     <BaseEmail
-      previewText={`Dispute resolved — decision in favour of ${winnerRole} on ${amount} ${asset} trade`}
+      previewText={`Dispute ruling: Decision rendered on ${amount} ${asset} trade`}
       ctaLabel="View Order"
       ctaUrl={url}
     >
       <Text style={{ fontSize: 22, fontWeight: "bold", color: "#991b1b", margin: "0 0 8px" }}>
-        Dispute Resolved
+        Dispute Resolution Notice
       </Text>
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-        Hi {name}, following a thorough review of all evidence submitted by both parties, CryptoBazaar's dispute resolution team has determined that this dispute be resolved in favour of the {winnerRole}.
+        Hi {name}, after a comprehensive review of all provided evidence, our compliance team has resolved this dispute in favour of the {winnerRole}.
       </Text>
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-        The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This outcome was determined in accordance with CryptoBazaar's Trading Policy and the Terms &amp; Conditions you accepted at registration, which grant CryptoBazaar the authority to adjudicate disputes and enforce resolutions on-chain.
+        The escrowed <strong>{amount} {asset}</strong> has been {fundsAction}. This outcome was determined in accordance with CryptoBazaar's Trading Policy and Terms of Service.
       </Text>
       <Text style={{ color: "#aaa", fontSize: 12, lineHeight: 1.6 }}>Order reference: #{displayId}</Text>
       <Text style={{ color: "#888", fontSize: 13, lineHeight: 1.6 }}>

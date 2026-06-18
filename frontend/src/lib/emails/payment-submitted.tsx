@@ -16,30 +16,30 @@ export default function PaymentSubmittedEmail({ role, name, amount, asset, total
   if (role === "seller") {
     return (
       <BaseEmail
-        previewText="Buyer submitted payment proof — verify and confirm"
+        previewText="Payment confirmation requested by buyer"
         ctaLabel="Verify & Confirm"
         ctaUrl={url}
       >
         <Text style={{ fontSize: 22, fontWeight: "bold", color: "#111", margin: "0 0 8px" }}>
-          Payment proof submitted ⚠️
+          Payment Submitted by Buyer
         </Text>
         <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-          Hi {name}, the buyer has submitted payment proof for <strong>{amount} {asset}</strong> (₹{totalInr}){utr ? ` with UTR <strong>${utr}</strong>` : ""}. Please check your bank account and confirm once the funds arrive.
+          Hi {name}, the buyer has marked the payment of ₹{totalInr} for <strong>{amount} {asset}</strong> as complete{utr ? ` (UTR: <strong>${utr}</strong>)` : ""}. Please verify the deposit in your bank account before releasing the escrow.
         </Text>
       </BaseEmail>
     );
   }
   return (
     <BaseEmail
-      previewText="Payment submitted — waiting for seller confirmation"
+      previewText="Your payment was logged — awaiting seller confirmation"
       ctaLabel="View Trade"
       ctaUrl={url}
     >
       <Text style={{ fontSize: 22, fontWeight: "bold", color: "#111", margin: "0 0 8px" }}>
-        Payment submitted
+        Payment Confirmation Pending
       </Text>
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-        Hi {name}, your payment of ₹{totalInr} for <strong>{amount} {asset}</strong> has been submitted. The seller will confirm once they receive the funds. This usually takes a few minutes.
+        Hi {name}, your payment of ₹{totalInr} for <strong>{amount} {asset}</strong> has been securely logged. The seller has been notified and will release the assets from escrow once they verify the funds.
       </Text>
     </BaseEmail>
   );

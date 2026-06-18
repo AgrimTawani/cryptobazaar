@@ -12,15 +12,15 @@ export default function BuyerCancelledEmail({ sellerName, amount, asset, orderId
   const url = `https://cryptobazaar.co.in/marketplace/${orderId}`;
   return (
     <BaseEmail
-      previewText={`Buyer cancelled — your ${amount} ${asset} listing is open again`}
+      previewText={`Order cancelled by buyer — your ${amount} ${asset} listing is active again`}
       ctaLabel="View Listing"
       ctaUrl={url}
     >
       <Text style={{ fontSize: 22, fontWeight: "bold", color: "#111", margin: "0 0 8px" }}>
-        Buyer cancelled the order
+        Order Cancelled by Buyer
       </Text>
       <Text style={{ color: "#444", fontSize: 15, lineHeight: 1.6 }}>
-        Hi {sellerName}, the buyer cancelled the lock on your <strong>{amount} {asset}</strong> listing. Your order is now open again and available on the marketplace.
+        Hi {sellerName}, the buyer has cancelled their lock on your <strong>{amount} {asset}</strong> listing. Your assets remain secure in escrow, and your listing is immediately available on the marketplace for new buyers.
       </Text>
     </BaseEmail>
   );
