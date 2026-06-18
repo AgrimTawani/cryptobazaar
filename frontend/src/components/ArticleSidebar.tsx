@@ -83,7 +83,7 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
 
   const renderNav = (isMobile: boolean) => (
     <>
-      <h3 className="font-condensed text-lg tracking-[2px] uppercase text-zinc-400 mb-6">
+      <h3 className="font-condensed text-xl tracking-[2px] uppercase text-zinc-500 mb-6 font-bold">
         Documentation Hub
       </h3>
       <nav className="flex flex-col gap-4">
@@ -91,10 +91,10 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
           <div key={category.id} className="flex flex-col gap-1">
             <button
               onClick={() => toggleCategory(category.id)}
-              className={`flex items-center justify-between w-full text-left font-condensed text-base tracking-[0.5px] font-bold text-black py-${isMobile ? "2" : "1"} hover:text-lime-dark transition-colors ${isMobile ? "border-b border-zinc-200" : ""}`}
+              className={`flex items-center justify-between w-full text-left font-condensed text-lg tracking-[0.5px] font-bold text-black py-${isMobile ? "3" : "1.5"} px-3 -mx-3 rounded-lg hover:bg-zinc-100 transition-colors ${isMobile ? "border-b border-zinc-200" : ""}`}
             >
               {category.title}
-              <span className="text-zinc-400 text-xs font-sans">
+              <span className="text-zinc-500 text-sm font-sans font-bold">
                 {expandedCategories.includes(category.id) ? "−" : "+"}
               </span>
             </button>
@@ -120,7 +120,7 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
                         }`}
                       >
                         <div className="min-w-0">
-                          <p className="font-condensed text-[0.9rem] tracking-[0.3px] leading-tight font-medium">
+                          <p className="font-condensed text-[1.05rem] tracking-[0.3px] leading-tight font-semibold">
                             {article.title}
                           </p>
                         </div>
@@ -142,10 +142,10 @@ export function ArticleSidebar({ currentSlug, sections }: ArticleSidebarProps) {
                                   <button
                                     key={sec.id}
                                     onClick={() => scrollToSection(sec.id)}
-                                    className={`font-sans text-[0.7rem] text-left leading-relaxed py-1 px-2 transition-all duration-150 rounded-r-md ${
+                                    className={`font-sans text-[0.85rem] text-left leading-relaxed py-1.5 px-3 transition-all duration-150 rounded-r-md ${
                                       activeSectionId === sec.id
-                                        ? "text-black font-bold bg-zinc-50"
-                                        : "text-zinc-400 hover:text-zinc-900"
+                                        ? "text-black font-bold bg-zinc-100"
+                                        : "text-zinc-500 hover:text-zinc-900 font-medium"
                                     }`}
                                   >
                                     {sec.title.replace(/^\d+(\.\d+)?\s/, "")}

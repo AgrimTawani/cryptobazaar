@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ARTICLES_CATEGORIES } from "@/data/articlesData";
@@ -65,9 +65,9 @@ export default function ArticlesIndexPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="font-sans text-sm text-zinc-500 hover:text-black transition-colors duration-200 no-underline"
+            className="font-sans text-sm text-[#555] no-underline border border-[#555] rounded-full px-4 py-1.5 flex items-center gap-1.5 hover:bg-[#f5f5f5] transition-colors"
           >
-            Home
+            <ArrowLeft className="w-4 h-4" /> Home
           </Link>
         </div>
       </header>

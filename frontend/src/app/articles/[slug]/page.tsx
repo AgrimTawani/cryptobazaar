@@ -11,6 +11,7 @@ import {
 import { ArticleSidebar } from "@/components/ArticleSidebar";
 import { ArticleHeader } from "@/components/ArticleHeader";
 import { MoveToTopButton } from "@/components/MoveToTopButton";
+import { AnimatedMain } from "@/components/AnimatedMain";
 
 // ── Static params for all articles ──
 export function generateStaticParams() {
@@ -110,7 +111,7 @@ export default async function ArticlePage({
       <ArticleHeader />
 
       {/* ── MAIN CONTENT GRID ── */}
-      <div className="max-w-[1280px] mx-auto flex min-h-[calc(100vh-64px)] relative">
+      <div className="w-full max-w-[1536px] mx-auto flex min-h-[calc(100vh-64px)] relative">
         {/* Sidebar */}
         <ArticleSidebar
           currentSlug={slug}
@@ -118,7 +119,7 @@ export default async function ArticlePage({
         />
 
         {/* ── MAIN ARTICLE READER AREA ── */}
-        <main className="flex-1 p-6 md:p-12 min-w-0 max-w-[900px]">
+        <AnimatedMain key={slug} className="flex-1 p-6 md:p-12 min-w-0 max-w-[900px]">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs font-sans text-zinc-400 mb-6">
             <Link
@@ -134,7 +135,7 @@ export default async function ArticlePage({
           {/* Article Header */}
           <div className="mb-10 pb-8 border-b border-zinc-200">
             <div className="flex items-center gap-3 mb-3">
-              <span className="font-sans text-xs tracking-[4px] uppercase text-lime-dark font-bold">
+              <span className="font-sans text-xs tracking-[4px] uppercase text-black font-bold">
                 CryptoBazaar Knowledge Base
               </span>
             </div>
@@ -229,7 +230,7 @@ export default async function ArticlePage({
               Contact Support
             </a>
           </div>
-        </main>
+        </AnimatedMain>
       </div>
       <MoveToTopButton />
     </div>

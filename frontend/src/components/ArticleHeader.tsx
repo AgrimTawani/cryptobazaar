@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
@@ -25,18 +27,16 @@ export function ArticleHeader() {
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="font-sans text-sm text-zinc-500 hover:text-black transition-colors duration-200 no-underline hidden md:inline"
+          className="font-sans text-sm text-[#555] no-underline border border-[#555] rounded-full px-4 py-1.5 hover:bg-[#f5f5f5] transition-colors hidden md:flex items-center gap-1.5"
         >
-          Home
+          <ArrowLeft className="w-4 h-4" /> Home
         </Link>
-        <span className="text-zinc-200 hidden md:inline">·</span>
         <WalletNavWidget />
         {isSignedIn && (
           <>
-            <span className="text-zinc-200 hidden md:inline">·</span>
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 no-underline py-1.5 pr-3.5 pl-1.5 border border-zinc-200 rounded-full bg-zinc-50 hover:bg-zinc-100 transition-colors"
+              className="flex items-center gap-2 no-underline py-1 px-3 border border-[#555] rounded-full bg-transparent hover:bg-[#f5f5f5] transition-colors"
             >
               {user?.imageUrl && (
                 <Image
@@ -47,7 +47,7 @@ export function ArticleHeader() {
                   className="rounded-full"
                 />
               )}
-              <span className="font-sans text-sm font-medium text-zinc-800">
+              <span className="font-sans text-sm font-semibold text-[#555]">
                 Dashboard
               </span>
             </Link>

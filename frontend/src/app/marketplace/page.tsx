@@ -215,11 +215,11 @@ export default function MarketplacePage() {
         <Link href="/" className="nav-logo no-underline text-black shrink-0">CRYPTOBAZAAR</Link>
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <Link href="/" className="hidden md:inline font-sans text-sm text-[#555] border border-[#555] rounded-full px-4 py-1.5 no-underline hover:bg-[#f5f5f5] transition-colors">Home</Link>
-          <span className="text-[#ddd] hidden md:inline">·</span>
+
           <WalletNavWidget />
           {!isGuest && (
             <>
-              <span className="text-[#ddd] hidden md:inline">·</span>
+
               <Link
                 href="/dashboard"
                 className={`flex items-center gap-2 no-underline py-1 pr-3 border border-[#555] text-[#555] rounded-full hover:bg-[#f5f5f5] transition-colors bg-white ${user?.imageUrl ? "pl-1" : "pl-3"}`}
