@@ -60,6 +60,7 @@ enum PaymentMethod {
   UPI
   IMPS
   NEFT
+  CDM // Cash Deposit Machine
 }
 
 // Seller posts order → tokens move to escrow instantly → LISTED
@@ -301,6 +302,9 @@ model Order {
   lockedAmount           Decimal?       @map("locked_amount") @db.Decimal(20, 8)
   acceptedPaymentMethods PaymentMethod[] @map("accepted_payment_methods")
 
+  // Face-to-face (in-person cash handover) — seller-set at listing time
+  isF2F                  Boolean        @default(false) @map("is_f2f")
+
   // Seller payment details (encrypted at app layer)
   sellerUpiId       String? @map("seller_upi_id")
   sellerBankAccount String? @map("seller_bank_account")
@@ -319,6 +323,7 @@ model Order {
   utr                   String?
   paymentMethod         PaymentMethod? @map("payment_method")
   paymentScreenshotIpfs String?        @map("payment_screenshot_ipfs")
+  cdmReceiptKey         String?        @map("cdm_receipt_key") // R2 key — cash deposit machine receipt
 
   // Trade timing (seconds — used for rating computation)
   buyerPaymentTimeSecs  Int? @map("buyer_payment_time_secs")
@@ -348,6 +353,7 @@ model Order {
   @@index([buyerId])
   @@index([status])
   @@index([createdAt])
+  @@index([isF2F])
   @@map("orders")
 }
 

@@ -31,13 +31,15 @@ export async function POST(
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    // "cdm" → cash deposit machine receipt (stored in its own column); else UPI/IMPS/NEFT screenshot
+    const isCdm = formData.get("kind") === "cdm";
 
     const ext = ALLOWED_TYPES[file.type];
     if (!ext) return NextResponse.json({ error: "Only PNG, JPEG, or WebP images allowed" }, { status: 400 });
     if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: "Max 5MB" }, { status: 400 });
 
     const bytes = await file.arrayBuffer();
-    const key = `screenshots/${id}/${Date.now()}.${ext}`;
+    const key = `${isCdm ? "cdm-receipts" : "screenshots"}/${id}/${Date.now()}.${ext}`;
 
     await r2.send(new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
@@ -48,7 +50,7 @@ export async function POST(
 
     await db.order.update({
       where: { id },
-      data: { paymentScreenshotIpfs: key },
+      data: isCdm ? { cdmReceiptKey: key } : { paymentScreenshotIpfs: key },
     });
 
     return NextResponse.json({ r2Key: key });
@@ -76,7 +78,9 @@ export async function GET(
     const isParty = user.id === order.sellerId || user.id === order.buyerId;
     if (!isParty) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    if (!order.paymentScreenshotIpfs) return NextResponse.json({ url: null });
+    // CDM receipt (dedicated column) takes precedence, else the UPI/IMPS/NEFT screenshot
+    const proofKey = order.cdmReceiptKey ?? order.paymentScreenshotIpfs;
+    if (!proofKey) return NextResponse.json({ url: null });
 
     // Pre-signed URL — works with private buckets, expires in 1 hour
     const url = await getSignedUrl(
@@ -84,12 +88,12 @@ export async function GET(
       r2,
       new GetObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME!,
-        Key: order.paymentScreenshotIpfs,
+        Key: proofKey,
       }),
       { expiresIn: 3600 }
     );
 
-    return NextResponse.json({ url });
+    return NextResponse.json({ url, kind: order.cdmReceiptKey ? "cdm" : "screenshot" });
   } catch (err) {
     console.error("[payment-proof GET]", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });

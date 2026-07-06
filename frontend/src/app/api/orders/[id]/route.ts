@@ -110,6 +110,9 @@ export async function GET(
       pricePerUnit: order.pricePerUnit.toString(),
       totalValueInr: order.totalValueInr.toString(),
       acceptedPaymentMethods: order.acceptedPaymentMethods,
+      isF2F: order.isF2F,
+      paymentMethod: (isSeller || isBuyer) ? (order.paymentMethod ?? null) : null,
+      hasCdmReceipt: (isSeller || isBuyer) ? Boolean(order.cdmReceiptKey) : false,
       status: order.status,
       escrowTxHash: order.escrowTxHash ?? null,
       escrowContractAddress: order.escrowContractAddress ?? null,
@@ -151,7 +154,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     const body = await request.json();
-    const { action, utr } = body;
+    const { action, utr, paymentMethod } = body;
 
     const isSeller = user.id === order.sellerId;
     const isBuyer  = user.id === order.buyerId;
@@ -233,6 +236,14 @@ export async function PATCH(
         if (order.status !== "BUYER_MATCHED")
           return NextResponse.json({ error: "Invalid state" }, { status: 400 });
 
+        // Buyer's chosen method must be one the seller accepts
+        if (paymentMethod && !order.acceptedPaymentMethods.includes(paymentMethod))
+          return NextResponse.json({ error: "Payment method not accepted for this order" }, { status: 400 });
+
+        // Cash Deposit Machine trades require the deposit receipt uploaded first
+        if (paymentMethod === "CDM" && !order.cdmReceiptKey)
+          return NextResponse.json({ error: "CDM receipt is required before marking paid" }, { status: 400 });
+
         const paidAt = new Date();
         const buyerPaymentTimeSecs = order.buyerMatchedAt
           ? Math.round((paidAt.getTime() - order.buyerMatchedAt.getTime()) / 1000)
@@ -242,6 +253,7 @@ export async function PATCH(
           data: {
             status: "BUYER_PAID",
             utr: utr ?? null,
+            paymentMethod: paymentMethod ?? null,
             paymentSubmittedAt: paidAt,
             buyerPaymentTimeSecs,
           },
@@ -255,7 +267,7 @@ export async function PATCH(
               chatRoomId: roomPaid.id,
               senderId: null,
               type: "SYSTEM",
-              content: `Buyer submitted payment proof${utr ? ` (UTR: ${utr})` : ""}. Seller — check your account before confirming.`,
+              content: `Buyer submitted ${paymentMethod === "CDM" ? "the CDM deposit receipt" : "payment proof"}${utr ? ` (UTR: ${utr})` : ""}. Seller — check your account before confirming.`,
             },
           });
         }

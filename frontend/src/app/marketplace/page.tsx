@@ -40,6 +40,7 @@ interface OrderRow {
   pricePerUnit: string;
   totalValueInr: string;
   acceptedPaymentMethods: string[];
+  isF2F: boolean;
   escrowTxHash: string | null;
   escrowContractAddress: string | null;
   status: string;
@@ -110,6 +111,7 @@ export default function MarketplacePage() {
   const isGuest = !isSignedIn;
   const [assetFilter, setAssetFilter] = useState("All");
   const [chainFilter, setChainFilter] = useState("All Chains");
+  const [tradeTab, setTradeTab] = useState<"All" | "F2F">("All");
   const [pendingOrder, setPendingOrder] = useState<OrderRow | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [orders, setOrders] = useState<OrderRow[]>([]);
@@ -179,9 +181,10 @@ export default function MarketplacePage() {
   const filtered = orders.filter((o) => {
     const assetMatch = assetFilter === "All" || o.asset === assetFilter;
     const chainMatch = chainFilter === "All Chains" || o.chain === CHAIN_MAP[chainFilter];
+    const tabMatch = tradeTab === "All" || (tradeTab === "F2F" && o.isF2F);
     const p = parseFloat(o.pricePerUnit);
     const priceMatch = p >= priceRange[0] && p <= priceRange[1];
-    return assetMatch && chainMatch && priceMatch;
+    return assetMatch && chainMatch && tabMatch && priceMatch;
   }).sort((a, b) => {
     let priceDiff = 0;
     if (priceSort === "asc") priceDiff = parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit);
@@ -322,6 +325,18 @@ export default function MarketplacePage() {
               + Post Order
             </Link>
           )}
+        </div>
+
+        {/* Trade type tabs */}
+        <div className="flex gap-1 mb-4 border-b border-[#e5e5e5]">
+          {(["All", "F2F"] as const).map((t) => (
+            <button key={t} onClick={() => setTradeTab(t)}
+              className={`relative -mb-px py-2 px-5 font-sans text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+                tradeTab === t ? "border-black text-black" : "border-transparent text-[#999] hover:text-[#555]"
+              }`}>
+              {t === "F2F" ? "Face-to-Face" : "All Listings"}
+            </button>
+          ))}
         </div>
 
         {/* Filters */}
@@ -484,6 +499,11 @@ export default function MarketplacePage() {
                     {CHAIN_BADGE[order.chain].label}
                   </span>
                 )}
+                {order.isF2F && (
+                  <span className="font-sans text-[0.6rem] font-semibold px-1.5 py-0.5 rounded-full w-fit text-[#7b3fe4] bg-[#f5f0ff]">
+                    F2F
+                  </span>
+                )}
               </div>
               <span className="font-mono text-sm text-[#111]">₹{parseFloat(order.pricePerUnit).toFixed(2)}</span>
               <div className="flex flex-col gap-0.5">
@@ -565,6 +585,11 @@ export default function MarketplacePage() {
                       <span className="font-sans text-[0.6rem] font-semibold px-1.5 py-0.5 rounded-full"
                         style={{ color: CHAIN_BADGE[order.chain].color, background: CHAIN_BADGE[order.chain].bg }}>
                         {CHAIN_BADGE[order.chain].label}
+                      </span>
+                    )}
+                    {order.isF2F && (
+                      <span className="font-sans text-[0.6rem] font-semibold px-1.5 py-0.5 rounded-full text-[#7b3fe4] bg-[#f5f0ff]">
+                        F2F
                       </span>
                     )}
                   </div>

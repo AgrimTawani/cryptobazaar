@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&family=Cascadia+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px; height: 1920px;
+        overflow: hidden;
+        background: #000;
+        font-family: 'Manrope', system-ui, sans-serif;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+      }
+      :root {
+        --lime: #D4FF00;
+        --lime-dark: #c2eb00;
+        --ink: #000;
+        --bone: #FAFAFA;
+        --mute: #777;
+        --line: #e5e5e5;
+      }
+      .condensed { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+      .mono { font-family: 'Cascadia Mono', 'Consolas', monospace; }
+      .clip { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+      .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+      /* ---------- Reusable phone-frame chrome ---------- */
+      .phone-chrome {
+        position: absolute; left: 60px; top: 110px;
+        width: 960px; height: 1700px;
+        background: #fff;
+        border: 8px solid #000;
+        border-radius: 56px;
+        box-shadow: 0 40px 100px rgba(212, 255, 0, 0.18), 0 0 0 1px #000;
+        color: #000;
+        overflow: hidden;
+        font-family: 'Manrope', sans-serif;
+      }
+      .phone-statusbar {
+        height: 60px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 50px;
+        font-size: 24px; font-weight: 700; color: #000;
+      }
+      .phone-statusbar .dots { display: flex; gap: 6px; }
+      .phone-statusbar .dots span { width: 8px; height: 8px; background: #000; border-radius: 50%; }
+      .phone-navbar {
+        height: 78px; padding: 0 40px;
+        display: flex; align-items: center; justify-content: space-between;
+        border-bottom: 2px solid #000;
+      }
+      .phone-navbar .brand {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 30px; letter-spacing: 4px;
+      }
+      .phone-navbar .menu { display: flex; flex-direction: column; gap: 5px; }
+      .phone-navbar .menu i { width: 26px; height: 3px; background: #000; display: block; }
+      .phone-body { padding: 50px 48px; }
+      .step-pill {
+        display: inline-block;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        padding: 12px 28px;
+        background: var(--lime);
+        color: #000;
+        border-radius: 999px;
+        letter-spacing: 3px;
+        margin-bottom: 36px;
+      }
+      .screen-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 92px;
+        line-height: 0.95;
+        color: #000;
+        margin-bottom: 28px;
+      }
+      .screen-sub {
+        font-size: 32px;
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 50px;
+      }
+      .input-row {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 18px;
+        padding: 28px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 24px;
+        font-size: 36px;
+      }
+      .input-row .label { font-size: 22px; color: #555; font-weight: 700; letter-spacing: 2px; }
+      .input-row .val { font-family: 'Cascadia Mono', monospace; font-size: 34px; font-weight: 600; color: #000; }
+      .input-row .tick { color: #0a8a0a; font-weight: 800; font-size: 38px; }
+      .lime-btn {
+        background: var(--lime); color: #000;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 42px; letter-spacing: 4px;
+        padding: 26px 0;
+        text-align: center;
+        border: 3px solid #000;
+        border-radius: 999px;
+        margin-top: 24px;
+      }
+
+      /* ===================================================== */
+      /* SCENE 1 — Hook (0 – 2.0s) */
+      /* ===================================================== */
+      .s1 { background: #000; }
+      .s1 .the { font-size: 200px; line-height: 0.9; color: #fff; }
+      .s1 .word { color: var(--lime); display: inline-block; min-width: 460px; text-align: left; }
+      .s1 .cursor { color: var(--lime); display: inline-block; margin-left: 6px; }
+      .s1 .bazaar {
+        font-size: 260px; line-height: 0.9; color: var(--lime); margin-top: 20px;
+        text-shadow: 0 0 80px rgba(212,255,0,0.0);
+      }
+
+      /* ===================================================== */
+      /* SCENE 2 — KYC + Liveness (2.0 – 5.0s) */
+      /* ===================================================== */
+      .s2-bg { background: #000; }
+      .liveness-frame {
+        background: #000;
+        border: 4px solid var(--lime);
+        border-radius: 28px;
+        height: 380px;
+        margin: 30px 0 24px;
+        position: relative;
+        overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .liveness-frame .face {
+        width: 220px; height: 280px;
+        border: 4px dashed var(--lime);
+        border-radius: 50% / 45%;
+        position: relative;
+      }
+      .liveness-frame .scanline {
+        position: absolute; left: 0; width: 100%; height: 4px;
+        background: var(--lime); box-shadow: 0 0 24px var(--lime);
+        top: 50%;
+      }
+      .liveness-frame .live-badge {
+        position: absolute; top: 24px; left: 24px;
+        background: var(--lime); color: #000;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 24px; padding: 8px 18px;
+        border-radius: 999px; letter-spacing: 3px;
+        opacity: 0;
+      }
+      .liveness-frame .live-badge .led {
+        display: inline-block; width: 10px; height: 10px;
+        background: #0a8a0a; border-radius: 50%; margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      /* ===================================================== */
+      /* SCENE 3 — Bank Statement (5.0 – 7.5s) */
+      /* ===================================================== */
+      .s3-bg { background: #000; }
+      .upload-card {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 24px;
+        padding: 50px 40px;
+        display: flex; flex-direction: column; gap: 28px;
+        margin-top: 30px;
+      }
+      .upload-card .file-row {
+        display: flex; align-items: center; gap: 24px;
+        font-size: 32px; font-weight: 700; color: #000;
+      }
+      .upload-card .file-icon {
+        width: 72px; height: 90px;
+        background: var(--lime);
+        border: 3px solid #000;
+        border-radius: 8px;
+        position: relative;
+      }
+      .upload-card .file-icon::after {
+        content: 'PDF';
+        position: absolute; bottom: 8px; left: 0; right: 0;
+        text-align: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px; letter-spacing: 2px;
+      }
+      .upload-card .scan-bar {
+        height: 16px;
+        background: #f0f0f0;
+        border-radius: 999px;
+        border: 2px solid #000;
+        overflow: hidden;
+      }
+      .upload-card .scan-fill {
+        width: 0%; height: 100%; background: var(--lime);
+      }
+      .upload-card .scan-label {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px; letter-spacing: 3px;
+        color: #000;
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .upload-card .scan-label .red-flags { color: #0a8a0a; }
+
+      /* ===================================================== */
+      /* SCENE 4 — Questionnaire (7.5 – 10.0s) */
+      /* ===================================================== */
+      .s4-bg { background: #000; }
+      .quiz-card {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 24px;
+        padding: 50px 44px;
+        margin-top: 20px;
+      }
+      .quiz-card .qnum {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px; color: var(--mute); letter-spacing: 4px;
+        margin-bottom: 24px;
+      }
+      .quiz-card .qtext {
+        font-size: 36px; line-height: 1.25; color: #000; font-weight: 700;
+        margin-bottom: 36px;
+      }
+      .quiz-opt {
+        border: 3px solid #000;
+        border-radius: 999px;
+        padding: 24px 36px;
+        font-size: 30px; font-weight: 600; color: #000;
+        margin-bottom: 18px;
+        display: flex; align-items: center; gap: 18px;
+        background: #fff;
+      }
+      .quiz-opt .dot {
+        width: 26px; height: 26px;
+        border: 3px solid #000;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .quiz-opt.selected { background: var(--lime); }
+      .quiz-opt.selected .dot { background: #000; }
+      .approved-stamp {
+        margin-top: 30px;
+        display: inline-block;
+        background: #000;
+        color: var(--lime);
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 60px;
+        padding: 18px 50px;
+        border-radius: 999px;
+        letter-spacing: 6px;
+        opacity: 0;
+      }
+
+      /* ===================================================== */
+      /* SCENE 5 — Marketplace (10.0 – 13.0s) */
+      /* ===================================================== */
+      .s5-bg { background: #000; }
+      .mkt-tabs {
+        display: flex; gap: 12px; margin-bottom: 28px;
+      }
+      .mkt-tab {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px; padding: 12px 28px;
+        border: 3px solid #000; border-radius: 999px;
+        letter-spacing: 3px; color: #000;
+      }
+      .mkt-tab.active { background: #000; color: var(--lime); }
+      .order-card {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 22px;
+        padding: 28px 32px;
+        margin-bottom: 20px;
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 20px;
+      }
+      .order-card .who {
+        display: flex; flex-direction: column; gap: 8px;
+      }
+      .order-card .seller { font-size: 26px; font-weight: 800; color: #000; }
+      .order-card .verified { font-size: 18px; color: #555; font-weight: 600; letter-spacing: 2px; }
+      .order-card .price-block { text-align: right; }
+      .order-card .price {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 48px; color: #000; line-height: 1;
+      }
+      .order-card .amount { font-size: 22px; color: #555; font-weight: 600; margin-top: 4px; }
+      .order-card .buy {
+        background: var(--lime); border: 3px solid #000;
+        padding: 14px 26px; border-radius: 999px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px; letter-spacing: 3px; color: #000;
+      }
+      .cursor-dot {
+        position: absolute;
+        width: 60px; height: 60px;
+        background: var(--lime); border: 4px solid #000;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 5;
+        box-shadow: 0 0 0 6px rgba(212,255,0,0.25);
+      }
+
+      /* ===================================================== */
+      /* SCENE 6 — Escrow lock (13.0 – 16.0s) */
+      /* ===================================================== */
+      .s6-bg { background: #000; }
+      .trade-card {
+        background: #000;
+        color: #fff;
+        border: 3px solid var(--lime);
+        border-radius: 24px;
+        padding: 40px;
+        margin-top: 20px;
+      }
+      .trade-card .tnum {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px; color: var(--lime); letter-spacing: 4px; margin-bottom: 12px;
+      }
+      .trade-card .tcoin {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 76px; color: #fff; line-height: 1; margin-bottom: 30px;
+      }
+      .trade-card .status-row {
+        display: flex; align-items: center; gap: 16px;
+        padding: 22px 28px;
+        background: #1a1a1a;
+        border-radius: 16px;
+        margin-bottom: 18px;
+      }
+      .trade-card .status-row .pulse {
+        width: 18px; height: 18px;
+        border-radius: 50%; background: var(--lime);
+      }
+      .trade-card .status-row .pulse.green { background: #6fff00; }
+      .trade-card .status-row .label {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px; letter-spacing: 3px; color: #fff;
+      }
+      .trade-card .tx-hash {
+        font-family: 'Cascadia Mono', monospace;
+        font-size: 22px; color: var(--lime);
+        padding: 16px 22px;
+        background: #1a1a1a; border-radius: 12px;
+        margin-top: 6px;
+        word-break: break-all;
+      }
+      .escrow-banner {
+        background: var(--lime); color: #000;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 56px; letter-spacing: 6px;
+        text-align: center;
+        padding: 30px 0;
+        border-radius: 18px;
+        border: 3px solid #000;
+        margin-top: 24px;
+        opacity: 0;
+      }
+
+      /* ===================================================== */
+      /* SCENE 7 — INR sent + auto-release (16.0 – 20.0s) */
+      /* ===================================================== */
+      .s7-bg { background: #000; }
+      .flow-card {
+        background: #fff;
+        color: #000;
+        border: 3px solid #000;
+        border-radius: 24px;
+        padding: 34px 36px;
+        margin-bottom: 24px;
+        display: flex; align-items: center; gap: 24px;
+        opacity: 0;
+      }
+      .flow-card .icon {
+        width: 92px; height: 92px;
+        background: var(--lime); border: 3px solid #000;
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 44px; color: #000;
+        flex-shrink: 0;
+      }
+      .flow-card .body { flex: 1; }
+      .flow-card .head-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .flow-card .kicker {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 24px; letter-spacing: 4px; color: #555;
+      }
+      .flow-card .check {
+        color: #0a8a0a; font-weight: 900; font-size: 38px;
+      }
+      .flow-card .amount {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 56px; color: #000; line-height: 1;
+      }
+      .flow-card .detail { font-size: 22px; color: #555; margin-top: 6px; font-weight: 600; }
+      .flow-card.dark { background: #000; color: #fff; border-color: var(--lime); }
+      .flow-card.dark .amount { color: var(--lime); }
+      .flow-card.dark .detail { color: #cfcfcf; }
+      .flow-card.dark .kicker { color: var(--lime); }
+      .flow-card.dark .check { color: var(--lime); }
+      .flow-arrow {
+        width: 6px; height: 60px;
+        background: var(--lime);
+        margin: 0 auto 24px;
+        opacity: 0;
+        position: relative;
+      }
+      .flow-arrow::after {
+        content: '';
+        position: absolute; left: 50%; bottom: -10px;
+        width: 0; height: 0;
+        border-left: 18px solid transparent;
+        border-right: 18px solid transparent;
+        border-top: 22px solid var(--lime);
+        transform: translateX(-50%);
+      }
+      .done-stamp {
+        position: absolute;
+        right: 70px; top: 220px;
+        font-family: 'Bebas Neue', sans-serif;
+        background: var(--lime); color: #000;
+        font-size: 48px; padding: 16px 30px;
+        border: 4px solid #000;
+        border-radius: 999px;
+        letter-spacing: 5px;
+        transform: rotate(-8deg);
+        opacity: 0;
+      }
+
+      /* ===================================================== */
+      /* SCENE 8 — Outro (20.0 – 25.0s) */
+      /* ===================================================== */
+      .s8 { background: #000; }
+      .s8 .word { font-family: 'Bebas Neue', sans-serif; font-size: 200px; color: #fff; letter-spacing: 6px; line-height: 1; }
+      .s8 .bar { width: 0; height: 18px; background: var(--lime); margin: 30px 0 50px; }
+      .s8 .tag { font-size: 50px; color: #cfcfcf; font-weight: 600; max-width: 900px; line-height: 1.25; padding: 0 60px; }
+      .s8 .url { font-family: 'Bebas Neue', sans-serif; font-size: 50px; color: var(--lime); margin-top: 50px; letter-spacing: 6px; font-weight: 600; }
+      .s8 .stamp {
+        margin-top: 36px;
+        font-size: 30px; color: #888; letter-spacing: 4px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="25"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- MUSIC -->
+      <audio
+        id="music"
+        data-start="0"
+        data-duration="25"
+        data-track-index="0"
+        data-volume="0.8"
+        src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"
+      ></audio>
+
+      <!-- =================================================== -->
+      <!-- SCENE 1: HOOK (0.0 – 2.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-hook" class="clip s1 center" data-start="0" data-duration="2.0" data-track-index="1">
+        <div class="condensed the" id="s1-the">
+          THE <span class="word" id="s1-word">SECURE</span><span class="cursor" id="s1-cursor">|</span>
+        </div>
+        <div class="condensed bazaar" id="s1-bazaar" style="opacity:0;">P2P BAZAAR</div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 2: KYC + LIVENESS (2.0 – 5.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-kyc" class="clip s2-bg" data-start="2.0" data-duration="3.0" data-track-index="2">
+        <div class="phone-chrome" id="s2-phone">
+          <div class="phone-statusbar">
+            <span>9:41</span>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="phone-navbar">
+            <span class="brand">CRYPTOBAZAAR</span>
+            <div class="menu"><i></i><i></i><i></i></div>
+          </div>
+          <div class="phone-body">
+            <span class="step-pill">STEP 01 OF 03</span>
+            <div class="screen-title">IDENTITY<br/>VERIFICATION</div>
+            <div class="screen-sub">Aadhaar · PAN · Liveness — under 5 minutes.</div>
+            <div class="input-row" id="s2-aadhaar">
+              <div>
+                <div class="label">AADHAAR</div>
+                <div class="val" id="s2-aadhaar-val">XXXX · XXXX · ____</div>
+              </div>
+              <span class="tick" id="s2-aadhaar-tick" style="opacity:0;">✓</span>
+            </div>
+            <div class="input-row" id="s2-pan">
+              <div>
+                <div class="label">PAN</div>
+                <div class="val" id="s2-pan-val">_________</div>
+              </div>
+              <span class="tick" id="s2-pan-tick" style="opacity:0;">✓</span>
+            </div>
+            <div class="liveness-frame" id="s2-liveness">
+              <div class="face"></div>
+              <div class="scanline" id="s2-scanline"></div>
+              <div class="live-badge" id="s2-live"><span class="led"></span>LIVE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 3: BANK STATEMENT (5.0 – 7.5s) -->
+      <!-- =================================================== -->
+      <div id="scene-bank" class="clip s3-bg" data-start="5.0" data-duration="2.5" data-track-index="1">
+        <div class="phone-chrome" id="s3-phone">
+          <div class="phone-statusbar">
+            <span>9:42</span>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="phone-navbar">
+            <span class="brand">CRYPTOBAZAAR</span>
+            <div class="menu"><i></i><i></i><i></i></div>
+          </div>
+          <div class="phone-body">
+            <span class="step-pill">STEP 02 OF 03</span>
+            <div class="screen-title">BANK<br/>STATEMENT</div>
+            <div class="screen-sub">6 months. Scanned for red flags. Never stored.</div>
+            <div class="upload-card">
+              <div class="file-row">
+                <div class="file-icon"></div>
+                <div>
+                  <div>BANK_STATEMENT_6MO.PDF</div>
+                  <div style="font-size:22px;color:#555;font-weight:600;margin-top:6px;">2.4 MB · uploaded</div>
+                </div>
+              </div>
+              <div class="scan-label">
+                <span>SCANNING…</span>
+                <span class="red-flags" id="s3-flags-label" style="opacity:0;">0 RED FLAGS</span>
+              </div>
+              <div class="scan-bar">
+                <div class="scan-fill" id="s3-scan-fill"></div>
+              </div>
+              <div style="font-size:24px;color:#555;font-weight:700;letter-spacing:2px;">
+                INCOME · CASH-FLOW · COUNTERPARTIES
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 4: QUESTIONNAIRE (7.5 – 10.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-quiz" class="clip s4-bg" data-start="7.5" data-duration="2.5" data-track-index="2">
+        <div class="phone-chrome" id="s4-phone">
+          <div class="phone-statusbar">
+            <span>9:43</span>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="phone-navbar">
+            <span class="brand">CRYPTOBAZAAR</span>
+            <div class="menu"><i></i><i></i><i></i></div>
+          </div>
+          <div class="phone-body">
+            <span class="step-pill">STEP 03 OF 03</span>
+            <div class="screen-title">QUICK<br/>SCREENING</div>
+            <div class="screen-sub">10 short questions on your trading background.</div>
+            <div class="quiz-card">
+              <div class="qnum">QUESTION 05 / 10</div>
+              <div class="qtext">How long have you been trading crypto?</div>
+              <div class="quiz-opt" id="s4-opt1"><span class="dot"></span>Less than 6 months</div>
+              <div class="quiz-opt" id="s4-opt2"><span class="dot"></span>6 months – 2 years</div>
+              <div class="quiz-opt" id="s4-opt3"><span class="dot"></span>Over 2 years</div>
+            </div>
+            <div style="text-align:center;">
+              <span class="approved-stamp" id="s4-approved">✓ APPROVED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 5: MARKETPLACE — pick an offer (10.0 – 13.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-marketplace" class="clip s5-bg" data-start="10.0" data-duration="3.0" data-track-index="1">
+        <div class="phone-chrome" id="s5-phone">
+          <div class="phone-statusbar">
+            <span>9:44</span>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="phone-navbar">
+            <span class="brand">CRYPTOBAZAAR</span>
+            <div class="menu"><i></i><i></i><i></i></div>
+          </div>
+          <div class="phone-body">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:0.95;color:#000;margin-bottom:24px;">MARKETPLACE</div>
+            <div class="mkt-tabs">
+              <span class="mkt-tab active">BUY USDT</span>
+              <span class="mkt-tab">SELL USDT</span>
+              <span class="mkt-tab">USDC</span>
+            </div>
+            <div class="order-card" id="s5-c1">
+              <div class="who">
+                <span class="seller">@rohan.eth</span>
+                <span class="verified">✓ VERIFIED · 142 TRADES</span>
+              </div>
+              <div class="price-block">
+                <div class="price">₹83.40</div>
+                <div class="amount">500 – 50,000 USDT</div>
+              </div>
+              <div class="buy">BUY</div>
+            </div>
+            <div class="order-card" id="s5-c2" style="border-color: #000; outline: 6px solid var(--lime); outline-offset: 0px;">
+              <div class="who">
+                <span class="seller">@nikita.sol</span>
+                <span class="verified">✓ VERIFIED · 87 TRADES</span>
+              </div>
+              <div class="price-block">
+                <div class="price">₹83.55</div>
+                <div class="amount">100 – 20,000 USDT</div>
+              </div>
+              <div class="buy">BUY</div>
+            </div>
+            <div class="order-card" id="s5-c3">
+              <div class="who">
+                <span class="seller">@arjun.poly</span>
+                <span class="verified">✓ VERIFIED · 311 TRADES</span>
+              </div>
+              <div class="price-block">
+                <div class="price">₹83.62</div>
+                <div class="amount">2,000 – 100,000 USDT</div>
+              </div>
+              <div class="buy">BUY</div>
+            </div>
+          </div>
+        </div>
+        <div class="cursor-dot" id="s5-cursor"></div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 6: ESCROW LOCK (13.0 – 16.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-escrow" class="clip s6-bg" data-start="13.0" data-duration="3.0" data-track-index="2">
+        <div class="phone-chrome" id="s6-phone" style="background:#0a0a0a;color:#fff;border-color:var(--lime);">
+          <div class="phone-statusbar" style="color:#fff;">
+            <span>9:45</span>
+            <div class="dots"><span style="background:var(--lime);"></span><span style="background:var(--lime);"></span><span style="background:var(--lime);"></span></div>
+          </div>
+          <div class="phone-navbar" style="border-bottom-color:var(--lime);">
+            <span class="brand" style="color:var(--lime);">CRYPTOBAZAAR</span>
+            <div class="menu"><i style="background:var(--lime);"></i><i style="background:var(--lime);"></i><i style="background:var(--lime);"></i></div>
+          </div>
+          <div class="phone-body" style="color:#fff;">
+            <div class="trade-card" style="margin-top:0;">
+              <div class="tnum">TRADE #1247 · BUYING</div>
+              <div class="tcoin">2,000 USDT · POLYGON</div>
+              <div class="status-row" id="s6-row1">
+                <div class="pulse" id="s6-pulse1"></div>
+                <div class="label" id="s6-label1">LOCKING ESCROW…</div>
+              </div>
+              <div class="status-row" id="s6-row2" style="opacity:0;">
+                <div class="pulse green"></div>
+                <div class="label" style="color: var(--lime);">ESCROW LOCKED ✓</div>
+              </div>
+              <div class="tx-hash" id="s6-tx" style="opacity:0;">
+                0x8af4…b21c · POLYGONSCAN
+              </div>
+            </div>
+            <div class="escrow-banner" id="s6-banner">
+              CRYPTO LOCKED ON-CHAIN
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 7: INR PAID + AUTO-RELEASE (16.0 – 20.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-flow" class="clip s7-bg" data-start="16.0" data-duration="4.0" data-track-index="1">
+        <div class="phone-chrome" id="s7-phone">
+          <div class="phone-statusbar">
+            <span>9:46</span>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="phone-navbar">
+            <span class="brand">CRYPTOBAZAAR</span>
+            <div class="menu"><i></i><i></i><i></i></div>
+          </div>
+          <div class="phone-body">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:0.95;color:#000;margin-bottom:32px;">SETTLEMENT</div>
+
+            <div class="flow-card" id="s7-card1">
+              <div class="icon">₹</div>
+              <div class="body">
+                <div class="head-row">
+                  <span class="kicker">INR · BANK TRANSFER</span>
+                  <span class="check" id="s7-check1" style="opacity:0;">✓</span>
+                </div>
+                <div class="amount">₹1,67,100</div>
+                <div class="detail">Sent buyer → seller · UPI / IMPS</div>
+              </div>
+            </div>
+
+            <div class="flow-arrow" id="s7-arrow"></div>
+
+            <div class="flow-card dark" id="s7-card2">
+              <div class="icon" style="background:#000;color:var(--lime);border-color:var(--lime);">⌧</div>
+              <div class="body">
+                <div class="head-row">
+                  <span class="kicker">SMART CONTRACT · AUTO-RELEASE</span>
+                  <span class="check" id="s7-check2" style="opacity:0;">✓</span>
+                </div>
+                <div class="amount">2,000 USDT</div>
+                <div class="detail">0x8af4…b21c · settled on Polygon</div>
+              </div>
+            </div>
+
+            <div style="text-align:center;margin-top:24px;font-family:'Bebas Neue',sans-serif;font-size:36px;color:#000;letter-spacing:4px;opacity:0;" id="s7-time">
+              SETTLED IN 4 MINUTES · 13 SECONDS
+            </div>
+          </div>
+          <div class="done-stamp" id="s7-done">SETTLED</div>
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- SCENE 8: OUTRO (20.0 – 25.0s) -->
+      <!-- =================================================== -->
+      <div id="scene-outro" class="clip s8 center" data-start="20.0" data-duration="5.0" data-track-index="2">
+        <div class="word" id="s8-word" style="opacity:0;">CRYPTOBAZAAR</div>
+        <div class="bar" id="s8-bar"></div>
+        <div class="tag" id="s8-tag" style="opacity:0;">Locked in code. Not in our wallets.</div>
+        <div class="url" id="s8-url" style="opacity:0;">CRYPTOBAZAAR.CO.IN</div>
+        <div class="stamp" id="s8-stamp" style="opacity:0;">EVERY MEMBER VERIFIED · EVERY TRADE IN ESCROW</div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Deterministic PRNG (mulberry32)
+      function mulberry32(a) {
+        return function() {
+          let t = (a += 0x6D2B79F5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rng = mulberry32(0xC0FFEE);
+
+      /* ============== SCENE 1: HOOK (0 – 2.0s) ============== */
+      tl.fromTo("#s1-the", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.15);
+      tl.to({}, { duration: 0.4, onStart: () => { const el = document.getElementById('s1-word'); if (el) el.textContent = 'SECURE'; }}, 0.20);
+      tl.to({}, { duration: 0.4, onStart: () => { const el = document.getElementById('s1-word'); if (el) el.textContent = 'PROTECTED'; }}, 0.65);
+      tl.to({}, { duration: 0.4, onStart: () => { const el = document.getElementById('s1-word'); if (el) el.textContent = 'TRUSTED'; }}, 1.10);
+      tl.to("#s1-cursor", { opacity: 0, duration: 0.25, repeat: 4, yoyo: true, ease: "steps(1)" }, 0.2);
+      // beat-locked: 1.60s — BAZAAR slam
+      tl.fromTo("#s1-bazaar",
+        { opacity: 0, scale: 1.4, filter: "blur(20px)" },
+        { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.4, ease: "expo.out" },
+        1.55
+      );
+      tl.to("#s1-bazaar", { textShadow: "0 0 80px rgba(212,255,0,0.6)", duration: 0.4 }, 1.6);
+
+      /* ============== SCENE 2: KYC + LIVENESS (2.0 – 5.0s) ============== */
+      tl.fromTo("#s2-phone",
+        { opacity: 0, y: 120, scale: 0.92 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" },
+        2.05
+      );
+      // Aadhaar fills in
+      tl.to({}, { duration: 0.001, onStart: () => { const el = document.getElementById('s2-aadhaar-val'); if (el) el.textContent = 'XXXX · XXXX · 4521'; }}, 2.55);
+      tl.fromTo("#s2-aadhaar-tick", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 2.65);
+      // PAN fills in
+      tl.to({}, { duration: 0.001, onStart: () => { const el = document.getElementById('s2-pan-val'); if (el) el.textContent = 'ABCDE · 1234F'; }}, 2.95);
+      tl.fromTo("#s2-pan-tick", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 3.05);
+      // Liveness scanline sweep
+      tl.fromTo("#s2-scanline", { top: "0%" }, { top: "100%", duration: 1.0, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.35);
+      // LIVE badge lights up — beat-locked: 4.23s
+      tl.fromTo("#s2-live", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 4.15);
+
+      /* ============== SCENE 3: BANK STATEMENT (5.0 – 7.5s) ============== */
+      tl.fromTo("#s3-phone",
+        { opacity: 0, x: 200 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" },
+        5.05
+      );
+      // Scan progress 0 → 100
+      tl.fromTo("#s3-scan-fill", { width: "0%" }, { width: "100%", duration: 1.5, ease: "power1.inOut" }, 5.55);
+      // beat-locked: 6.86s — red flags = 0 result lights up
+      tl.fromTo("#s3-flags-label", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 7.05);
+
+      /* ============== SCENE 4: QUESTIONNAIRE (7.5 – 10.0s) ============== */
+      tl.fromTo("#s4-phone",
+        { opacity: 0, y: 120, scale: 0.92 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.6)" },
+        7.55
+      );
+      // Option highlight cascade then settle on opt2
+      tl.to("#s4-opt1", { className: "+=hover", duration: 0.001, onStart: () => {} }, 8.0);
+      tl.to("#s4-opt2", { backgroundColor: "#D4FF00", duration: 0.2, ease: "power2.out", onStart: function(){
+        const dot = document.querySelector('#s4-opt2 .dot'); if (dot) dot.style.background = '#000';
+      }}, 8.3);
+      // beat-locked: 9.50s — APPROVED stamp
+      tl.fromTo("#s4-approved",
+        { opacity: 0, scale: 2, rotate: -8 },
+        { opacity: 1, scale: 1, rotate: 0, duration: 0.4, ease: "back.out(2)" },
+        9.30
+      );
+
+      /* ============== SCENE 5: MARKETPLACE (10.0 – 13.0s) ============== */
+      tl.fromTo("#s5-phone",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" },
+        10.05
+      );
+      // Cards cascade in
+      tl.fromTo("#s5-c1", { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.28 }, 10.35);
+      tl.fromTo("#s5-c2", { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.28 }, 10.55);
+      tl.fromTo("#s5-c3", { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.28 }, 10.75);
+      // Cursor flies in and lands on c2
+      tl.fromTo("#s5-cursor",
+        { opacity: 0, left: 900, top: 400 },
+        { opacity: 1, left: 540, top: 1180, duration: 0.7, ease: "power3.inOut" },
+        11.20
+      );
+      // Click — pulse on c2 + bump scale
+      tl.to("#s5-c2", { scale: 1.04, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 11.95);
+      tl.to("#s5-cursor", { scale: 0.7, duration: 0.1, yoyo: true, repeat: 1 }, 11.95);
+
+      /* ============== SCENE 6: ESCROW LOCK (13.0 – 16.0s) ============== */
+      tl.fromTo("#s6-phone",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" },
+        13.05
+      );
+      // Pulse on the "locking…" indicator
+      tl.to("#s6-pulse1", { opacity: 0.4, duration: 0.35, repeat: 3, yoyo: true, ease: "sine.inOut" }, 13.5);
+      // beat-locked: ~14.5s — lock click, status flips
+      tl.to("#s6-row1", { opacity: 0.35, duration: 0.2 }, 14.40);
+      tl.fromTo("#s6-row2", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(1.8)" }, 14.50);
+      tl.fromTo("#s6-tx", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 14.85);
+      // Big banner
+      tl.fromTo("#s6-banner",
+        { opacity: 0, scale: 1.25 },
+        { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" },
+        15.20
+      );
+
+      /* ============== SCENE 7: SETTLEMENT (16.0 – 20.0s) ============== */
+      tl.fromTo("#s7-phone",
+        { opacity: 0, scale: 0.94 },
+        { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" },
+        16.05
+      );
+      // INR card slides in
+      tl.fromTo("#s7-card1", { opacity: 0, x: -120 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 16.35);
+      tl.fromTo("#s7-check1", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 16.95);
+      // Arrow draws
+      tl.fromTo("#s7-arrow", { opacity: 0, scaleY: 0, transformOrigin: "top" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 17.25);
+      // USDT card slides in
+      tl.fromTo("#s7-card2", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 17.65);
+      tl.fromTo("#s7-check2", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 18.25);
+      // Time stamp
+      tl.to("#s7-time", { opacity: 1, duration: 0.3 }, 18.55);
+      // SETTLED stamp slams in
+      tl.fromTo("#s7-done", { opacity: 0, scale: 2.4, rotate: -25 }, { opacity: 1, scale: 1, rotate: -8, duration: 0.35, ease: "back.out(2)" }, 18.85);
+
+      /* ============== SCENE 8: OUTRO (20.0 – 25.0s) ============== */
+      tl.fromTo("#s8-word",
+        { opacity: 0, y: 40, filter: "blur(8px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.55, ease: "power3.out" },
+        20.20
+      );
+      // beat-locked: ~22.65s — logo lockup completes
+      tl.to("#s8-bar", { width: 600, duration: 0.55, ease: "power2.inOut" }, 20.85);
+      tl.fromTo("#s8-tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 21.50);
+      tl.fromTo("#s8-url", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 22.10);
+      tl.fromTo("#s8-stamp", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 22.80);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

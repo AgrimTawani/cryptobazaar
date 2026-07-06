@@ -33,7 +33,7 @@ const escrowContract = getContract({ client: thirdwebClient, chain: amoyChain, a
 const usdcContract = getContract({ client: thirdwebClient, chain: amoyChain, address: USDC_ADDR });
 
 type Step = "form" | "review" | "approving" | "creating" | "saving" | "done" | "error";
-type PaymentMethod = "UPI" | "IMPS" | "NEFT";
+type PaymentMethod = "UPI" | "IMPS" | "NEFT" | "CDM";
 
 const STEPS: { key: Step; label: string }[] = [
   { key: "approving", label: "Approving USDC" },
@@ -82,6 +82,7 @@ export default function SellPage() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(["UPI"]);
   const [partialAllowed, setPartialAllowed] = useState(false);
   const [minOrderAmount, setMinOrderAmount] = useState("");
+  const [isF2F, setIsF2F] = useState(false);
   const [step, setStep] = useState<Step>("form");
   const [errorMsg, setErrorMsg] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -176,6 +177,7 @@ export default function SellPage() {
           paymentMethods,
           partialAllowed,
           minOrderAmount: partialAllowed ? parseFloat(minOrderAmount) : null,
+          isF2F,
         }),
       });
       if (!saveRes.ok) {
@@ -308,6 +310,7 @@ export default function SellPage() {
                 ["Total value", `₹${totalInr ? parseFloat(totalInr).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}`],
                 ["Payment methods", paymentMethods.join(", ")],
                 ["Partial orders", partialAllowed ? `Yes — min ${minOrderAmount} USDC` : "No (full order only)"],
+                ["Face-to-face", isF2F ? "Yes — in-person cash" : "No"],
                 ...(profilePayment?.upiId ? [["UPI ID", profilePayment.upiId]] : []),
                 ...(profilePayment?.bankAccount ? [["Bank account", profilePayment.bankAccount], ["IFSC", profilePayment.ifscCode ?? ""]] : []),
               ].map(([k, v]) => (
@@ -408,6 +411,31 @@ export default function SellPage() {
             )}
           </div>
 
+          {/* Face-to-face toggle */}
+          <div>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block">
+                  Face-to-Face (F2F)
+                </label>
+                <p className="font-sans text-xs text-[#999] mt-0.5">
+                  In-person cash handover. Shows in the F2F tab of the marketplace.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsF2F((p) => !p)}
+                className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer border-0 shrink-0 p-0 ${
+                  isF2F ? "bg-[#7b3fe4]" : "bg-[#e5e5e5]"
+                }`}
+              >
+                <span className={`absolute top-[2px] left-[2px] w-5 h-5 rounded-full bg-white shadow transition-all ${
+                  isF2F ? "translate-x-6" : "translate-x-0"
+                }`} />
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="font-sans text-sm font-semibold text-[#333] uppercase tracking-widest block mb-2">
               Price per USDC (₹)
@@ -452,7 +480,7 @@ export default function SellPage() {
               Accepted Payment Methods
             </label>
             <div className="flex gap-2">
-              {(["UPI", "IMPS", "NEFT"] as PaymentMethod[])
+              {(["UPI", "IMPS", "NEFT", "CDM"] as PaymentMethod[])
                 .filter((m) => m !== "UPI" || !!profilePayment?.upiId)
                 .map((method) => (
                   <button key={method} type="button" onClick={() => togglePayment(method)}

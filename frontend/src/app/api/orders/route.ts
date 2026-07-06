@@ -20,6 +20,7 @@ function mapOrder(o: {
   id: string; orderId: string; asset: string; chain: string;
   amount: { toString(): string }; pricePerUnit: { toString(): string };
   totalValueInr: { toString(): string }; acceptedPaymentMethods: string[];
+  isF2F: boolean;
   escrowTxHash: string | null; escrowContractAddress: string | null;
   status: string; sellerId: number;
   partialAllowed: boolean;
@@ -49,6 +50,7 @@ function mapOrder(o: {
     pricePerUnit: o.pricePerUnit.toString(),
     totalValueInr: o.totalValueInr.toString(),
     acceptedPaymentMethods: o.acceptedPaymentMethods,
+    isF2F: o.isF2F,
     escrowTxHash: o.escrowTxHash ?? null,
     escrowContractAddress: o.escrowContractAddress ?? null,
     status: o.status,
@@ -93,6 +95,7 @@ export async function GET(request: Request) {
           pricePerUnit: o.pricePerUnit.toString(),
           totalValueInr: o.totalValueInr.toString(),
           acceptedPaymentMethods: o.acceptedPaymentMethods,
+          isF2F: o.isF2F,
           escrowTxHash: o.escrowTxHash ?? null,
           escrowContractAddress: o.escrowContractAddress ?? null,
           status: o.status,
@@ -149,7 +152,7 @@ export async function POST(request: Request) {
     const {
       orderId, chain, asset, amount, pricePerUnit,
       escrowTxHash, escrowContractAddress, paymentMethods,
-      partialAllowed, minOrderAmount,
+      partialAllowed, minOrderAmount, isF2F,
     } = body;
 
     const amountNum = parseFloat(amount);
@@ -165,6 +168,7 @@ export async function POST(request: Request) {
         pricePerUnit: priceNum,
         totalValueInr: amountNum * priceNum,
         acceptedPaymentMethods: paymentMethods,
+        isF2F: isF2F ?? false,
         escrowContractAddress: escrowContractAddress ?? null,
         escrowTxHash: escrowTxHash ?? null,
         sellerUpiId: user.upiId ?? null,

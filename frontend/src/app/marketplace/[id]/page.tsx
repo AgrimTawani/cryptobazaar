@@ -73,6 +73,7 @@ interface OrderDetail {
   pricePerUnit: string;
   totalValueInr: string;
   acceptedPaymentMethods: string[];
+  isF2F: boolean;
   status: string;
   escrowTxHash: string | null;
   utr: string | null;
@@ -301,6 +302,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
   const [screenshotUploading, setScreenshotUploading] = useState(false);
   const [screenshotUploaded, setScreenshotUploaded] = useState(false);
   const [screenshotFileName, setScreenshotFileName] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState<string | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
   const [buyAmount, setBuyAmount] = useState<string>("");
@@ -380,6 +382,8 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     try {
       const form = new FormData();
       form.append("file", file);
+      const method = payMethod ?? (order?.acceptedPaymentMethods.length === 1 ? order.acceptedPaymentMethods[0] : null);
+      if (method === "CDM") form.append("kind", "cdm");
       const res = await fetch(`/api/orders/${id}/payment-proof`, { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Upload failed"); return; }
@@ -420,6 +424,10 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
     } catch (e: unknown) { setError(e instanceof Error ? e.message : "Something went wrong"); }
     finally { setBusy(null); }
   };
+
+  // Effective buyer payment method — explicit pick, else the sole accepted method
+  const effectivePayMethod = payMethod
+    ?? (order?.acceptedPaymentMethods.length === 1 ? order.acceptedPaymentMethods[0] : null);
 
   if (loading) return <LoadingSpinner />;
   if (accessDenied) {
@@ -721,6 +729,28 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                     )}
                   </div>
 
+                  {/* Payment method selector — determines how proof is stored (CDM receipt vs screenshot) */}
+                  <div className="mb-3">
+                    <p className="font-sans text-xs text-[#999] uppercase tracking-widest mb-1.5">Payment method used</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {order.acceptedPaymentMethods.map((m) => (
+                        <button key={m} type="button"
+                          onClick={() => {
+                            if (m === effectivePayMethod) return;
+                            setPayMethod(m);
+                            // switching method invalidates any uploaded proof (different storage column)
+                            setScreenshotUploaded(false); setScreenshotFileName(null);
+                            if (screenshotInputRef.current) screenshotInputRef.current.value = "";
+                          }}
+                          className={`py-1.5 px-4 rounded-full border-[1.5px] font-sans text-sm font-medium cursor-pointer transition-colors ${
+                            effectivePayMethod === m ? "border-[#7b3fe4] bg-[#7b3fe4] text-white" : "border-[#e5e5e5] bg-white text-[#555]"
+                          }`}>
+                          {m === "CDM" ? "CDM (Cash Deposit)" : m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mb-3">
                     <div onClick={() => !screenshotUploaded && !screenshotUploading && screenshotInputRef.current?.click()}
                       className={`border-[1.5px] border-dashed rounded-lg py-3 px-4 text-center transition-colors ${
@@ -744,7 +774,9 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                         </div>
                       ) : (
                         <>
-                          <p className="font-sans text-sm font-semibold text-[#333]">Upload payment screenshot</p>
+                          <p className="font-sans text-sm font-semibold text-[#333]">
+                            {effectivePayMethod === "CDM" ? "Upload CDM deposit receipt" : "Upload payment screenshot"}
+                          </p>
                           <p className="font-sans text-xs text-[#aaa]">PNG, JPG or WebP · max 5MB</p>
                         </>
                       )}
@@ -763,7 +795,7 @@ export default function TradePage({ params }: { params: Promise<{ id: string }> 
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => run("markPaid", async () => {
                       await sendTx(prepareContractCall({ contract: escrowContract, method: "function markPaid(uint256 id)", params: [onChainId] }));
-                    })} disabled={!!busy || !walletOk || !chainOk || !utrInput.trim() || !screenshotUploaded}
+                    }, { paymentMethod: effectivePayMethod ?? undefined })} disabled={!!busy || !walletOk || !chainOk || !utrInput.trim() || !screenshotUploaded || !effectivePayMethod}
                       className="py-3 bg-lime text-black font-sans font-bold text-sm rounded-lg cursor-pointer transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] disabled:opacity-40">
                       {busy === "markPaid" ? "Submitting…" : "✓  I Have Paid"}
                     </button>
