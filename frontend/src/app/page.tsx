@@ -724,7 +724,7 @@ export default function Home() {
           {/* CTA */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link
-              href="/login"
+              href="/waitlist"
               className="cta-primary"
             >
               JOIN THE WAITLIST

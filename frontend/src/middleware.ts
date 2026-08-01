@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
-const isPublicRoute = createRouteMatcher(['/', '/login(.*)', '/sso-callback(.*)', '/terms(.*)', '/articles(.*)', '/api/webhooks/(.*)', '/marketplace', '/api/orders', '/api/stats(.*)', '/opengraph-image(.*)', '/twitter-image(.*)'])
+const isPublicRoute = createRouteMatcher(['/', '/login(.*)', '/sso-callback(.*)', '/terms(.*)', '/articles(.*)', '/api/webhooks/(.*)', '/marketplace', '/waitlist(.*)', '/api/waitlist(.*)', '/api/orders', '/api/stats(.*)', '/opengraph-image(.*)', '/twitter-image(.*)'])
 
 export const middleware = clerkMiddleware(async (auth, request) => {
   const url = request.nextUrl.clone();

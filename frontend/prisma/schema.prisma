@@ -220,6 +220,16 @@ model PushSubscription {
   @@map("push_subscriptions")
 }
 
+// Public membership waitlist — lightweight email capture, no auth required.
+model WaitlistEntry {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  source    String?  @default("membership")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("waitlist_entries")
+}
+
 model OnboardingRecord {
   userId          Int                   @map("user_id")
   layer           OnboardingLayer
