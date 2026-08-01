@@ -296,7 +296,7 @@ export default function Waitlist() {
                     <button
                       type="submit"
                       disabled={status === "loading"}
-                      className="cta-primary !px-8 min-h-[52px] inline-flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="shrink-0 inline-flex items-center justify-center gap-2 h-[52px] px-8 rounded-full border border-black bg-black text-white font-condensed text-[1.2rem] tracking-[0.05em] whitespace-nowrap transition-all duration-300 hover:bg-lime hover:text-black hover:border-lime hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-black disabled:hover:text-white disabled:hover:border-black"
                     >
                       {status === "loading" ? (
                         <>
@@ -306,7 +306,7 @@ export default function Waitlist() {
                       ) : (
                         <>
                           Join
-                          <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                          <ArrowRight className="w-[18px] h-[18px]" aria-hidden="true" />
                         </>
                       )}
                     </button>
